@@ -10,12 +10,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ScrollableTabRow
 import androidx.compose.material3.Snackbar
@@ -24,6 +20,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -35,6 +32,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.imageviewer.R
 import com.imageviewer.ui.components.ImageGridItem
 import com.imageviewer.ui.components.SearchBar
@@ -59,8 +58,19 @@ fun ImageGridScreen(
 
     var showFullscreen by remember { mutableStateOf(false) }
     var fullscreenIndex by remember { mutableStateOf(0) }
+    var shouldRefresh by remember { mutableStateOf(false) }
 
     val categories = listOf("All", "Screenshots", "Camera", "Downloads", "Other")
+    val swipeRefreshState = rememberSwipeRefreshState(isRefreshing = isLoading)
+
+    // Auto-refresh after copy with delay for smooth UX
+    LaunchedEffect(shouldRefresh) {
+        if (shouldRefresh) {
+            kotlinx.coroutines.delay(300) // Small delay to avoid jarring refresh
+            viewModel.refreshIndex()
+            shouldRefresh = false
+        }
+    }
 
     if (showFullscreen) {
         FullscreenImageViewer(
@@ -73,6 +83,7 @@ fun ImageGridScreen(
                         message = context.getString(R.string.path_copied)
                     )
                 }
+                shouldRefresh = true
             }
         )
     } else {
@@ -97,84 +108,81 @@ fun ImageGridScreen(
                     onQueryChange = { viewModel.searchImages(it) }
                 )
 
-                Box(modifier = Modifier.fillMaxSize()) {
-                when {
-                    isLoading && images.isEmpty() -> {
-                        Box(
-                            modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                CircularProgressIndicator()
-                                Text(
-                                    text = stringResource(R.string.loading),
-                                    modifier = Modifier.padding(top = 16.dp),
-                                    style = MaterialTheme.typography.bodyMedium
-                                )
-                            }
-                        }
-                    }
-                    images.isEmpty() -> {
-                        Box(
-                            modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = stringResource(R.string.no_images_found),
-                                style = MaterialTheme.typography.bodyLarge
-                            )
-                        }
-                    }
-                    else -> {
-                        LazyVerticalGrid(
-                            columns = GridCells.Fixed(3),
-                            contentPadding = PaddingValues(8.dp),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-                            verticalArrangement = Arrangement.spacedBy(8.dp),
-                            modifier = Modifier.fillMaxSize()
-                        ) {
-                            itemsIndexed(images, key = { _, image -> image.id }) { index, image ->
-                                ImageGridItem(
-                                    image = image,
-                                    onClick = {
-                                        fullscreenIndex = index
-                                        showFullscreen = true
-                                    },
-                                    onCopyClick = {
-                                        ClipboardHelper.copyToClipboard(context, image.path)
-                                        scope.launch {
-                                            snackbarHostState.showSnackbar(
-                                                message = context.getString(R.string.path_copied)
-                                            )
-                                        }
+                SwipeRefresh(
+                    state = swipeRefreshState,
+                    onRefresh = { viewModel.refreshIndex() },
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    Box(modifier = Modifier.fillMaxSize()) {
+                        when {
+                            isLoading && images.isEmpty() -> {
+                                Box(
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                        CircularProgressIndicator()
+                                        Text(
+                                            text = stringResource(R.string.loading),
+                                            modifier = Modifier.padding(top = 16.dp),
+                                            style = MaterialTheme.typography.bodyMedium
+                                        )
                                     }
-                                )
+                                }
+                            }
+                            images.isEmpty() -> {
+                                Box(
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text(
+                                        text = stringResource(R.string.no_images_found),
+                                        style = MaterialTheme.typography.bodyLarge
+                                    )
+                                }
+                            }
+                            else -> {
+                                LazyVerticalGrid(
+                                    columns = GridCells.Fixed(3),
+                                    contentPadding = PaddingValues(8.dp),
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                                    modifier = Modifier.fillMaxSize()
+                                ) {
+                                    itemsIndexed(images, key = { _, image -> image.id }) { index, image ->
+                                        ImageGridItem(
+                                            image = image,
+                                            onClick = {
+                                                fullscreenIndex = index
+                                                showFullscreen = true
+                                            },
+                                            onCopyClick = {
+                                                ClipboardHelper.copyToClipboard(context, image.path)
+                                                scope.launch {
+                                                    snackbarHostState.showSnackbar(
+                                                        message = context.getString(R.string.path_copied)
+                                                    )
+                                                }
+                                                shouldRefresh = true
+                                            }
+                                        )
+                                    }
+                                }
                             }
                         }
                     }
                 }
             }
-        }
 
-        // Refresh FAB
-        FloatingActionButton(
-            onClick = { viewModel.refreshIndex() },
-            modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .padding(16.dp)
-        ) {
-            Icon(Icons.Default.Refresh, contentDescription = "Refresh")
+            SnackbarHost(
+                hostState = snackbarHostState,
+                modifier = Modifier.align(Alignment.BottomCenter)
+            ) { data ->
+                Snackbar(
+                    snackbarData = data,
+                    modifier = Modifier.padding(16.dp)
+                )
+            }
         }
-
-        SnackbarHost(
-            hostState = snackbarHostState,
-            modifier = Modifier.align(Alignment.BottomCenter)
-        ) { data ->
-            Snackbar(
-                snackbarData = data,
-                modifier = Modifier.padding(16.dp)
-            )
-        }
-    }
     }
 }

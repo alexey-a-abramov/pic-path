@@ -83,6 +83,9 @@ dependencies {
     // Coil for Image Loading
     implementation("io.coil-kt:coil-compose:2.5.0")
 
+    // Pull to Refresh
+    implementation("com.google.accompanist:accompanist-swiperefresh:0.32.0")
+
     // Core KTX
     implementation("androidx.core:core-ktx:1.12.0")
 
