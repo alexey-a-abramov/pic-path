@@ -1,137 +1,321 @@
-# Pic Selector - Android App
+# Pic Path - Android Image Path Copier
 
-An Android image selector app built with Kotlin and Jetpack Compose that displays images from device storage with category tabs, fullscreen viewing, and easy path copying.
+<div align="center">
 
-## Features
+**Fast, Simple Image Path Copying for Android**
 
-- **Category Tabs**: Filter images by All, Screenshots (default), Camera, Downloads, or Other
-- **Fullscreen Viewer**: Single tap opens fullscreen view with swipe navigation
-- **Easy Path Copying**: 70% transparent "Copy" button on every image (grid and fullscreen)
-- **Navigation**: Left/right arrows and close button in fullscreen mode
-- **Search**: Real-time search by filename with debouncing
-- **Long Press**: Copy image path to clipboard in any mode
-- **Refresh**: Manual refresh button to re-index images
-- **Modern UI**: Material 3 with Jetpack Compose
-- **Efficient Loading**: Coil for image loading and caching
-- **Local Indexing**: Room database for fast category filtering and search
+Perfect for Claude on Termux - instantly get file paths for image analysis!
 
-## Technical Stack
+[Download APK](https://github.com/YOUR_USERNAME/pic-path/releases) | [Report Bug](https://github.com/YOUR_USERNAME/pic-path/issues) | [Request Feature](https://github.com/YOUR_USERNAME/pic-path/issues)
 
-- **Language**: Kotlin
-- **UI Framework**: Jetpack Compose
-- **Architecture**: MVVM (Model-View-ViewModel)
-- **Minimum SDK**: API 29 (Android 10+)
-- **Target SDK**: API 34
-- **Image Loading**: Coil
-- **Database**: Room
-- **Async**: Kotlin Coroutines + Flow
+</div>
 
-## Project Structure
+---
 
-```
-app/
-├── src/main/
-│   ├── java/com/imageviewer/
-│   │   ├── MainActivity.kt                 # Entry point with permission handling
-│   │   ├── ui/
-│   │   │   ├── ImageGridScreen.kt          # Main screen with grid
-│   │   │   ├── ImageViewerApp.kt           # App root composable
-│   │   │   └── components/
-│   │   │       ├── ImageGridItem.kt        # Grid item with long press
-│   │   │       └── SearchBar.kt            # Search input field
-│   │   ├── viewmodel/
-│   │   │   └── ImageViewModel.kt           # Business logic
-│   │   ├── data/
-│   │   │   ├── model/
-│   │   │   │   └── ImageFile.kt            # Data model
-│   │   │   ├── repository/
-│   │   │   │   └── ImageRepository.kt      # Data source coordinator
-│   │   │   └── database/
-│   │   │       ├── ImageDatabase.kt        # Room database
-│   │   │       └── ImageDao.kt             # Database queries
-│   │   └── util/
-│   │       ├── MediaStoreScanner.kt        # MediaStore integration
-│   │       └── ClipboardHelper.kt          # Clipboard utility
-│   └── AndroidManifest.xml
-└── build.gradle.kts
-```
+## 📱 What is Pic Path?
 
-## Building the Project
+Pic Path is a lightweight Android app designed to make copying image file paths effortless. Built specifically for developers and power users who frequently need to reference image paths - especially when working with AI assistants like Claude in Termux.
 
-### Prerequisites
+### Why Pic Path?
 
-- Android Studio Hedgehog or later
-- JDK 17
-- Android SDK 34
-- Gradle 8.2
+When using Claude (or other AI tools) on Android, you often need to provide image file paths for analysis. Traditional methods are tedious:
+- ❌ Navigating through file managers
+- ❌ Long-pressing to copy paths
+- ❌ Switching between multiple apps
 
-### Build Instructions
+**With Pic Path, it's instant:**
+- ✅ Single tap to copy any image path
+- ✅ Share images directly from any app
+- ✅ Automatic clipboard copy with notification
+- ✅ Works perfectly with Claude on Termux
 
-1. Clone or download the project
-2. Open in Android Studio
-3. Sync Gradle files
-4. Run on device or emulator (Android 10+)
+---
 
-Or use command line:
+## ✨ Features
+
+### 🎯 Core Features
+
+**📂 Category Tabs**
+- Browse images by category: All, Screenshots, Camera, Downloads, Other
+- Screenshots tab set as default (most commonly shared)
+- Fast category switching with Material 3 design
+
+**🖼️ Dual View Modes**
+- **Grid View**: 3-column thumbnail grid for browsing
+- **Fullscreen View**: Single tap opens fullscreen with swipe navigation
+
+**📋 Multiple Copy Methods**
+- **Copy Button**: 70% transparent button on every image (bottom-right)
+- **Long Press**: Press and hold anywhere on image
+- **Share Target**: Share images from any app to auto-copy path
+
+**🔔 Smart Notifications**
+- System notification appears when path is copied
+- Shows filename and full path
+- Persistent in notification shade for later reference
+- Expandable to see full path
+
+**🔄 Auto-Refresh**
+- Pull down to refresh image list
+- Auto-refreshes after each copy operation (300ms delay)
+- Smooth updates without UI blinking
+
+**🎨 Modern UI**
+- Material 3 design language
+- Custom app icon
+- Smooth animations throughout
+- Dark background for fullscreen viewing
+
+---
+
+## 🚀 Usage
+
+### Method 1: Browse and Copy
+
+1. Open Pic Path app
+2. Choose category tab (Screenshots, Camera, etc.)
+3. **Single tap** image to open fullscreen
+4. **Tap copy button** or **long press** to copy path
+5. See notification confirming copy
+6. Paste path in Claude on Termux!
+
+### Method 2: Share from Any App (Recommended)
+
+1. Open Gallery, Files, or any app with images
+2. Select an image
+3. Tap **Share** button
+4. Choose **Pic Path** from share menu
+5. Path is **automatically copied**!
+6. Notification appears with the path
+7. Switch to Termux and paste
+
+### Method 3: Search and Copy
+
+1. Open Pic Path
+2. Use search bar at top
+3. Type filename to filter
+4. Tap copy button on result
+5. Path is copied!
+
+---
+
+## 💡 Perfect for Claude on Termux
+
+### Why this works great with Claude:
+
+When running Claude in Termux, you often need to analyze images. Instead of typing long paths:
 
 ```bash
-# Build debug APK
-./gradlew assembleDebug
+# Old way (tedious):
+# Navigate to file manager, find image, copy path manually...
 
-# Install on connected device
-./gradlew installDebug
-
-# Build and install
-./gradlew build installDebug
+# With Pic Path (instant):
+# 1. Share image to Pic Path
+# 2. Path auto-copied to clipboard
+# 3. In Termux, type your command and paste:
+claude analyze /sdcard/DCIM/Camera/IMG_20240226_123456.jpg
 ```
 
-## Permissions
+**Real workflow example:**
+1. Take a screenshot of an error
+2. Tap Share → Pic Path
+3. Path copied automatically with notification
+4. Open Termux
+5. Type: `claude "explain this error" ` and paste path
+6. Done! ⚡
 
-The app requires storage permissions to access images:
-- `READ_MEDIA_IMAGES` (Android 13+)
-- `READ_EXTERNAL_STORAGE` (Android 10-12)
+---
 
-Permissions are requested at runtime on first launch.
+## 📥 Installation
 
-## Usage
+### Option 1: Download APK
+1. Download the latest APK from [Releases](https://github.com/YOUR_USERNAME/pic-path/releases)
+2. Enable "Install from Unknown Sources" if prompted
+3. Tap APK to install
 
-1. **Launch App**: Grant storage permission when prompted
-2. **View Images**: Images load automatically in a 3-column grid
-3. **Search**: Type in the search bar to filter by filename
-4. **Copy Path**: Long press any image to copy its path to clipboard
-5. **Refresh**: Pull down to re-index and refresh the image list
+### Option 2: Build from Source
+```bash
+git clone https://github.com/YOUR_USERNAME/pic-path.git
+cd pic-path
+./gradlew assembleDebug
+adb install app/build/outputs/apk/debug/app-debug.apk
+```
 
-## Key Features Implementation
+---
 
-### Long Press to Copy Path
-- Uses `Modifier.combinedClickable` for gesture handling
-- Copies full file path using system clipboard
-- Shows confirmation snackbar
+## 🛠️ Technical Details
 
-### Search Functionality
-- Real-time search with 300ms debounce
-- Searches against indexed database
-- Case-insensitive filename matching
+### Tech Stack
+- **Language**: Kotlin
+- **UI**: Jetpack Compose with Material 3
+- **Architecture**: MVVM (Model-View-ViewModel)
+- **Database**: Room (for fast image indexing and search)
+- **Image Loading**: Coil (efficient caching)
+- **Async**: Kotlin Coroutines + Flow
+- **Min SDK**: Android 10 (API 29)
+- **Target SDK**: Android 14 (API 34)
 
-### File Indexing
-- Scans MediaStore on app launch
-- Stores metadata in Room database
-- Manual refresh via pull-to-refresh
+### Permissions
+- `READ_MEDIA_IMAGES` (Android 13+) / `READ_EXTERNAL_STORAGE` (Android 10-12)
+- `POST_NOTIFICATIONS` (Android 13+, optional)
 
-### Image Display
-- Lazy loading grid with 3 columns
-- Coil for efficient image loading and caching
-- Filename overlay on each thumbnail
+### Project Structure
+```
+app/src/main/java/com/imageviewer/
+├── MainActivity.kt                    # Entry point, permission handling
+├── ui/
+│   ├── ImageGridScreen.kt            # Main grid view with tabs
+│   ├── FullscreenImageViewer.kt      # Fullscreen image viewer
+│   ├── SharedImageViewer.kt          # Share target handler
+│   └── components/
+│       ├── ImageGridItem.kt          # Grid thumbnail component
+│       └── SearchBar.kt              # Search functionality
+├── viewmodel/
+│   └── ImageViewModel.kt             # Business logic
+├── data/
+│   ├── model/ImageFile.kt            # Image data model
+│   ├── repository/ImageRepository.kt # Data source coordination
+│   └── database/
+│       ├── ImageDatabase.kt          # Room database
+│       └── ImageDao.kt               # Database queries
+└── util/
+    ├── MediaStoreScanner.kt          # MediaStore integration
+    ├── ClipboardHelper.kt            # Clipboard operations
+    ├── NotificationHelper.kt         # Notification management
+    └── UriHelper.kt                  # URI to path conversion
+```
 
-## Libraries Used
+---
 
-- **Jetpack Compose**: Modern declarative UI
-- **Material 3**: Material Design components
-- **Room**: Local database for indexing
-- **Coil**: Image loading and caching
-- **Kotlin Coroutines**: Asynchronous programming
-- **Lifecycle Components**: ViewModel and state management
+## 🎨 Features in Detail
 
-## License
+### Category Detection
+Images are automatically categorized based on their file path:
+- **Screenshots**: `/Pictures/Screenshots/`, `/DCIM/Screenshots/`
+- **Camera**: `/DCIM/Camera/`, `/DCIM/`
+- **Downloads**: `/Download/`, `/Downloads/`
+- **Other**: Everything else
 
-This project is provided as-is for educational and reference purposes.
+### Copy Button Design
+- Position: Bottom-right corner
+- Transparency: 70% (alpha 0.3)
+- Icon: Custom clipboard/copy icon
+- Shape: Circular with white background
+- Size: 36dp (grid), 48dp (fullscreen)
+
+### Notification Details
+- Channel: "Copy Notifications"
+- Priority: Default
+- Auto-cancel: Yes (tap to dismiss)
+- Content: Filename in title, full path in expanded view
+- Icon: Custom copy icon
+
+### Pull-to-Refresh Behavior
+- Trigger: Pull down on image grid
+- Action: Re-scans device storage for new images
+- Updates: Database is updated with new/deleted images
+- UI: Smooth refresh without clearing existing images
+
+---
+
+## 🔧 Configuration
+
+### Changing Default Tab
+Edit `ImageViewModel.kt`:
+```kotlin
+private val _selectedCategory = MutableStateFlow("Screenshots") // Change to "All", "Camera", etc.
+```
+
+### Adjusting Grid Columns
+Edit `ImageGridScreen.kt`:
+```kotlin
+columns = GridCells.Fixed(3) // Change to 2, 4, or adaptive
+```
+
+### Customizing Copy Button Transparency
+Edit `ImageGridItem.kt` and `FullscreenImageViewer.kt`:
+```kotlin
+.background(Color.White.copy(alpha = 0.3f)) // Change alpha value (0.0-1.0)
+```
+
+---
+
+## 🐛 Troubleshooting
+
+### Images Not Showing
+- Grant storage permission when prompted
+- Pull down to refresh the image list
+- Check if images are in standard Android folders (DCIM, Pictures, Download)
+
+### Notification Not Appearing
+- Grant POST_NOTIFICATIONS permission in Android settings
+- Check notification settings for Pic Path
+- Notifications work without permission but won't show system notification
+
+### Share Target Not Appearing
+- Reinstall the app
+- Clear defaults for Gallery/Files app
+- Check that you're sharing an image file (not video)
+
+### Path Shows "null" or Content URI
+- Some apps share images via content:// URIs
+- App attempts to resolve to real path, but not always possible
+- Works best with native Android Gallery and file managers
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! Here's how:
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+---
+
+## 📝 Changelog
+
+### v1.0.0 (2024-02-26)
+- ✨ Initial release
+- 📂 Category tabs (All, Screenshots, Camera, Downloads, Other)
+- 🖼️ Grid and fullscreen view modes
+- 📋 Copy button on all images
+- 🔔 System notifications
+- 🔄 Pull-to-refresh and auto-refresh
+- 📤 Share target from other apps
+- 🎨 Custom Material 3 UI
+- 🔍 Search functionality
+
+---
+
+## 📄 License
+
+This project is open source and available under the [MIT License](LICENSE).
+
+---
+
+## 🙏 Acknowledgments
+
+- Built with [Jetpack Compose](https://developer.android.com/jetpack/compose)
+- Image loading by [Coil](https://coil-kt.github.io/coil/)
+- Database by [Room](https://developer.android.com/training/data-storage/room)
+- Icons from [Material Icons](https://fonts.google.com/icons)
+
+---
+
+## 📧 Contact
+
+Questions or suggestions? Open an issue on GitHub!
+
+---
+
+<div align="center">
+
+**Made with ❤️ for developers who need fast image paths**
+
+*Especially those using Claude on Termux! 🚀*
+
+</div>
