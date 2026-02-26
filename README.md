@@ -6,7 +6,7 @@
 
 Perfect for Claude on Termux - instantly get file paths for image analysis!
 
-[Download APK](https://github.com/YOUR_USERNAME/pic-path/releases) | [Report Bug](https://github.com/YOUR_USERNAME/pic-path/issues) | [Request Feature](https://github.com/YOUR_USERNAME/pic-path/issues)
+[Download APK](https://github.com/alexey-a-abramov/pic-path/releases) | [Report Bug](https://github.com/alexey-a-abramov/pic-path/issues) | [Request Feature](https://github.com/alexey-a-abramov/pic-path/issues)
 
 </div>
 
@@ -129,13 +129,13 @@ claude analyze /sdcard/DCIM/Camera/IMG_20240226_123456.jpg
 ## 📥 Installation
 
 ### Option 1: Download APK
-1. Download the latest APK from [Releases](https://github.com/YOUR_USERNAME/pic-path/releases)
+1. Download the latest APK from [Releases](https://github.com/alexey-a-abramov/pic-path/releases)
 2. Enable "Install from Unknown Sources" if prompted
 3. Tap APK to install
 
 ### Option 2: Build from Source
 ```bash
-git clone https://github.com/YOUR_USERNAME/pic-path.git
+git clone https://github.com/alexey-a-abramov/pic-path.git
 cd pic-path
 ./gradlew assembleDebug
 adb install app/build/outputs/apk/debug/app-debug.apk
