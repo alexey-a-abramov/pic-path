@@ -10,25 +10,25 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import com.imageviewer.R
 import com.imageviewer.data.model.ImageFile
 import com.imageviewer.util.ClipboardHelper
 import kotlinx.coroutines.launch
@@ -78,20 +78,25 @@ fun FullscreenImageViewer(
                     contentScale = ContentScale.Fit
                 )
 
-                // Copy button overlay
-                Button(
+                // Copy button overlay (70% transparent) - bottom right
+                IconButton(
                     onClick = {
                         ClipboardHelper.copyToClipboard(context, image.path)
                         onCopyPath(image.path)
                     },
                     modifier = Modifier
-                        .align(Alignment.BottomCenter)
-                        .padding(bottom = 80.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.White.copy(alpha = 0.3f)
-                    )
+                        .align(Alignment.BottomEnd)
+                        .padding(16.dp)
+                        .size(48.dp)
+                        .clip(CircleShape)
+                        .background(Color.White.copy(alpha = 0.3f))
                 ) {
-                    Text("Copy", color = Color.White)
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_copy),
+                        contentDescription = "Copy path",
+                        tint = Color.White,
+                        modifier = Modifier.size(24.dp)
+                    )
                 }
             }
         }
