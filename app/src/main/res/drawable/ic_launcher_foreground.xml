@@ -1,0 +1,97 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <group
+        android:scaleX="0.8"
+        android:scaleY="0.8"
+        android:translateX="10.8"
+        android:translateY="10.8">
+
+        <!-- Background circle -->
+        <path
+            android:fillColor="#4CAF50"
+            android:pathData="M54,54m-50,0a50,50 0,1 1,100 0a50,50 0,1 1,-100 0"/>
+
+        <!-- Grid of images (3x3 grid representing image thumbnails) -->
+        <!-- Top left image -->
+        <path
+            android:fillColor="#FFFFFF"
+            android:pathData="M28,28 L44,28 L44,44 L28,44 Z"/>
+        <path
+            android:fillColor="#E0E0E0"
+            android:pathData="M30,38 L35,33 L38,36 L42,32 L42,42 L30,42 Z"/>
+
+        <!-- Top middle image -->
+        <path
+            android:fillColor="#FFFFFF"
+            android:pathData="M48,28 L64,28 L64,44 L48,44 Z"/>
+        <path
+            android:fillColor="#E0E0E0"
+            android:pathData="M50,38 L55,33 L58,36 L62,32 L62,42 L50,42 Z"/>
+
+        <!-- Top right image -->
+        <path
+            android:fillColor="#FFFFFF"
+            android:pathData="M68,28 L84,28 L84,44 L68,44 Z"/>
+        <path
+            android:fillColor="#E0E0E0"
+            android:pathData="M70,38 L75,33 L78,36 L82,32 L82,42 L70,42 Z"/>
+
+        <!-- Middle left image -->
+        <path
+            android:fillColor="#FFFFFF"
+            android:pathData="M28,48 L44,48 L44,64 L28,64 Z"/>
+        <path
+            android:fillColor="#E0E0E0"
+            android:pathData="M30,58 L35,53 L38,56 L42,52 L42,62 L30,62 Z"/>
+
+        <!-- Middle center image (highlighted/selected) -->
+        <path
+            android:fillColor="#FFEB3B"
+            android:pathData="M48,48 L64,48 L64,64 L48,64 Z"/>
+        <path
+            android:fillColor="#FBC02D"
+            android:pathData="M50,58 L55,53 L58,56 L62,52 L62,62 L50,62 Z"/>
+
+        <!-- Checkmark on selected image -->
+        <path
+            android:fillColor="#4CAF50"
+            android:strokeWidth="3"
+            android:strokeColor="#4CAF50"
+            android:pathData="M52,56 L55,59 L60,52"/>
+
+        <!-- Middle right image -->
+        <path
+            android:fillColor="#FFFFFF"
+            android:pathData="M68,48 L84,48 L84,64 L68,64 Z"/>
+        <path
+            android:fillColor="#E0E0E0"
+            android:pathData="M70,58 L75,53 L78,56 L82,52 L82,62 L70,62 Z"/>
+
+        <!-- Bottom left image -->
+        <path
+            android:fillColor="#FFFFFF"
+            android:pathData="M28,68 L44,68 L44,84 L28,84 Z"/>
+        <path
+            android:fillColor="#E0E0E0"
+            android:pathData="M30,78 L35,73 L38,76 L42,72 L42,82 L30,82 Z"/>
+
+        <!-- Bottom middle image -->
+        <path
+            android:fillColor="#FFFFFF"
+            android:pathData="M48,68 L64,68 L64,84 L48,84 Z"/>
+        <path
+            android:fillColor="#E0E0E0"
+            android:pathData="M50,78 L55,73 L58,76 L62,72 L62,82 L50,82 Z"/>
+
+        <!-- Bottom right image -->
+        <path
+            android:fillColor="#FFFFFF"
+            android:pathData="M68,68 L84,68 L84,84 L68,84 Z"/>
+        <path
+            android:fillColor="#E0E0E0"
+            android:pathData="M70,78 L75,73 L78,76 L82,72 L82,82 L70,82 Z"/>
+    </group>
+</vector>
