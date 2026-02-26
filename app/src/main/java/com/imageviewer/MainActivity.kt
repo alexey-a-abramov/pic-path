@@ -32,6 +32,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import com.imageviewer.ui.ImageViewerApp
+import com.imageviewer.ui.SharedImageViewer
+import com.imageviewer.util.ClipboardHelper
+import com.imageviewer.util.UriHelper
 import com.imageviewer.viewmodel.ImageViewModel
 
 class MainActivity : ComponentActivity() {
@@ -39,6 +42,8 @@ class MainActivity : ComponentActivity() {
     private val viewModel: ImageViewModel by viewModels()
     private var hasPermission by mutableStateOf(false)
     private var permissionDenied by mutableStateOf(false)
+    private var sharedImageUri by mutableStateOf<Uri?>(null)
+    private var sharedImagePath by mutableStateOf<String?>(null)
 
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -63,6 +68,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        handleIntent(intent)
         checkAndRequestPermission()
 
         setContent {
@@ -71,21 +77,53 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    when {
-                        hasPermission -> {
-                            ImageViewerApp(viewModel = viewModel)
-                        }
-                        permissionDenied -> {
-                            PermissionDeniedScreen(
-                                onOpenSettings = { openAppSettings() }
-                            )
-                        }
-                        else -> {
-                            PermissionRequestScreen(
-                                onRequestPermission = { checkAndRequestPermission() }
-                            )
+                    // Show shared image viewer if there's a shared image
+                    val imageUri = sharedImageUri
+                    if (imageUri != null) {
+                        SharedImageViewer(
+                            imageUri = imageUri,
+                            imagePath = sharedImagePath,
+                            onClose = {
+                                sharedImageUri = null
+                                sharedImagePath = null
+                            }
+                        )
+                    } else {
+                        when {
+                            hasPermission -> {
+                                ImageViewerApp(viewModel = viewModel)
+                            }
+                            permissionDenied -> {
+                                PermissionDeniedScreen(
+                                    onOpenSettings = { openAppSettings() }
+                                )
+                            }
+                            else -> {
+                                PermissionRequestScreen(
+                                    onRequestPermission = { checkAndRequestPermission() }
+                                )
+                            }
                         }
                     }
+                }
+            }
+        }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        handleIntent(intent)
+    }
+
+    private fun handleIntent(intent: Intent?) {
+        if (intent?.action == Intent.ACTION_SEND && intent.type?.startsWith("image/") == true) {
+            (intent.getParcelableExtra<Uri>(Intent.EXTRA_STREAM))?.let { uri ->
+                sharedImageUri = uri
+                sharedImagePath = UriHelper.getPathFromUri(this, uri)
+
+                // Auto-copy the path and show notification
+                sharedImagePath?.let { path ->
+                    ClipboardHelper.copyToClipboard(this, path)
                 }
             }
         }
