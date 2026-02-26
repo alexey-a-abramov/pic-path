@@ -2,6 +2,7 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("org.jetbrains.kotlin.plugin.compose")
+    id("org.jetbrains.kotlin.plugin.serialization") version "2.0.21"
     id("com.google.devtools.ksp")
 }
 
@@ -13,13 +14,16 @@ android {
         applicationId = "com.imageviewer"
         minSdk = 29
         targetSdk = 34
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 2
+        versionName = "1.1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true
         }
+
+        buildConfigField("String", "VERSION_NAME", "\"${versionName}\"")
+        buildConfigField("String", "GITHUB_REPO", "\"alexey-a-abramov/pic-path\"")
     }
 
     buildTypes {
@@ -45,6 +49,7 @@ android {
 
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 
     packaging {
@@ -85,6 +90,12 @@ dependencies {
 
     // Pull to Refresh
     implementation("com.google.accompanist:accompanist-swiperefresh:0.32.0")
+
+    // OkHttp for GitHub API calls
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+
+    // JSON parsing
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.2")
 
     // Core KTX
     implementation("androidx.core:core-ktx:1.12.0")

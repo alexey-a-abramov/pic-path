@@ -66,6 +66,12 @@ When using Claude (or other AI tools) on Android, you often need to provide imag
 - Smooth animations throughout
 - Dark background for fullscreen viewing
 
+**🔄 Auto-Update**
+- Check for updates directly from GitHub
+- One-tap update installation
+- View release notes before updating
+- MIT License - fully open source
+
 ---
 
 ## 🚀 Usage
@@ -96,6 +102,14 @@ When using Claude (or other AI tools) on Android, you often need to provide imag
 3. Type filename to filter
 4. Tap copy button on result
 5. Path is copied!
+
+### Keeping Updated
+
+1. Tap **Info** icon (ℹ️) in top-right corner
+2. Tap **Check for Updates**
+3. If update available, tap **Update Now**
+4. APK downloads and installs automatically
+5. View release notes to see what's new
 
 ---
 
@@ -151,6 +165,8 @@ adb install app/build/outputs/apk/debug/app-debug.apk
 - **Architecture**: MVVM (Model-View-ViewModel)
 - **Database**: Room (for fast image indexing and search)
 - **Image Loading**: Coil (efficient caching)
+- **Networking**: OkHttp (for GitHub API update checks)
+- **Serialization**: Kotlinx Serialization (JSON parsing)
 - **Async**: Kotlin Coroutines + Flow
 - **Min SDK**: Android 10 (API 29)
 - **Target SDK**: Android 14 (API 34)
@@ -158,6 +174,8 @@ adb install app/build/outputs/apk/debug/app-debug.apk
 ### Permissions
 - `READ_MEDIA_IMAGES` (Android 13+) / `READ_EXTERNAL_STORAGE` (Android 10-12)
 - `POST_NOTIFICATIONS` (Android 13+, optional)
+- `INTERNET` (for checking updates from GitHub)
+- `REQUEST_INSTALL_PACKAGES` (for installing APK updates)
 
 ### Project Structure
 ```
@@ -277,6 +295,13 @@ Contributions are welcome! Here's how:
 ---
 
 ## 📝 Changelog
+
+### v1.1.0 (2026-02-26)
+- 🔄 Auto-update feature with GitHub integration
+- ℹ️ About screen with app information
+- 📋 View release notes before updating
+- 🔒 MIT License confirmation in app
+- 🎨 New top app bar with info button
 
 ### v1.0.0 (2024-02-26)
 - ✨ Initial release

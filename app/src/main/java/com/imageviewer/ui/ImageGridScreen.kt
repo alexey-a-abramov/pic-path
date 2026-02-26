@@ -10,15 +10,21 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScrollableTabRow
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -45,6 +51,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun ImageGridScreen(
     viewModel: ImageViewModel,
+    onNavigateToAbout: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val images by viewModel.images.collectAsStateWithLifecycle()
@@ -87,8 +94,30 @@ fun ImageGridScreen(
             }
         )
     } else {
-        Box(modifier = modifier.fillMaxSize()) {
-            Column(modifier = Modifier.fillMaxSize()) {
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = { Text("Pic Path") },
+                    actions = {
+                        IconButton(onClick = onNavigateToAbout) {
+                            Icon(
+                                imageVector = Icons.Default.Info,
+                                contentDescription = "About"
+                            )
+                        }
+                    }
+                )
+            },
+            snackbarHost = {
+                SnackbarHost(hostState = snackbarHostState) { data ->
+                    Snackbar(
+                        snackbarData = data,
+                        modifier = Modifier.padding(16.dp)
+                    )
+                }
+            }
+        ) { paddingValues ->
+            Column(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
                 // Category Tabs
                 ScrollableTabRow(
                     selectedTabIndex = categories.indexOf(selectedCategory),
@@ -172,16 +201,6 @@ fun ImageGridScreen(
                         }
                     }
                 }
-            }
-
-            SnackbarHost(
-                hostState = snackbarHostState,
-                modifier = Modifier.align(Alignment.BottomCenter)
-            ) { data ->
-                Snackbar(
-                    snackbarData = data,
-                    modifier = Modifier.padding(16.dp)
-                )
             }
         }
     }
