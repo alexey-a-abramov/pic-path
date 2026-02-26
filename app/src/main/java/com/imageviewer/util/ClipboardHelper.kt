@@ -9,5 +9,8 @@ object ClipboardHelper {
         val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
         val clip = ClipData.newPlainText(label, text)
         clipboard.setPrimaryClip(clip)
+
+        // Show notification
+        NotificationHelper.showCopyNotification(context, text)
     }
 }

@@ -47,9 +47,17 @@ class MainActivity : ComponentActivity() {
             hasPermission = true
             permissionDenied = false
             viewModel.loadImages()
+            requestNotificationPermission()
         } else {
             permissionDenied = true
         }
+    }
+
+    private val requestNotificationLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        // Notification permission is optional, so we don't block the app
+        // if it's denied
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -98,9 +106,23 @@ class MainActivity : ComponentActivity() {
                 hasPermission = true
                 permissionDenied = false
                 viewModel.loadImages()
+                requestNotificationPermission()
             }
             else -> {
                 requestPermissionLauncher.launch(permission)
+            }
+        }
+    }
+
+    private fun requestNotificationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            val notificationPermission = Manifest.permission.POST_NOTIFICATIONS
+            if (ContextCompat.checkSelfPermission(
+                    this,
+                    notificationPermission
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                requestNotificationLauncher.launch(notificationPermission)
             }
         }
     }
