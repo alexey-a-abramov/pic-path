@@ -173,7 +173,6 @@ adb install app/build/outputs/apk/debug/app-debug.apk
 
 ### Permissions
 - `READ_MEDIA_IMAGES` (Android 13+) / `READ_EXTERNAL_STORAGE` (Android 10-12)
-- `POST_NOTIFICATIONS` (Android 13+, optional)
 - `INTERNET` (for checking updates from GitHub)
 - `REQUEST_INSTALL_PACKAGES` (for installing APK updates)
 
@@ -199,11 +198,19 @@ app/src/main/java/com/imageviewer/
 └── util/
     ├── MediaStoreScanner.kt          # MediaStore integration
     ├── ClipboardHelper.kt            # Clipboard operations
-    ├── NotificationHelper.kt         # Notification management
     └── UriHelper.kt                  # URI to path conversion
 ```
 
 ---
+
+## 🚀 Why Pic Path?
+
+Copying image paths on Android is notoriously difficult. Pic Path makes it a one-tap operation, especially useful for developers and AI power users who need to provide local file paths to tools like:
+- **Gemini CLI**
+- **Codex**
+- **Claude on Termux**
+
+Simply find your image, tap the copy button, and paste the absolute path directly into your terminal.
 
 ## 🎨 Features in Detail
 
@@ -221,12 +228,8 @@ Images are automatically categorized based on their file path:
 - Shape: Circular with white background
 - Size: 36dp (grid), 48dp (fullscreen)
 
-### Notification Details
-- Channel: "Copy Notifications"
-- Priority: Default
-- Auto-cancel: Yes (tap to dismiss)
-- Content: Filename in title, full path in expanded view
-- Icon: Custom copy icon
+### Feedback
+- When a path is copied, a "Path copied to clipboard" message is shown.
 
 ### Pull-to-Refresh Behavior
 - Trigger: Pull down on image grid
@@ -264,11 +267,6 @@ Edit `ImageGridItem.kt` and `FullscreenImageViewer.kt`:
 - Grant storage permission when prompted
 - Pull down to refresh the image list
 - Check if images are in standard Android folders (DCIM, Pictures, Download)
-
-### Notification Not Appearing
-- Grant POST_NOTIFICATIONS permission in Android settings
-- Check notification settings for Pic Path
-- Notifications work without permission but won't show system notification
 
 ### Share Target Not Appearing
 - Reinstall the app

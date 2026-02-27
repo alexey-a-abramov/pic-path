@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Pic Path</string>
+    <string name="search_hint">Поиск изображений...</string>
+    <string name="path_copied">Путь скопирован в буфер обмена</string>
+    <string name="no_images_found">Изображения не найдены</string>
+    <string name="loading">Загрузка изображений...</string>
+    <string name="permission_required">Для просмотра изображений требуется разрешение на доступ к хранилищу</string>
+    <string name="grant_permission">Предоставить разрешение</string>
+    <string name="permission_denied">В доступе отказано. Пожалуйста, предоставьте разрешение в настройках.</string>
+    <string name="open_settings">Открыть настройки</string>
+    <string name="about">О приложении</string>
+    <string name="check_for_updates">Проверить обновления</string>
+    <string name="update_available">Доступно обновление</string>
+    <string name="up_to_date">У вас установлена последняя версия!</string>
+    <string name="back">Назад</string>
+    <string name="app_icon">Иконка приложения</string>
+    <string name="app_description">Быстрое и простое копирование пути к изображению на Android</string>
+    <string name="updates">Обновления</string>
+    <string name="checking_updates">Проверка обновлений...</string>
+    <string name="new_version_available">Доступна новая версия: %1$s</string>
+    <string name="downloading_update">Загрузка обновления...</string>
+    <string name="update_now">Обновить сейчас</string>
+    <string name="view_notes">Список изменений</string>
+    <string name="check_updates_github">Проверить обновления на GitHub</string>
+    <string name="failed_check_updates">Ошибка проверки обновлений: %1$s</string>
+    <string name="failed_download_update">Ошибка загрузки обновления</string>
+    <string name="download_failed">Загрузка не удалась: %1$s</string>
+    <string name="license">Лицензия</string>
+    <string name="mit_license">Лицензия MIT</string>
+    <string name="copyright">Copyright © 2024 Алексей Абрамов</string>
+    <string name="license_description">Программное обеспечение с открытым исходным кодом под лицензией MIT. Вы можете свободно использовать, изменять и распространять его.</string>
+    <string name="made_with_heart">Сделано с ❤️ для пользователей Gemini, Codex и Claude на Termux</string>
+    <string name="release_notes_title">Список изменений - v%1$s</string>
+    <string name="close">Закрыть</string>
+    <string name="cat_all">Все</string>
+    <string name="cat_screenshots">Скриншоты</string>
+    <string name="cat_camera">Камера</string>
+    <string name="cat_downloads">Загрузки</string>
+    <string name="cat_other">Прочее</string>
+    <string name="language">Язык</string>
+    <string name="system_language">Язык системы (по умолчанию)</string>
+    <string name="select_language">Выберите язык</string>
+</resources>

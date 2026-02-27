@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Pic Path</string>
+    <string name="search_hint">ပုံများကို ရှာပါ...</string>
+    <string name="path_copied">လမ်းကြောင်းကို ကူးယူပြီးပါပြီ</string>
+    <string name="no_images_found">မည်သည့်ပုံမှ မတွေ့ပါ</string>
+    <string name="loading">ပုံများကို ဖွင့်နေသည်...</string>
+    <string name="permission_required">ပုံများကို ကြည့်ရန် ဖုန်းသိုလှောင်မှု ခွင့်ပြုချက် လိုအပ်သည်</string>
+    <string name="grant_permission">ခွင့်ပြုချက်ပေးပါ</string>
+    <string name="permission_denied">ခွင့်ပြုချက် ငြင်းပယ်ခံရသည်။ ဆက်တင်တွင် ဖုန်းသိုလှောင်မှု ခွင့်ပြုချက် ပေးပါ။</string>
+    <string name="open_settings">ဆက်တင်ကို ဖွင့်ပါ</string>
+    <string name="about">အကြောင်း</string>
+    <string name="check_for_updates">ဗားရှင်းအသစ် စစ်ဆေးပါ</string>
+    <string name="update_available">ဗားရှင်းအသစ် ရှိသည်</string>
+    <string name="up_to_date">သင်၏ အက်ပ်သည် ဗားရှင်းအသစ် ဖြစ်နေပါပြီ။</string>
+    <string name="back">နောက်သို့</string>
+    <string name="app_icon">အက်ပ် သင်္ကေတ</string>
+    <string name="app_description">Android အတွက် မြန်ဆန်ရိုးရှင်းသော ပုံလမ်းကြောင်း ကူးယူသည့် ကိရိယာ</string>
+    <string name="updates">ဗားရှင်းအသစ်များ</string>
+    <string name="checking_updates">ဗားရှင်းအသစ် စစ်ဆေးနေသည်...</string>
+    <string name="new_version_available">ဗားရှင်းအသစ် ရရှိနိုင်သည်- %1$s</string>
+    <string name="downloading_update">ဗားရှင်းအသစ် ဒေါင်းလုဒ်လုပ်နေသည်...</string>
+    <string name="update_now">ယခု အပ်ဒိတ်လုပ်ပါ</string>
+    <string name="view_notes">မှတ်စုများကို ကြည့်ပါ</string>
+    <string name="check_updates_github">GitHub မှတစ်ဆင့် ဗားရှင်းအသစ် စစ်ဆေးပါ</string>
+    <string name="failed_check_updates">ဗားရှင်းအသစ် စစ်ဆေးခြင်း မအောင်မြင်ပါ- %1$s</string>
+    <string name="failed_download_update">ဒေါင်းလုဒ်လုပ်ခြင်း မအောင်မြင်ပါ</string>
+    <string name="download_failed">ဒေါင်းလုဒ်လုပ်ခြင်း မအောင်မြင်ပါ- %1$s</string>
+    <string name="license">လိုင်စင်</string>
+    <string name="mit_license">MIT လိုင်စင်</string>
+    <string name="copyright">မူပိုင်ခွင့် © 2024 Alexey Abramov</string>
+    <string name="license_description">MIT လိုင်စင်အောက်ရှိ ပွင့်လင်းအရင်းအမြစ် ဆော့ဖ်ဝဲဖြစ်သည်။ သင်သည် ဤဆော့ဖ်ဝဲကို လွတ်လပ်စွာ အသုံးပြုနိုင်၊ ပြင်ဆင်နိုင်ပြီး ဖြန့်ဝေနိုင်ပါသည်။</string>
+    <string name="made_with_heart">Termux ရှိ Gemini, Codex နှင့် Claude အသုံးပြုသူများအတွက် ❤️ ဖြင့် ပြုလုပ်ထားပါသည်</string>
+    <string name="release_notes_title">ထုတ်ပြန်ချက် မှတ်စုများ - v%1$s</string>
+    <string name="close">ပိတ်ပါ</string>
+    <string name="cat_all">အားလုံး</string>
+    <string name="cat_screenshots">ဖန်သားပြင်ဓာတ်ပုံများ</string>
+    <string name="cat_camera">ကင်မရာ</string>
+    <string name="cat_downloads">ဒေါင်းလုဒ်များ</string>
+    <string name="cat_other">အခြား</string>
+    <string name="language">ဘာသာစကား</string>
+    <string name="system_language">စနစ်သုံး ဘာသာစကား (မူလ)</string>
+    <string name="select_language">ဘာသာစကား ရွေးချယ်ပါ</string>
+</resources>

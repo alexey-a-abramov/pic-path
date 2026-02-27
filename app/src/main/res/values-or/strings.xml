@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Pic Path</string>
+    <string name="search_hint">ଛବି ଖୋଜନ୍ତୁ...</string>
+    <string name="path_copied">ପାଥ୍ କ୍ଲିପବୋର୍ଡକୁ କପି ହୋଇଛି</string>
+    <string name="no_images_found">କୌଣସି ଛବି ମିଳିଲା ନାହିଁ</string>
+    <string name="loading">ଛବି ଲୋଡ୍ ହେଉଛି...</string>
+    <string name="permission_required">ଛବି ଦେଖିବା ପାଇଁ ଷ୍ଟୋରେଜ୍ ଅନୁମତି ଆବଶ୍ୟକ</string>
+    <string name="grant_permission">ଅନୁମତି ଦିଅନ୍ତୁ</string>
+    <string name="permission_denied">ଅନୁମତି ପ୍ରତ୍ୟାଖ୍ୟାନ ହୋଇଛି | ଦୟାକରି ସେଟିଂସରେ ଷ୍ଟୋରେଜ୍ ଅନୁମତି ଦିଅନ୍ତୁ |</string>
+    <string name="open_settings">ସେଟିଂସ ଖୋଲନ୍ତୁ</string>
+    <string name="about">ବିଷୟରେ</string>
+    <string name="check_for_updates">ଅପଡେଟ୍ ପାଇଁ ଯାଞ୍ଚ କରନ୍ତୁ</string>
+    <string name="update_available">ଅପଡେଟ୍ ଉପଲବ୍ଧ ଅଛି</string>
+    <string name="up_to_date">ଆପଣଙ୍କ ଆପ୍ ଅପଡେଟ୍ ଅଛି!</string>
+    <string name="back">ପଛକୁ</string>
+    <string name="app_icon">ଆପ୍ ଆଇକନ୍</string>
+    <string name="app_description">Android ପାଇଁ ଦ୍ରୁତ, ସରଳ ଛବି ପାଥ୍ କପି କରିବା</string>
+    <string name="updates">ଅପଡେଟ୍</string>
+    <string name="checking_updates">ଅପଡେଟ୍ ପାଇଁ ଯାଞ୍ચ ହେଉଛି...</string>
+    <string name="new_version_available">ନୂତନ ସଂସ୍କରଣ ଉପଲବ୍ଧ: %1$s</string>
+    <string name="downloading_update">ଅପଡେଟ୍ ଡାଉନଲୋଡ୍ ହେଉଛି...</string>
+    <string name="update_now">ଏବେ ଅପଡେଟ୍ କରନ୍ତୁ</string>
+    <string name="view_notes">ନୋଟ୍ ଦେଖନ୍ତୁ</string>
+    <string name="check_updates_github">GitHub ରୁ ଅପଡେଟ୍ ଯାଞ୍ચ କରନ୍ତୁ</string>
+    <string name="failed_check_updates">ଅପଡେଟ୍ ଯାଞ୍ચ କରିବାରେ ବିଫଳ: %1$s</string>
+    <string name="failed_download_update">ଅପଡେଟ୍ ଡାଉନଲୋଡ୍ କରିବାରେ ବିଫଳ</string>
+    <string name="download_failed">ଡାଉନଲୋଡ୍ ବିଫଳ: %1$s</string>
+    <string name="license">ଲାଇସେନ୍ସ</string>
+    <string name="mit_license">MIT ଲାଇସେନ୍ସ</string>
+    <string name="copyright">Copyright © 2024 Alexey Abramov</string>
+    <string name="license_description">MIT ଲାଇସେନ୍ସ ଅଧୀନରେ ଓପନ୍ ସୋର୍ସ ସଫ୍ଟୱେର୍ | ଆପଣ ଏହି ସଫ୍ଟୱେର୍ ବ୍ୟବହାର, ପରିବର୍ତ୍ତନ ଏବଂ ବିତରଣ କରିବାକୁ ମୁକ୍ତ |</string>
+    <string name="made_with_heart">Termux ରେ Gemini, Codex ଏବଂ Claude ବ୍ୟବହାରକାରୀଙ୍କ ପାଇଁ ❤️ ସହିତ ନିର୍ମିତ</string>
+    <string name="release_notes_title">ରିଲିଜ୍ ନୋଟ୍ - v%1$s</string>
+    <string name="close">ବନ୍ଦ କରନ୍ତୁ</string>
+    <string name="cat_all">ସବୁ</string>
+    <string name="cat_screenshots">ସ୍କ୍ରିନସଟ୍</string>
+    <string name="cat_camera">କ୍ୟାମେରା</string>
+    <string name="cat_downloads">ଡାଉନଲୋଡ୍</string>
+    <string name="cat_other">ଅନ୍ୟାନ୍ୟ</string>
+    <string name="language">ଭାଷା</string>
+    <string name="system_language">ସିଷ୍ଟମ୍ ଭାଷା (ଡିଫଲ୍ଟ)</string>
+    <string name="select_language">ଭାଷା ଚୟନ କରନ୍ତୁ</string>
+</resources>

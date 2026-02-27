@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Pic Path</string>
+    <string name="search_hint">이미지 검색...</string>
+    <string name="path_copied">경로가 클립보드에 복사되었습니다</string>
+    <string name="no_images_found">이미지를 찾을 수 없습니다</string>
+    <string name="loading">이미지 불러오는 중...</string>
+    <string name="permission_required">이미지를 보려면 저장소 권한이 필요합니다</string>
+    <string name="grant_permission">권한 허용</string>
+    <string name="permission_denied">권한이 거부되었습니다. 설정에서 저장소 권한을 허용해주세요.</string>
+    <string name="open_settings">설정 열기</string>
+    <string name="about">정보</string>
+    <string name="check_for_updates">업데이트 확인</string>
+    <string name="update_available">업데이트 가능</string>
+    <string name="up_to_date">최신 버전입니다!</string>
+    <string name="back">뒤로</string>
+    <string name="app_icon">앱 아이콘</string>
+    <string name="app_description">Android용 빠르고 간편한 이미지 경로 복사 도구</string>
+    <string name="updates">업데이트</string>
+    <string name="checking_updates">업데이트 확인 중...</string>
+    <string name="new_version_available">새 버전 사용 가능: %1$s</string>
+    <string name="downloading_update">업데이트 다운로드 중...</string>
+    <string name="update_now">지금 업데이트</string>
+    <string name="view_notes">노트 보기</string>
+    <string name="check_updates_github">GitHub에서 업데이트 확인</string>
+    <string name="failed_check_updates">업데이트 확인 실패: %1$s</string>
+    <string name="failed_download_update">업데이트 다운로드 실패</string>
+    <string name="download_failed">다운로드 실패: %1$s</string>
+    <string name="license">라이선스</string>
+    <string name="mit_license">MIT 라이선스</string>
+    <string name="copyright">Copyright © 2024 Alexey Abramov</string>
+    <string name="license_description">MIT 라이선스에 따른 오픈 소스 소프트웨어입니다. 이 소프트웨어를 자유롭게 사용, 수정 및 배포할 수 있습니다.</string>
+    <string name="made_with_heart">Termux의 Gemini, Codex 및 Claude 사용자를 위해 ❤️로 제작되었습니다</string>
+    <string name="release_notes_title">릴리스 노트 - v%1$s</string>
+    <string name="close">닫기</string>
+    <string name="cat_all">전체</string>
+    <string name="cat_screenshots">스크린샷</string>
+    <string name="cat_camera">카메라</string>
+    <string name="cat_downloads">다운로드</string>
+    <string name="cat_other">기타</string>
+    <string name="language">언어</string>
+    <string name="system_language">시스템 언어 (기본값)</string>
+    <string name="select_language">언어 선택</string>
+</resources>

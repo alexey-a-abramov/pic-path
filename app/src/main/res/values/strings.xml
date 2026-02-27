@@ -13,4 +13,50 @@
     <string name="check_for_updates">Check for Updates</string>
     <string name="update_available">Update available</string>
     <string name="up_to_date">You\'re up to date!</string>
+    
+    <!-- i18n additions -->
+    <string name="back">Back</string>
+    <string name="app_icon">App Icon</string>
+    <string name="app_description">Fast, Simple Image Path Copying for Android</string>
+    <string name="updates">Updates</string>
+    <string name="checking_updates">Checking for updates...</string>
+    <string name="new_version_available">New version available: %1$s</string>
+    <string name="downloading_update">Downloading update...</string>
+    <string name="update_now">Update Now</string>
+    <string name="view_notes">View Notes</string>
+    <string name="check_updates_github">Check for updates from GitHub</string>
+    <string name="failed_check_updates">Failed to check for updates: %1$s</string>
+    <string name="failed_download_update">Failed to download update</string>
+    <string name="download_failed">Download failed: %1$s</string>
+    <string name="license">License</string>
+    <string name="mit_license">MIT License</string>
+    <string name="copyright">Copyright © 2024 Alexey Abramov</string>
+    <string name="license_description">Open source software licensed under the MIT License. You are free to use, modify, and distribute this software.</string>
+    <string name="made_with_heart">Made with ❤️ for Gemini, Codex, and Claude on Termux users</string>
+    <string name="release_notes_title">Release Notes - v%1$s</string>
+    <string name="close">Close</string>
+    
+    <!-- Categories -->
+    <string name="cat_all">All</string>
+    <string name="cat_screenshots">Screenshots</string>
+    <string name="cat_camera">Camera</string>
+    <string name="cat_downloads">Downloads</string>
+    <string name="cat_other">Other</string>
+    
+    <!-- Settings/Language -->
+    <string name="language">Language</string>
+    <string name="system_language">System Language (Default)</string>
+    <string name="select_language">Select Language</string>
+    
+    <!-- Selection Mode -->
+    <string name="selection_mode">Selection Mode</string>
+    <string name="clear">Clear</string>
+    <string name="copy_selected">Copy Selected (%1$d)</string>
+    <string name="multiple_paths_copied">Multiple paths copied to clipboard</string>
+    
+    <!-- Crash Activity -->
+    <string name="app_crashed">App has stopped</string>
+    <string name="error_report">Error Report</string>
+    <string name="copy_stacktrace">Copy Stacktrace</string>
+    <string name="restart_app">Restart App</string>
 </resources>

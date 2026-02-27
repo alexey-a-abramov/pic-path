@@ -32,6 +32,12 @@ class ImageViewModel(application: Application) : AndroidViewModel(application) {
     private val _selectedCategory = MutableStateFlow("Screenshots")
     val selectedCategory: StateFlow<String> = _selectedCategory.asStateFlow()
 
+    private val _isSelectionMode = MutableStateFlow(false)
+    val isSelectionMode: StateFlow<Boolean> = _isSelectionMode.asStateFlow()
+
+    private val _selectedImageIds = MutableStateFlow<Set<Long>>(emptySet())
+    val selectedImageIds: StateFlow<Set<Long>> = _selectedImageIds.asStateFlow()
+
     val images: StateFlow<List<ImageFile>>
 
     init {
@@ -60,6 +66,10 @@ class ImageViewModel(application: Application) : AndroidViewModel(application) {
             _isLoading.value = true
             try {
                 repository.scanAndIndexImages()
+            } catch (e: Exception) {
+                android.util.Log.e("ImageViewModel", "Error loading images", e)
+                // Re-throw to trigger crash handler
+                throw e
             } finally {
                 _isLoading.value = false
             }
@@ -72,6 +82,38 @@ class ImageViewModel(application: Application) : AndroidViewModel(application) {
 
     fun selectCategory(category: String) {
         _selectedCategory.value = category
+        clearSelection()
+    }
+
+    fun toggleSelectionMode(enabled: Boolean) {
+        _isSelectionMode.value = enabled
+        if (!enabled) {
+            clearSelection()
+        }
+    }
+
+    fun toggleImageSelection(imageId: Long) {
+        val current = _selectedImageIds.value.toMutableSet()
+        if (current.contains(imageId)) {
+            current.remove(imageId)
+        } else {
+            current.add(imageId)
+        }
+        _selectedImageIds.value = current
+        
+        if (current.isEmpty()) {
+            _isSelectionMode.value = false
+        }
+    }
+
+    fun clearSelection() {
+        _selectedImageIds.value = emptySet()
+        _isSelectionMode.value = false
+    }
+
+    fun getSelectedPaths(): List<String> {
+        val selectedIds = _selectedImageIds.value
+        return images.value.filter { it.id in selectedIds }.map { it.path }
     }
 
     fun refreshIndex() {

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Pic Path</string>
+    <string name="search_hint">Rechercher des images...</string>
+    <string name="path_copied">Chemin copié dans le presse-papiers</string>
+    <string name="no_images_found">Aucune image trouvée</string>
+    <string name="loading">Chargement des images...</string>
+    <string name="permission_required">L\'autorisation de stockage est requise pour voir les images</string>
+    <string name="grant_permission">Accorder l\'autorisation</string>
+    <string name="permission_denied">Autorisation refusée. Veuillez accorder l\'autorisation de stockage dans les paramètres.</string>
+    <string name="open_settings">Ouvrir les paramètres</string>
+    <string name="about">À propos</string>
+    <string name="check_for_updates">Vérifier les mises à jour</string>
+    <string name="update_available">Mise à jour disponible</string>
+    <string name="up_to_date">Vous êtes à jour !</string>
+    <string name="back">Retour</string>
+    <string name="app_icon">Icône de l\'application</string>
+    <string name="app_description">Copie rapide et simple du chemin d\'image pour Android</string>
+    <string name="updates">Mises à jour</string>
+    <string name="checking_updates">Vérification des mises à jour...</string>
+    <string name="new_version_available">Nouvelle version disponible : %1$s</string>
+    <string name="downloading_update">Téléchargement de la mise à jour...</string>
+    <string name="update_now">Mettre à jour maintenant</string>
+    <string name="view_notes">Voir les notes</string>
+    <string name="check_updates_github">Vérifier les mises à jour sur GitHub</string>
+    <string name="failed_check_updates">Échec de la vérification : %1$s</string>
+    <string name="failed_download_update">Échec du téléchargement de la mise à jour</string>
+    <string name="download_failed">Téléchargement échoué : %1$s</string>
+    <string name="license">Licence</string>
+    <string name="mit_license">Licence MIT</string>
+    <string name="copyright">Copyright © 2024 Alexey Abramov</string>
+    <string name="license_description">Logiciel libre sous licence MIT. Vous êtes libre de l\'utiliser, de le modifier et de le distribuer.</string>
+    <string name="made_with_heart">Fait avec ❤️ pour les utilisateurs de Gemini, Codex et Claude sur Termux</string>
+    <string name="release_notes_title">Notes de version - v%1$s</string>
+    <string name="close">Fermer</string>
+    <string name="cat_all">Tout</string>
+    <string name="cat_screenshots">Captures d\'écran</string>
+    <string name="cat_camera">Appareil photo</string>
+    <string name="cat_downloads">Téléchargements</string>
+    <string name="cat_other">Autre</string>
+    <string name="language">Langue</string>
+    <string name="system_language">Langue du système (Par défaut)</string>
+    <string name="select_language">Choisir la langue</string>
+</resources>

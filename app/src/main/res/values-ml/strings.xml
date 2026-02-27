@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Pic Path</string>
+    <string name="search_hint">ചിത്രങ്ങൾ തിരയുക...</string>
+    <string name="path_copied">പാത്ത് ക്ലിപ്പ്ബോർഡിലേക്ക് പകർത്തി</string>
+    <string name="no_images_found">ചിത്രങ്ങളൊന്നും കണ്ടെത്തിയില്ല</string>
+    <string name="loading">ചിത്രങ്ങൾ ലോഡ് ചെയ്യുന്നു...</string>
+    <string name="permission_required">ചിത്രങ്ങൾ കാണുന്നതിന് സ്റ്റോറേജ് അനുമതി ആവശ്യമാണ്</string>
+    <string name="grant_permission">അനുമതി നൽകുക</string>
+    <string name="permission_denied">അനുമതി നിഷേധിച്ചു. ക്രമീകരണങ്ങളിൽ സ്റ്റോറേജ് അനുമതി നൽകുക.</string>
+    <string name="open_settings">ക്രമീകരണങ്ങൾ തുറക്കുക</string>
+    <string name="about">അപ്ലിക്കേഷനെക്കുറിച്ച്</string>
+    <string name="check_for_updates">അപ്ഡേറ്റുകൾക്കായി പരിശോധിക്കുക</string>
+    <string name="update_available">അപ്ഡേറ്റ് ലഭ്യമാണ്</string>
+    <string name="up_to_date">നിങ്ങളുടെ ആപ്പ് അപ്-ടു-ഡേറ്റ് ആണ്!</string>
+    <string name="back">പിന്നിലേക്ക്</string>
+    <string name="app_icon">ആപ്പ് ഐക്കൺ</string>
+    <string name="app_description">Android-നായി വേഗത്തിലും ലളിതമായും ഇമേജ് പാത്ത് കോപ്പി ചെയ്യാം</string>
+    <string name="updates">അപ്ഡേറ്റുകൾ</string>
+    <string name="checking_updates">അപ്ഡേറ്റുകൾക്കായി പരിശോധിക്കുന്നു...</string>
+    <string name="new_version_available">പുതിയ പതിപ്പ് ലഭ്യമാണ്: %1$s</string>
+    <string name="downloading_update">അപ്ഡേറ്റ് ഡൗൺലോഡ് ചെയ്യുന്നു...</string>
+    <string name="update_now">ഇപ്പോൾ അപ്ഡേറ്റ് ചെയ്യുക</string>
+    <string name="view_notes">കുറിപ്പുകൾ കാണുക</string>
+    <string name="check_updates_github">GitHub-ൽ നിന്ന് അപ്ഡേറ്റുകൾ പരിശോധിക്കുക</string>
+    <string name="failed_check_updates">അപ്ഡേറ്റുകൾ പരിശോധിക്കുന്നതിൽ പരാജയപ്പെട്ടു: %1$s</string>
+    <string name="failed_download_update">അപ്ഡേറ്റ് ഡൗൺലോഡ് ചെയ്യുന്നതിൽ പരാജയപ്പെട്ടു</string>
+    <string name="download_failed">ഡൗൺലോഡ് പരാജയപ്പെട്ടു: %1$s</string>
+    <string name="license">ലൈസൻസ്</string>
+    <string name="mit_license">MIT ലൈസൻസ്</string>
+    <string name="copyright">പകർപ്പവകാശം © 2024 Alexey Abramov</string>
+    <string name="license_description">MIT ലൈസൻസിന് കീഴിലുള്ള ഓപ്പൺ സോഴ്സ് സോഫ്റ്റ്‌വെയർ. നിങ്ങൾക്ക് ഈ സോഫ്റ്റ്‌വെയർ ഉപയോഗിക്കാനും പരിഷ്കരിക്കാനും വിതരണം ചെയ്യാനും സ്വാതന്ത്ര്യമുണ്ട്.</string>
+    <string name="made_with_heart">Termux-ലെ Gemini, Codex, Claude ഉപയോക്താക്കൾക്കായി ❤️-ഓടെ നിർമ്മിച്ചത്</string>
+    <string name="release_notes_title">റിലീസ് കുറിപ്പുകൾ - v%1$s</string>
+    <string name="close">അടയ്ക്കുക</string>
+    <string name="cat_all">എല്ലാം</string>
+    <string name="cat_screenshots">സ്ക്രീൻഷോട്ടുകൾ</string>
+    <string name="cat_camera">ക്യാമറ</string>
+    <string name="cat_downloads">ഡൗൺലോഡുകൾ</string>
+    <string name="cat_other">മറ്റുള്ളവ</string>
+    <string name="language">ഭാഷ</string>
+    <string name="system_language">സിസ്റ്റം ഭാഷ (ഡിഫോൾട്ട്)</string>
+    <string name="select_language">ഭാഷ തിരഞ്ഞെടുക്കുക</string>
+</resources>

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Pic Path</string>
+    <string name="search_hint">ਤਸਵੀਰਾਂ ਖੋਜੋ...</string>
+    <string name="path_copied">ਪਾਥ ਕਲਿੱਪਬੋਰਡ ਵਿੱਚ ਕਾਪੀ ਕੀਤਾ ਗਿਆ</string>
+    <string name="no_images_found">ਕੋਈ ਤਸਵੀਰ ਨਹੀਂ ਮਿਲੀ</string>
+    <string name="loading">ਤਸਵੀਰਾਂ ਲੋਡ ਹੋ ਰਹੀਆਂ ਹਨ...</string>
+    <string name="permission_required">ਤਸਵੀਰਾਂ ਦੇਖਣ ਲਈ ਸਟੋਰੇਜ ਇਜਾਜ਼ਤ ਦੀ ਲੋੜ ਹੈ</string>
+    <string name="grant_permission">ਇਜਾਜ਼ਤ ਦਿਓ</string>
+    <string name="permission_denied">ਇਜਾਜ਼ਤ ਰੱਦ ਕੀਤੀ ਗਈ। ਕਿਰਪਾ ਕਰਕੇ ਸੈਟਿੰਗਾਂ ਵਿੱਚ ਸਟੋਰੇਜ ਇਜਾਜ਼ਤ ਦਿਓ।</string>
+    <string name="open_settings">ਸੈਟਿੰਗਾਂ ਖੋਲ੍ਹੋ</string>
+    <string name="about">ਬਾਰੇ</string>
+    <string name="check_for_updates">ਅੱਪਡੇਟ ਲਈ ਚੈੱਕ ਕਰੋ</string>
+    <string name="update_available">ਅੱਪਡੇਟ ਉਪਲਬਧ ਹੈ</string>
+    <string name="up_to_date">ਤੁਹਾਡਾ ਐਪ ਅੱਪ-ਟੂ-ਡੇਟ ਹੈ!</string>
+    <string name="back">ਪਿੱਛੇ</string>
+    <string name="app_icon">ਐਪ ਆਈਕਨ</string>
+    <string name="app_description">ਐਂਡਰੌਇਡ ਲਈ ਤੇਜ਼, ਸਰਲ ਚਿੱਤਰ ਮਾਰਗ ਕਾਪੀ ਕਰਨਾ</string>
+    <string name="updates">ਅੱਪਡੇਟ</string>
+    <string name="checking_updates">ਅੱਪਡੇਟ ਲਈ ਚੈੱਕ ਕੀਤਾ ਜਾ ਰਿਹਾ ਹੈ...</string>
+    <string name="new_version_available">ਨਵਾਂ ਸੰਸਕਰਣ ਉਪਲਬਧ ਹੈ: %1$s</string>
+    <string name="downloading_update">ਅੱਪਡੇਟ ਡਾਊਨਲੋਡ ਕੀਤਾ ਜਾ ਰਿਹਾ ਹੈ...</string>
+    <string name="update_now">ਹੁਣੇ ਅੱਪਡੇਟ ਕਰੋ</string>
+    <string name="view_notes">ਨੋਟਸ ਦੇਖੋ</string>
+    <string name="check_updates_github">GitHub ਤੋਂ ਅੱਪਡੇਟ ਚੈੱਕ ਕਰੋ</string>
+    <string name="failed_check_updates">ਅੱਪਡੇਟ ਚੈੱਕ ਕਰਨ ਵਿੱਚ ਅਸਫਲ: %1$s</string>
+    <string name="failed_download_update">ਅੱਪਡੇਟ ਡਾਊਨਲੋਡ ਕਰਨ ਵਿੱਚ ਅਸਫਲ</string>
+    <string name="download_failed">ਡਾਊਨਲੋਡ ਅਸਫਲ: %1$s</string>
+    <string name="license">ਲਾਇਸੰਸ</string>
+    <string name="mit_license">MIT ਲਾਇਸੰਸ</string>
+    <string name="copyright">ਕਾਪੀਰਾਈਟ © 2024 Alexey Abramov</string>
+    <string name="license_description">MIT ਲਾਇਸੰਸ ਦੇ ਅਧੀਨ ਓਪਨ ਸੋਰਸ ਸੌਫਟਵੇਅਰ। ਤੁਸੀਂ ਇਸ ਸੌਫਟਵੇਅਰ ਦੀ ਵਰਤੋਂ, ਸੋਧ ਅਤੇ ਵੰਡ ਕਰਨ ਲਈ ਸੁਤੰਤਰ ਹੋ।</string>
+    <string name="made_with_heart">Termux ਤੇ Gemini, Codex ਅਤੇ Claude ਉਪਭੋਗਤਾਵਾਂ ਲਈ ❤️ ਨਾਲ ਬਣਾਇਆ ਗਿਆ</string>
+    <string name="release_notes_title">ਰੀਲੀਜ਼ ਨੋਟਸ - v%1$s</string>
+    <string name="close">ਬੰਦ ਕਰੋ</string>
+    <string name="cat_all">ਸਾਰੇ</string>
+    <string name="cat_screenshots">ਸਕ੍ਰੀਨਸ਼ਾਟ</string>
+    <string name="cat_camera">ਕੈਮਰਾ</string>
+    <string name="cat_downloads">ਡਾਊਨਲੋਡ</string>
+    <string name="cat_other">ਹੋਰ</string>
+    <string name="language">ਭਾਸ਼ਾ</string>
+    <string name="system_language">ਸਿਸਟਮ ਭਾਸ਼ਾ (ਡਿਫੌਲਟ)</string>
+    <string name="select_language">ਭਾਸ਼ਾ ਚੁਣੋ</string>
+</resources>

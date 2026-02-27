@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Pic Path</string>
+    <string name="search_hint">Пошук зображень...</string>
+    <string name="path_copied">Шлях скопійовано в буфер обміну</string>
+    <string name="no_images_found">Зображень не знайдено</string>
+    <string name="loading">Завантаження зображень...</string>
+    <string name="permission_required">Для перегляду зображень потрібен дозвіл на доступ до сховища</string>
+    <string name="grant_permission">Надати дозвіл</string>
+    <string name="permission_denied">У доступі відмовлено. Будь ласка, надайте дозвіл у налаштуваннях.</string>
+    <string name="open_settings">Відкрити налаштування</string>
+    <string name="about">Про додаток</string>
+    <string name="check_for_updates">Перевірити оновлення</string>
+    <string name="update_available">Доступне оновлення</string>
+    <string name="up_to_date">У вас встановлена остання версія!</string>
+    <string name="back">Назад</string>
+    <string name="app_icon">Іконка додатка</string>
+    <string name="app_description">Швидке та просте копіювання шляху до зображення на Android</string>
+    <string name="updates">Оновлення</string>
+    <string name="checking_updates">Перевірка оновлень...</string>
+    <string name="new_version_available">Доступна нова версія: %1$s</string>
+    <string name="downloading_update">Завантаження оновлення...</string>
+    <string name="update_now">Оновити зараз</string>
+    <string name="view_notes">Список змін</string>
+    <string name="check_updates_github">Перевірити оновлення на GitHub</string>
+    <string name="failed_check_updates">Помилка перевірки оновлень: %1$s</string>
+    <string name="failed_download_update">Помилка завантаження оновлення</string>
+    <string name="download_failed">Завантаження не вдалося: %1$s</string>
+    <string name="license">Ліцензія</string>
+    <string name="mit_license">Ліцензія MIT</string>
+    <string name="copyright">Copyright © 2024 Alexey Abramov</string>
+    <string name="license_description">Програмне забезпечення з відкритим вихідним кодом під ліцензією MIT. Ви можете вільно використовувати, змінювати та розповсюджувати його.</string>
+    <string name="made_with_heart">Зроблено з ❤️ для користувачів Gemini, Codex та Claude на Termux</string>
+    <string name="release_notes_title">Список змін - v%1$s</string>
+    <string name="close">Закрити</string>
+    <string name="cat_all">Всі</string>
+    <string name="cat_screenshots">Скріншоти</string>
+    <string name="cat_camera">Камера</string>
+    <string name="cat_downloads">Завантаження</string>
+    <string name="cat_other">Інше</string>
+    <string name="language">Мова</string>
+    <string name="system_language">Мова системи (за замовчуванням)</string>
+    <string name="select_language">Виберіть мову</string>
+</resources>

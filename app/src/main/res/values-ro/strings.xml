@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Pic Path</string>
+    <string name="search_hint">Caută imagini...</string>
+    <string name="path_copied">Calea a fost copiată în clipboard</string>
+    <string name="no_images_found">Nu s-au găsit imagini</string>
+    <string name="loading">Se încarcă imaginile...</string>
+    <string name="permission_required">Este necesară permisiunea de stocare pentru a vedea imaginile</string>
+    <string name="grant_permission">Acordă permisiunea</string>
+    <string name="permission_denied">Permisiune refuzată. Te rugăm să acorzi permisiunea de stocare în setări.</string>
+    <string name="open_settings">Deschide Setări</string>
+    <string name="about">Despre</string>
+    <string name="check_for_updates">Verifică actualizări</string>
+    <string name="update_available">Actualizare disponibilă</string>
+    <string name="up_to_date">Aplicația este actualizată!</string>
+    <string name="back">Înapoi</string>
+    <string name="app_icon">Pictogramă Aplicație</string>
+    <string name="app_description">Copiere rapidă și simplă a căii imaginii pentru Android</string>
+    <string name="updates">Actualizări</string>
+    <string name="checking_updates">Se verifică actualizările...</string>
+    <string name="new_version_available">Versiune nouă disponibilă: %1$s</string>
+    <string name="downloading_update">Se descarcă actualizarea...</string>
+    <string name="update_now">Actualizează Acum</string>
+    <string name="view_notes">Vezi Note</string>
+    <string name="check_updates_github">Verifică actualizări de pe GitHub</string>
+    <string name="failed_check_updates">Verificarea actualizărilor a eșuat: %1$s</string>
+    <string name="failed_download_update">Descărcarea actualizării a eșuat</string>
+    <string name="download_failed">Descărcarea a eșuat: %1$s</string>
+    <string name="license">Licență</string>
+    <string name="mit_license">Licență MIT</string>
+    <string name="copyright">Copyright © 2024 Alexey Abramov</string>
+    <string name="license_description">Software open source sub licența MIT. Ești liber să folosești, să modifici și să distribui acest software.</string>
+    <string name="made_with_heart">Creat cu ❤️ pentru utilizatorii Gemini, Codex și Claude pe Termux</string>
+    <string name="release_notes_title">Note de lansare - v%1$s</string>
+    <string name="close">Închide</string>
+    <string name="cat_all">Toate</string>
+    <string name="cat_screenshots">Capturi de ecran</string>
+    <string name="cat_camera">Cameră</string>
+    <string name="cat_downloads">Descărcări</string>
+    <string name="cat_other">Altele</string>
+    <string name="language">Limbă</string>
+    <string name="system_language">Limba sistemului (Implicit)</string>
+    <string name="select_language">Selectează Limba</string>
+</resources>

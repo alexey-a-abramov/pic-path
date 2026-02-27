@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Pic Path</string>
+    <string name="search_hint">ಚಿತ್ರಗಳನ್ನು ಹುಡುಕಿ...</string>
+    <string name="path_copied">ಪಥವನ್ನು ಕ್ಲಿಪ್‌ಬೋರ್ಡ್‌ಗೆ ನಕಲಿಸಲಾಗಿದೆ</string>
+    <string name="no_images_found">ಯಾವುದೇ ಚಿತ್ರಗಳು ಕಂಡುಬಂದಿಲ್ಲ</string>
+    <string name="loading">ಚಿತ್ರಗಳನ್ನು ಲೋಡ್ ಮಾಡಲಾಗುತ್ತಿದೆ...</string>
+    <string name="permission_required">ಚಿತ್ರಗಳನ್ನು ವೀಕ್ಷಿಸಲು ಶೇಖರಣಾ ಅನುಮತಿ ಅಗತ್ಯವಿದೆ</string>
+    <string name="grant_permission">ಅನುಮತಿ ನೀಡಿ</string>
+    <string name="permission_denied">ಅನುಮತಿ ನಿರಾಕರಿಸಲಾಗಿದೆ. ದಯವಿಟ್ಟು ಸೆಟ್ಟಿಂಗ್‌ಗಳಲ್ಲಿ ಶೇಖರಣಾ ಅನುಮತಿ ನೀಡಿ.</string>
+    <string name="open_settings">ಸೆಟ್ಟಿಂಗ್‌ಗಳನ್ನು ತೆರೆಯಿರಿ</string>
+    <string name="about">ಬಗ್ಗೆ</string>
+    <string name="check_for_updates">ಅಪ್‌ಡೇಟ್‌ಗಳಿಗಾಗಿ ಪರಿಶೀಲಿಸಿ</string>
+    <string name="update_available">ಅಪ್‌ಡೇಟ್ ಲಭ್ಯವಿದೆ</string>
+    <string name="up_to_date">ನಿಮ್ಮ ಆಪ್ ನವೀಕೃತವಾಗಿದೆ!</string>
+    <string name="back">ಹಿಂದಕ್ಕೆ</string>
+    <string name="app_icon">ಆಪ್ ಐಕಾನ್</string>
+    <string name="app_description">Android ಗಾಗಿ ವೇಗವಾದ, ಸರಳವಾದ ಚಿತ್ರ ಪಥ ನಕಲು ಮಾಡುವುದು</string>
+    <string name="updates">ಅಪ್‌ಡೇಟ್‌ಗಳು</string>
+    <string name="checking_updates">ಅಪ್‌ಡೇಟ್‌ಗಳಿಗಾಗಿ ಪರಿಶೀಲಿಸಲಾಗುತ್ತಿದೆ...</string>
+    <string name="new_version_available">ಹೊಸ ಆವೃತ್ತಿ ಲಭ್ಯವಿದೆ: %1$s</string>
+    <string name="downloading_update">ಅಪ್‌ಡೇಟ್ ಡೌನ್‌ಲೋಡ್ ಮಾಡಲಾಗುತ್ತಿದೆ...</string>
+    <string name="update_now">ಈಗಲೇ ಅಪ್‌ಡೇಟ್ ಮಾಡಿ</string>
+    <string name="view_notes">ಟಿಪ್ಪಣಿಗಳನ್ನು ವೀಕ್ಷಿಸಿ</string>
+    <string name="check_updates_github">GitHub ನಿಂದ ಅಪ್‌ಡೇಟ್‌ಗಳನ್ನು ಪರಿಶೀಲಿಸಿ</string>
+    <string name="failed_check_updates">ಅಪ್‌ಡೇಟ್‌ಗಳನ್ನು ಪರಿಶೀಲಿಸುವಲ್ಲಿ ವಿಫಲವಾಗಿದೆ: %1$s</string>
+    <string name="failed_download_update">ಅಪ್‌ಡೇಟ್ ಡೌನ್‌ಲೋಡ್ ಮಾಡುವಲ್ಲಿ ವಿಫಲವಾಗಿದೆ</string>
+    <string name="download_failed">ಡೌನ್‌ಲೋಡ್ ವಿಫಲವಾಗಿದೆ: %1$s</string>
+    <string name="license">ಪರವಾನಗಿ</string>
+    <string name="mit_license">MIT ಪರವಾನಗಿ</string>
+    <string name="copyright">ಕೃತಿಸ್ವಾಮ್ಯ © 2024 Alexey Abramov</string>
+    <string name="license_description">MIT ಪರವಾನಗಿ ಅಡಿಯಲ್ಲಿ ಓಪನ್ ಸೋರ್ಸ್ ಸಾಫ್ಟ್‌ವೇರ್. ಈ ಸಾಫ್ಟ್‌ವೇರ್ ಅನ್ನು ಬಳಸಲು, ಮಾರ್ಪಡಿಸಲು ಮತ್ತು ವಿತರಿಸಲು ನೀವು ಸ್ವತಂತ್ರರು.</string>
+    <string name="made_with_heart">Termux ನಲ್ಲಿ Gemini, Codex ಮತ್ತು Claude ಬಳಕೆದಾರರಿಗಾಗಿ ❤️ ನೊಂದಿಗೆ ಮಾಡಲ್ಪಟ್ಟಿದೆ</string>
+    <string name="release_notes_title">ಬಿಡುಗಡೆ ಟಿಪ್ಪಣಿಗಳು - v%1$s</string>
+    <string name="close">ಮುಚ್ಚಿ</string>
+    <string name="cat_all">ಎಲ್ಲವೂ</string>
+    <string name="cat_screenshots">ಸ್ಕ್ರೀನ್‌ಶಾಟ್‌ಗಳು</string>
+    <string name="cat_camera">ಕ್ಯಾಮೆರಾ</string>
+    <string name="cat_downloads">ಡೌನ್‌ಲೋಡ್‌ಗಳು</string>
+    <string name="cat_other">ಇತರೆ</string>
+    <string name="language">ಭಾಷೆ</string>
+    <string name="system_language">ಸಿಸ್ಟಮ್ ಭಾಷೆ (ಡೀಫಾಲ್ಟ್)</string>
+    <string name="select_language">ಭಾಷೆಯನ್ನು ಆಯ್ಕೆಮಾಡಿ</string>
+</resources>

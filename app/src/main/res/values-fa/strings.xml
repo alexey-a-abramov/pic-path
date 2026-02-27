@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Pic Path</string>
+    <string name="search_hint">جستجوی تصاویر...</string>
+    <string name="path_copied">مسیر در حافظه موقت کپی شد</string>
+    <string name="no_images_found">تصویری پیدا نشد</string>
+    <string name="loading">در حال بارگذاری تصاویر...</string>
+    <string name="permission_required">برای مشاهده تصاویر به اجازه دسترسی به حافظه نیاز است</string>
+    <string name="grant_permission">اجازه دادن</string>
+    <string name="permission_denied">دسترسی رد شد. لطفاً در تنظیمات اجازه دسترسی به حافظه را بدهید.</string>
+    <string name="open_settings">باز کردن تنظیمات</string>
+    <string name="about">درباره</string>
+    <string name="check_for_updates">بررسی به‌روزرسانی</string>
+    <string name="update_available">به‌روزرسانی موجود است</string>
+    <string name="up_to_date">برنامه شما به‌روز است!</string>
+    <string name="back">بازگشت</string>
+    <string name="app_icon">آیکون برنامه</string>
+    <string name="app_description">کپی سریع و آسان مسیر تصاویر برای اندروید</string>
+    <string name="updates">به‌روزرسانی‌ها</string>
+    <string name="checking_updates">در حال بررسی به‌روزرسانی...</string>
+    <string name="new_version_available">نسخه جدید موجود است: %1$s</string>
+    <string name="downloading_update">در حال دانلود به‌روزرسانی...</string>
+    <string name="update_now">به‌روزرسانی اکنون</string>
+    <string name="view_notes">مشاهده یادداشت‌ها</string>
+    <string name="check_updates_github">بررسی به‌روزرسانی از GitHub</string>
+    <string name="failed_check_updates">بررسی به‌روزرسانی ناموفق بود: %1$s</string>
+    <string name="failed_download_update">دانلود به‌روزرسانی ناموفق بود</string>
+    <string name="download_failed">دانلود ناموفق بود: %1$s</string>
+    <string name="license">مجوز</string>
+    <string name="mit_license">مجوز MIT</string>
+    <string name="copyright">کپی‌رایت © 2024 Alexey Abramov</string>
+    <string name="license_description">نرم‌افزار متن‌باز تحت مجوز MIT. شما در استفاده، تغییر و توزیع این نرم‌افزار آزاد هستید.</string>
+    <string name="made_with_heart">ساخته شده با ❤️ برای کاربران Gemini، Codex و Claude در Termux</string>
+    <string name="release_notes_title">یادداشت‌های انتشار - v%1$s</string>
+    <string name="close">بستن</string>
+    <string name="cat_all">همه</string>
+    <string name="cat_screenshots">اسکرین‌شات‌ها</string>
+    <string name="cat_camera">دوربین</string>
+    <string name="cat_downloads">دانلودها</string>
+    <string name="cat_other">سایر</string>
+    <string name="language">زبان</string>
+    <string name="system_language">زبان سیستم (پیش‌فرض)</string>
+    <string name="select_language">انتخاب زبان</string>
+</resources>

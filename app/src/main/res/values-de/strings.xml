@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Pic Path</string>
+    <string name="search_hint">Bilder suchen...</string>
+    <string name="path_copied">Pfad in die Zwischenablage kopiert</string>
+    <string name="no_images_found">Keine Bilder gefunden</string>
+    <string name="loading">Bilder werden geladen...</string>
+    <string name="permission_required">Speicherzugriff ist erforderlich, um Bilder anzuzeigen</string>
+    <string name="grant_permission">Berechtigung erteilen</string>
+    <string name="permission_denied">Berechtigung verweigert. Bitte erteilen Sie in den Einstellungen Zugriff auf den Speicher.</string>
+    <string name="open_settings">Einstellungen öffnen</string>
+    <string name="about">Über</string>
+    <string name="check_for_updates">Nach Updates suchen</string>
+    <string name="update_available">Update verfügbar</string>
+    <string name="up_to_date">Die App ist auf dem neuesten Stand!</string>
+    <string name="back">Zurück</string>
+    <string name="app_icon">App-Symbol</string>
+    <string name="app_description">Schnelles, einfaches Kopieren von Bildpfaden für Android</string>
+    <string name="updates">Updates</string>
+    <string name="checking_updates">Suche nach Updates...</string>
+    <string name="new_version_available">Neue Version verfügbar: %1$s</string>
+    <string name="downloading_update">Update wird heruntergeladen...</string>
+    <string name="update_now">Jetzt aktualisieren</string>
+    <string name="view_notes">Notizen anzeigen</string>
+    <string name="check_updates_github">Auf GitHub nach Updates suchen</string>
+    <string name="failed_check_updates">Fehler bei der Suche nach Updates: %1$s</string>
+    <string name="failed_download_update">Update konnte nicht heruntergeladen werden</string>
+    <string name="download_failed">Download fehlgeschlagen: %1$s</string>
+    <string name="license">Lizenz</string>
+    <string name="mit_license">MIT-Lizenz</string>
+    <string name="copyright">Copyright © 2024 Alexey Abramov</string>
+    <string name="license_description">Open-Source-Software unter der MIT-Lizenz. Sie können diese Software frei verwenden, modifizieren und verbreiten.</string>
+    <string name="made_with_heart">Mit ❤️ erstellt für Nutzer von Gemini, Codex und Claude auf Termux</string>
+    <string name="release_notes_title">Versionshinweise - v%1$s</string>
+    <string name="close">Schließen</string>
+    <string name="cat_all">Alle</string>
+    <string name="cat_screenshots">Screenshots</string>
+    <string name="cat_camera">Kamera</string>
+    <string name="cat_downloads">Downloads</string>
+    <string name="cat_other">Andere</string>
+    <string name="language">Sprache</string>
+    <string name="system_language">Systemsprache (Standard)</string>
+    <string name="select_language">Sprache wählen</string>
+</resources>

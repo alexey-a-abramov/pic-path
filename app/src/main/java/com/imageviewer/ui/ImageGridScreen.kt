@@ -4,14 +4,23 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material3.BottomAppBar
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -58,6 +67,8 @@ fun ImageGridScreen(
     val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
     val searchQuery by viewModel.searchQuery.collectAsStateWithLifecycle()
     val selectedCategory by viewModel.selectedCategory.collectAsStateWithLifecycle()
+    val isSelectionMode by viewModel.isSelectionMode.collectAsStateWithLifecycle()
+    val selectedImageIds by viewModel.selectedImageIds.collectAsStateWithLifecycle()
 
     val context = LocalContext.current
     val snackbarHostState = remember { SnackbarHostState() }
@@ -68,6 +79,14 @@ fun ImageGridScreen(
     var shouldRefresh by remember { mutableStateOf(false) }
 
     val categories = listOf("All", "Screenshots", "Camera", "Downloads", "Other")
+    val categoryLabels = mapOf(
+        "All" to stringResource(R.string.cat_all),
+        "Screenshots" to stringResource(R.string.cat_screenshots),
+        "Camera" to stringResource(R.string.cat_camera),
+        "Downloads" to stringResource(R.string.cat_downloads),
+        "Other" to stringResource(R.string.cat_other)
+    )
+    
     val swipeRefreshState = rememberSwipeRefreshState(isRefreshing = isLoading)
 
     // Auto-refresh after copy with delay for smooth UX
@@ -97,16 +116,63 @@ fun ImageGridScreen(
         Scaffold(
             topBar = {
                 TopAppBar(
-                    title = { Text("Pic Path") },
+                    title = {
+                        if (isSelectionMode) {
+                            Text(stringResource(R.string.selection_mode))
+                        } else {
+                            Text(stringResource(R.string.app_name))
+                        }
+                    },
                     actions = {
                         IconButton(onClick = onNavigateToAbout) {
                             Icon(
                                 imageVector = Icons.Default.Info,
-                                contentDescription = "About"
+                                contentDescription = stringResource(R.string.about)
                             )
                         }
                     }
                 )
+            },
+            bottomBar = {
+                if (isSelectionMode && selectedImageIds.isNotEmpty()) {
+                    BottomAppBar {
+                        Row(
+                            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                            horizontalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
+                            OutlinedButton(
+                                onClick = { viewModel.clearSelection() },
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Icon(Icons.Default.Clear, contentDescription = null)
+                                Spacer(Modifier.width(8.dp))
+                                Text(stringResource(R.string.clear))
+                            }
+                            Button(
+                                onClick = {
+                                    val paths = viewModel.getSelectedPaths()
+                                    val combinedPath = paths.joinToString("\n")
+                                    ClipboardHelper.copyToClipboard(context, combinedPath)
+                                    scope.launch {
+                                        snackbarHostState.showSnackbar(
+                                            message = context.getString(R.string.multiple_paths_copied)
+                                        )
+                                    }
+                                    viewModel.clearSelection()
+                                    shouldRefresh = true
+                                },
+                                modifier = Modifier.weight(1f),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = MaterialTheme.colorScheme.primary
+                                )
+                            ) {
+                                Icon(Icons.Default.ContentCopy, contentDescription = null)
+                                Spacer(Modifier.width(8.dp))
+                                Text(stringResource(R.string.copy_selected, selectedImageIds.size))
+                            }
+                        }
+                    }
+                }
             },
             snackbarHost = {
                 SnackbarHost(hostState = snackbarHostState) { data ->
@@ -120,14 +186,14 @@ fun ImageGridScreen(
             Column(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
                 // Category Tabs
                 ScrollableTabRow(
-                    selectedTabIndex = categories.indexOf(selectedCategory),
+                    selectedTabIndex = categories.indexOf(selectedCategory).coerceAtLeast(0),
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     categories.forEach { category ->
                         Tab(
                             selected = selectedCategory == category,
                             onClick = { viewModel.selectCategory(category) },
-                            text = { Text(category) }
+                            text = { Text(categoryLabels[category] ?: category) }
                         )
                     }
                 }
@@ -182,8 +248,12 @@ fun ImageGridScreen(
                                         ImageGridItem(
                                             image = image,
                                             onClick = {
-                                                fullscreenIndex = index
-                                                showFullscreen = true
+                                                if (isSelectionMode) {
+                                                    viewModel.toggleImageSelection(image.id)
+                                                } else {
+                                                    fullscreenIndex = index
+                                                    showFullscreen = true
+                                                }
                                             },
                                             onCopyClick = {
                                                 ClipboardHelper.copyToClipboard(context, image.path)
@@ -193,7 +263,14 @@ fun ImageGridScreen(
                                                     )
                                                 }
                                                 shouldRefresh = true
-                                            }
+                                            },
+                                            onLongClick = {
+                                                if (!isSelectionMode) {
+                                                    viewModel.toggleSelectionMode(true)
+                                                }
+                                                viewModel.toggleImageSelection(image.id)
+                                            },
+                                            isSelected = selectedImageIds.contains(image.id)
                                         )
                                     }
                                 }

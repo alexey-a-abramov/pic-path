@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Pic Path</string>
+    <string name="search_hint">Tìm kiếm ảnh...</string>
+    <string name="path_copied">Đã sao chép đường dẫn vào bộ nhớ tạm</string>
+    <string name="no_images_found">Không tìm thấy ảnh nào</string>
+    <string name="loading">Đang tải ảnh...</string>
+    <string name="permission_required">Cần quyền truy cập bộ nhớ để xem ảnh</string>
+    <string name="grant_permission">Cấp quyền</string>
+    <string name="permission_denied">Quyền bị từ chối. Vui lòng cấp quyền truy cập bộ nhớ trong cài đặt.</string>
+    <string name="open_settings">Mở Cài đặt</string>
+    <string name="about">Giới thiệu</string>
+    <string name="check_for_updates">Kiểm tra cập nhật</string>
+    <string name="update_available">Có bản cập nhật mới</string>
+    <string name="up_to_date">Bạn đã cập nhật bản mới nhất!</string>
+    <string name="back">Quay lại</string>
+    <string name="app_icon">Biểu tượng ứng dụng</string>
+    <string name="app_description">Sao chép đường dẫn ảnh nhanh chóng, đơn giản cho Android</string>
+    <string name="updates">Cập nhật</string>
+    <string name="checking_updates">Đang kiểm tra cập nhật...</string>
+    <string name="new_version_available">Có phiên bản mới: %1$s</string>
+    <string name="downloading_update">Đang tải bản cập nhật...</string>
+    <string name="update_now">Cập nhật ngay</string>
+    <string name="view_notes">Xem ghi chú</string>
+    <string name="check_updates_github">Kiểm tra cập nhật từ GitHub</string>
+    <string name="failed_check_updates">Kiểm tra cập nhật thất bại: %1$s</string>
+    <string name="failed_download_update">Tải bản cập nhật thất bại</string>
+    <string name="download_failed">Tải xuống thất bại: %1$s</string>
+    <string name="license">Giấy phép</string>
+    <string name="mit_license">Giấy phép MIT</string>
+    <string name="copyright">Bản quyền © 2024 Alexey Abramov</string>
+    <string name="license_description">Phần mềm nguồn mở theo giấy phép MIT. Bạn có quyền sử dụng, sửa đổi và phân phối phần mềm này.</string>
+    <string name="made_with_heart">Được thực hiện với ❤️ dành cho người dùng Gemini, Codex và Claude trên Termux</string>
+    <string name="release_notes_title">Ghi chú phát hành - v%1$s</string>
+    <string name="close">Đóng</string>
+    <string name="cat_all">Tất cả</string>
+    <string name="cat_screenshots">Ảnh chụp màn hình</string>
+    <string name="cat_camera">Máy ảnh</string>
+    <string name="cat_downloads">Tải xuống</string>
+    <string name="cat_other">Khác</string>
+    <string name="language">Ngôn ngữ</string>
+    <string name="system_language">Ngôn ngữ hệ thống (Mặc định)</string>
+    <string name="select_language">Chọn ngôn ngữ</string>
+</resources>

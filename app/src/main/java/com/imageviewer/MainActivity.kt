@@ -7,10 +7,10 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -22,6 +22,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -31,13 +32,17 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import com.imageviewer.ui.ImageViewerApp
 import com.imageviewer.ui.SharedImageViewer
 import com.imageviewer.util.ClipboardHelper
+import com.imageviewer.util.LanguageManager
 import com.imageviewer.util.UriHelper
 import com.imageviewer.viewmodel.ImageViewModel
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 
-class MainActivity : ComponentActivity() {
+class MainActivity : AppCompatActivity() {
 
     private val viewModel: ImageViewModel by viewModels()
     private var hasPermission by mutableStateOf(false)
@@ -52,24 +57,31 @@ class MainActivity : ComponentActivity() {
             hasPermission = true
             permissionDenied = false
             viewModel.loadImages()
-            requestNotificationPermission()
         } else {
             permissionDenied = true
         }
     }
 
-    private val requestNotificationLauncher = registerForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { isGranted ->
-        // Notification permission is optional, so we don't block the app
-        // if it's denied
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        handleIntent(intent)
-        checkAndRequestPermission()
+        try {
+            // Apply saved language
+            lifecycleScope.launch {
+                try {
+                    val language = LanguageManager.getSelectedLanguage(this@MainActivity).first()
+                    LanguageManager.applyLanguage(language)
+                } catch (e: Exception) {
+                    android.util.Log.e("MainActivity", "Error applying language", e)
+                }
+            }
+
+            handleIntent(intent)
+            checkAndRequestPermission()
+        } catch (e: Exception) {
+            android.util.Log.e("MainActivity", "Error in onCreate", e)
+            throw e
+        }
 
         setContent {
             MaterialTheme {
@@ -116,16 +128,20 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun handleIntent(intent: Intent?) {
-        if (intent?.action == Intent.ACTION_SEND && intent.type?.startsWith("image/") == true) {
-            (intent.getParcelableExtra<Uri>(Intent.EXTRA_STREAM))?.let { uri ->
-                sharedImageUri = uri
-                sharedImagePath = UriHelper.getPathFromUri(this, uri)
+        try {
+            if (intent?.action == Intent.ACTION_SEND && intent.type?.startsWith("image/") == true) {
+                (intent.getParcelableExtra<Uri>(Intent.EXTRA_STREAM))?.let { uri ->
+                    sharedImageUri = uri
+                    sharedImagePath = UriHelper.getPathFromUri(this, uri)
 
-                // Auto-copy the path and show notification
-                sharedImagePath?.let { path ->
-                    ClipboardHelper.copyToClipboard(this, path)
+                    // Auto-copy the path
+                    sharedImagePath?.let { path ->
+                        ClipboardHelper.copyToClipboard(this, path)
+                    }
                 }
             }
+        } catch (e: Exception) {
+            android.util.Log.e("MainActivity", "Error handling intent", e)
         }
     }
 
@@ -144,23 +160,9 @@ class MainActivity : ComponentActivity() {
                 hasPermission = true
                 permissionDenied = false
                 viewModel.loadImages()
-                requestNotificationPermission()
             }
             else -> {
                 requestPermissionLauncher.launch(permission)
-            }
-        }
-    }
-
-    private fun requestNotificationPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            val notificationPermission = Manifest.permission.POST_NOTIFICATIONS
-            if (ContextCompat.checkSelfPermission(
-                    this,
-                    notificationPermission
-                ) != PackageManager.PERMISSION_GRANTED
-            ) {
-                requestNotificationLauncher.launch(notificationPermission)
             }
         }
     }

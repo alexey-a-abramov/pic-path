@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Pic Path</string>
+    <string name="search_hint">படங்களைத் தேடு...</string>
+    <string name="path_copied">பாதை கிளிப்போர்டில் நகலெடுக்கப்பட்டது</string>
+    <string name="no_images_found">படங்கள் எதுவும் இல்லை</string>
+    <string name="loading">படங்கள் ஏற்றப்படுகின்றன...</string>
+    <string name="permission_required">படங்களைப் பார்க்க சேமிப்பக அனுமதி தேவை</string>
+    <string name="grant_permission">அனுமதி வழங்கு</string>
+    <string name="permission_denied">அனுமதி மறுக்கப்பட்டது. அமைப்புகளில் சேமிப்பக அனுமதியை வழங்கவும்.</string>
+    <string name="open_settings">அமைப்புகளைத் திற</string>
+    <string name="about">பற்றி</string>
+    <string name="check_for_updates">புதுப்பிப்புகளைச் சரிபார்</string>
+    <string name="update_available">புதுப்பிப்பு உள்ளது</string>
+    <string name="up_to_date">உங்கள் ஆப் புதுப்பித்த நிலையில் உள்ளது!</string>
+    <string name="back">பின்செல்</string>
+    <string name="app_icon">ஆப் ஐகான்</string>
+    <string name="app_description">Android க்கான வேகமான, எளிமையான படப் பாதை நகலெடுப்பு</string>
+    <string name="updates">புதுப்பிப்புகள்</string>
+    <string name="checking_updates">புதுப்பிப்புகளைச் சரிபார்க்கிறது...</string>
+    <string name="new_version_available">புதிய பதிப்பு உள்ளது: %1$s</string>
+    <string name="downloading_update">புதுப்பிப்பு பதிவிறக்கப்படுகிறது...</string>
+    <string name="update_now">இப்போதே புதுப்பி</string>
+    <string name="view_notes">குறிப்புகளைப் பார்</string>
+    <string name="check_updates_github">GitHub இலிருந்து புதுப்பிப்புகளைச் சரிபார்</string>
+    <string name="failed_check_updates">புதுப்பிப்புகளைச் சரிபார்க்க முடியவில்லை: %1$s</string>
+    <string name="failed_download_update">புதுப்பிப்பைப் பதிவிறக்க முடியவில்லை</string>
+    <string name="download_failed">பதிவிறக்கம் தோல்வியடைந்தது: %1$s</string>
+    <string name="license">உரிமம்</string>
+    <string name="mit_license">MIT உரிமம்</string>
+    <string name="copyright">பதிப்புரிமை © 2024 Alexey Abramov</string>
+    <string name="license_description">MIT உரிமத்தின் கீழ் ஓப்பன் சோர்ஸ் மென்பொருள். இந்த மென்பொருளை நீங்கள் பயன்படுத்தலாம், மாற்றலாம் மற்றும் விநியோகிக்கலாம்.</string>
+    <string name="made_with_heart">Termux இல் உள்ள Gemini, Codex மற்றும் Claude பயனர்களுக்காக ❤️ உடன் உருவாக்கப்பட்டது</string>
+    <string name="release_notes_title">பதிப்புக் குறிப்புகள் - v%1$s</string>
+    <string name="close">மூடு</string>
+    <string name="cat_all">எல்லாம்</string>
+    <string name="cat_screenshots">ஸ்கிரீன்ஷாட்கள்</string>
+    <string name="cat_camera">கேமரா</string>
+    <string name="cat_downloads">பதிவிறக்கங்கள்</string>
+    <string name="cat_other">மற்றவை</string>
+    <string name="language">மொழி</string>
+    <string name="system_language">கணினி மொழி (இயல்புநிலை)</string>
+    <string name="select_language">மொழியைத் தேர்ந்தெடு</string>
+</resources>

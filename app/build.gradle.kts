@@ -67,6 +67,7 @@ dependencies {
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.material3:material3")
     implementation("androidx.compose.material3:material3-adaptive-navigation-suite")
+    implementation("androidx.compose.material:material-icons-extended")
 
     // Compose Activity
     implementation("androidx.activity:activity-compose:1.8.1")
@@ -99,6 +100,12 @@ dependencies {
 
     // Core KTX
     implementation("androidx.core:core-ktx:1.12.0")
+
+    // DataStore Preferences
+    implementation("androidx.datastore:datastore-preferences:1.0.0")
+
+    // AppCompat for Locale management
+    implementation("androidx.appcompat:appcompat:1.6.1")
 
     // Testing
     testImplementation("junit:junit:4.13.2")

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Pic Path</string>
+    <string name="search_hint">Goleki gambar...</string>
+    <string name="path_copied">Alamat gambar wis disalin menyang clipboard</string>
+    <string name="no_images_found">Gambar ora ketemu</string>
+    <string name="loading">Lagi mbukak gambar...</string>
+    <string name="permission_required">Butuh izin panyimpenan kanggo ndeleng gambar</string>
+    <string name="grant_permission">Wenehi Izin</string>
+    <string name="permission_denied">Izin ditolak. Monggo wenehi izin panyimpenan ing setelan.</string>
+    <string name="open_settings">Bukak Setelan</string>
+    <string name="about">Babagan</string>
+    <string name="check_for_updates">Cek Update</string>
+    <string name="update_available">Ana update anyar</string>
+    <string name="up_to_date">Aplikasi wis paling anyar!</string>
+    <string name="back">Bali</string>
+    <string name="app_icon">Ikon Aplikasi</string>
+    <string name="app_description">Salin alamat gambar sing cepet lan gampang kanggo Android</string>
+    <string name="updates">Update</string>
+    <string name="checking_updates">Lagi ngecek update...</string>
+    <string name="new_version_available">Versi anyar kasedhiya: %1$s</string>
+    <string name="downloading_update">Lagi ndownload update...</string>
+    <string name="update_now">Update Saiki</string>
+    <string name="view_notes">Deleng Cathetan</string>
+    <string name="check_updates_github">Cek update saka GitHub</string>
+    <string name="failed_check_updates">Gagal ngecek update: %1$s</string>
+    <string name="failed_download_update">Gagal ndownload update</string>
+    <string name="download_failed">Download gagal: %1$s</string>
+    <string name="license">Lisensi</string>
+    <string name="mit_license">Lisensi MIT</string>
+    <string name="copyright">Hak Cipta © 2024 Alexey Abramov</string>
+    <string name="license_description">Software sumber terbuka kanthi lisensi MIT. Sampeyan bebas nggunakake, ngowahi, lan nyebarake software iki.</string>
+    <string name="made_with_heart">Digawe kanthi ❤️ kanggo pangguna Gemini, Codex, lan Claude ing Termux</string>
+    <string name="release_notes_title">Cathetan Rilis - v%1$s</string>
+    <string name="close">Tutup</string>
+    <string name="cat_all">Kabeh</string>
+    <string name="cat_screenshots">Tangkapan Layar</string>
+    <string name="cat_camera">Kamera</string>
+    <string name="cat_downloads">Unduhan</string>
+    <string name="cat_other">Liyane</string>
+    <string name="language">Basa</string>
+    <string name="system_language">Basa Sistem (Default)</string>
+    <string name="select_language">Pilih Basa</string>
+</resources>

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Pic Path</string>
+    <string name="search_hint">البحث عن الصور...</string>
+    <string name="path_copied">تم نسخ المسار إلى الحافظة</string>
+    <string name="no_images_found">لم يتم العثور على صور</string>
+    <string name="loading">جاري تحميل الصور...</string>
+    <string name="permission_required">مطلوب إذن التخزين لعرض الصور</string>
+    <string name="grant_permission">منح الإذن</string>
+    <string name="permission_denied">تم رفض الإذن. يرجى منح إذن التخزين في الإعدادات.</string>
+    <string name="open_settings">فتح الإعدادات</string>
+    <string name="about">حول</string>
+    <string name="check_for_updates">التحقق من وجود تحديثات</string>
+    <string name="update_available">تحديث متاح</string>
+    <string name="up_to_date">أنت تستخدم أحدث إصدار!</string>
+    <string name="back">رجوع</string>
+    <string name="app_icon">أيقونة التطبيق</string>
+    <string name="app_description">نسخ مسار الصور بسرعة وسهولة للأندرويد</string>
+    <string name="updates">التحديثات</string>
+    <string name="checking_updates">جاري التحقق من وجود تحديثات...</string>
+    <string name="new_version_available">يتوفر إصدار جديد: %1$s</string>
+    <string name="downloading_update">جاري تحميل التحديث...</string>
+    <string name="update_now">تحديث الآن</string>
+    <string name="view_notes">عرض الملاحظات</string>
+    <string name="check_updates_github">التحقق من التحديثات من GitHub</string>
+    <string name="failed_check_updates">فشل التحقق من التحديثات: %1$s</string>
+    <string name="failed_download_update">فشل تحميل التحديث</string>
+    <string name="download_failed">فشل التحميل: %1$s</string>
+    <string name="license">الترخيص</string>
+    <string name="mit_license">ترخيص MIT</string>
+    <string name="copyright">حقوق النشر © 2024 Alexey Abramov</string>
+    <string name="license_description">برمجيات مفتوحة المصدر مرخصة بموجب ترخيص MIT. أنت حر في استخدام البرمجيات وتعديلها وتوزيعها.</string>
+    <string name="made_with_heart">صُنع بـ ❤️ لمستخدمي Gemini و Codex و Claude على Termux</string>
+    <string name="release_notes_title">ملاحظات الإصدار - v%1$s</string>
+    <string name="close">إغلاق</string>
+    <string name="cat_all">الكل</string>
+    <string name="cat_screenshots">لقطات الشاشة</string>
+    <string name="cat_camera">الكاميرا</string>
+    <string name="cat_downloads">التنزيلات</string>
+    <string name="cat_other">أخرى</string>
+    <string name="language">اللغة</string>
+    <string name="system_language">لغة النظام (افتراضي)</string>
+    <string name="select_language">اختر اللغة</string>
+</resources>

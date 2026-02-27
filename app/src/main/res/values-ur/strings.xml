@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Pic Path</string>
+    <string name="search_hint">تصویریں تلاش کریں...</string>
+    <string name="path_copied">راستہ کلپ بورڈ پر کاپی کر لیا گیا ہے</string>
+    <string name="no_images_found">کوئی تصویر نہیں ملی</string>
+    <string name="loading">تصویریں لوڈ ہو رہی ہیں...</string>
+    <string name="permission_required">تصویریں دیکھنے کے لیے اسٹوریج کی اجازت درکار ہے</string>
+    <string name="grant_permission">اجازت دیں</string>
+    <string name="permission_denied">اجازت مسترد کر دی گئی۔ براہ کرم ترتیبات میں اسٹوریج کی اجازت دیں۔</string>
+    <string name="open_settings">ترتیبات کھولیں</string>
+    <string name="about">کے بارے میں</string>
+    <string name="check_for_updates">اپ ڈیٹ چیک کریں</string>
+    <string name="update_available">اپ ڈیٹ دستیاب ہے</string>
+    <string name="up_to_date">آپ کی ایپ اپ ٹو ڈیٹ ہے!</string>
+    <string name="back">پیچھے</string>
+    <string name="app_icon">ایپ آئیکن</string>
+    <string name="app_description">اینڈرائیڈ کے لیے تیز اور آسان امیج پاتھ کاپی کرنا</string>
+    <string name="updates">اپ ڈیٹس</string>
+    <string name="checking_updates">اپ ڈیٹ چیک کیا جا رہا ہے...</string>
+    <string name="new_version_available">نیا ورژن دستیاب ہے: %1$s</string>
+    <string name="downloading_update">اپ ڈیٹ ڈاؤن لوڈ ہو رہا ہے...</string>
+    <string name="update_now">ابھی اپ ڈیٹ کریں</string>
+    <string name="view_notes">نوٹس دیکھیں</string>
+    <string name="check_updates_github">GitHub سے اپ ڈیٹ چیک کریں</string>
+    <string name="failed_check_updates">اپ ڈیٹ چیک کرنے میں ناکامی: %1$s</string>
+    <string name="failed_download_update">اپ ڈیٹ ڈاؤن لوڈ کرنے میں ناکامی</string>
+    <string name="download_failed">ڈاؤن لوڈ ناکام ہو گیا: %1$s</string>
+    <string name="license">لائسنس</string>
+    <string name="mit_license">MIT لائسنس</string>
+    <string name="copyright">کاپی رائٹ © 2024 Alexey Abramov</string>
+    <string name="license_description">MIT لائسنس کے تحت اوپن سورس سافٹ ویئر۔ آپ اس سافٹ ویئر کو استعمال کرنے، ترمیم کرنے اور تقسیم کرنے میں آزاد ہیں۔</string>
+    <string name="made_with_heart">ٹرمکس پر جیمنائی، کوڈیکس اور کلاڈ صارفین کے لیے ❤️ کے ساتھ بنایا گیا ہے</string>
+    <string name="release_notes_title">ریلیز نوٹس - v%1$s</string>
+    <string name="close">بند کریں</string>
+    <string name="cat_all">تمام</string>
+    <string name="cat_screenshots">اسکرین شاٹس</string>
+    <string name="cat_camera">کیمرہ</string>
+    <string name="cat_downloads">ڈاؤن لوڈز</string>
+    <string name="cat_other">دیگر</string>
+    <string name="language">زبان</string>
+    <string name="system_language">سسٹم کی زبان (ڈیفالٹ)</string>
+    <string name="select_language">زبان منتخب کریں</string>
+</resources>

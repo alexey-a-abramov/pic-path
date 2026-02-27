@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Pic Path</string>
+    <string name="search_hint">Resimlerde ara...</string>
+    <string name="path_copied">Yol panoya kopyalandı</string>
+    <string name="no_images_found">Resim bulunamadı</string>
+    <string name="loading">Resimler yükleniyor...</string>
+    <string name="permission_required">Resimleri görmek için depolama izni gereklidir</string>
+    <string name="grant_permission">İzin Ver</string>
+    <string name="permission_denied">İzin reddedildi. Lütfen ayarlardan depolama izni verin.</string>
+    <string name="open_settings">Ayarları Aç</string>
+    <string name="about">Hakkında</string>
+    <string name="check_for_updates">Güncellemeleri Denetle</string>
+    <string name="update_available">Güncelleme mevcut</string>
+    <string name="up_to_date">Güncelsiniz!</string>
+    <string name="back">Geri</string>
+    <string name="app_icon">Uygulama Simgesi</string>
+    <string name="app_description">Android için Hızlı, Basit Resim Yolu Kopyalama</string>
+    <string name="updates">Güncellemeler</string>
+    <string name="checking_updates">Güncellemeler denetleniyor...</string>
+    <string name="new_version_available">Yeni sürüm mevcut: %1$s</string>
+    <string name="downloading_update">Güncelleme indiriliyor...</string>
+    <string name="update_now">Şimdi Güncelle</string>
+    <string name="view_notes">Notları Görüntüle</string>
+    <string name="check_updates_github">GitHub\'dan güncellemeleri denetle</string>
+    <string name="failed_check_updates">Güncellemeler denetlenemedi: %1$s</string>
+    <string name="failed_download_update">Güncelleme indirilemedi</string>
+    <string name="download_failed">İndirme başarısız: %1$s</string>
+    <string name="license">Lisans</string>
+    <string name="mit_license">MIT Lisansı</string>
+    <string name="copyright">Telif Hakkı © 2024 Alexey Abramov</string>
+    <string name="license_description">MIT Lisansı altında açık kaynaklı yazılım. Bu yazılımı kullanmakta, değiştirmekte ve dağıtmakta özgürsünüz.</string>
+    <string name="made_with_heart">Termux\'taki Gemini, Codex ve Claude kullanıcıları için ❤️ ile yapıldı</string>
+    <string name="release_notes_title">Sürüm Notları - v%1$s</string>
+    <string name="close">Kapat</string>
+    <string name="cat_all">Hepsi</string>
+    <string name="cat_screenshots">Ekran Görüntüleri</string>
+    <string name="cat_camera">Kamera</string>
+    <string name="cat_downloads">İndirilenler</string>
+    <string name="cat_other">Diğer</string>
+    <string name="language">Dil</string>
+    <string name="system_language">Sistem Dili (Varsayılan)</string>
+    <string name="select_language">Dil Seçin</string>
+</resources>

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Pic Path</string>
+    <string name="search_hint">画像を検索...</string>
+    <string name="path_copied">パスをクリップボードにコピーしました</string>
+    <string name="no_images_found">画像が見つかりません</string>
+    <string name="loading">画像を読み込み中...</string>
+    <string name="permission_required">画像を表示するにはストレージの権限が必要です</string>
+    <string name="grant_permission">権限を許可</string>
+    <string name="permission_denied">権限が拒否されました。設定からストレージの権限を許可してください。</string>
+    <string name="open_settings">設定を開く</string>
+    <string name="about">アプリについて</string>
+    <string name="check_for_updates">アップデートを確認</string>
+    <string name="update_available">アップデートがあります</string>
+    <string name="up_to_date">最新の状態です！</string>
+    <string name="back">戻る</string>
+    <string name="app_icon">アプリのアイコン</string>
+    <string name="app_description">Android用の高速でシンプルな画像パスクリップツール</string>
+    <string name="updates">アップデート</string>
+    <string name="checking_updates">アップデートを確認中...</string>
+    <string name="new_version_available">新しいバージョンが利用可能です: %1$s</string>
+    <string name="downloading_update">アップデートをダウンロード中...</string>
+    <string name="update_now">今すぐアップデート</string>
+    <string name="view_notes">更新内容を表示</string>
+    <string name="check_updates_github">GitHubからアップデートを確認</string>
+    <string name="failed_check_updates">アップデートの確認に失敗しました: %1$s</string>
+    <string name="failed_download_update">アップデートのダウンロードに失敗しました</string>
+    <string name="download_failed">ダウンロードに失敗しました: %1$s</string>
+    <string name="license">ライセンス</string>
+    <string name="mit_license">MITライセンス</string>
+    <string name="copyright">Copyright © 2024 Alexey Abramov</string>
+    <string name="license_description">MITライセンスの下で公開されているオープンソースソフトウェアです。自由に使用、変更、配布することができます。</string>
+    <string name="made_with_heart">Termux上のGemini、Codex、Claudeユーザーのために❤️を込めて作成</string>
+    <string name="release_notes_title">リリースノート - v%1$s</string>
+    <string name="close">閉じる</string>
+    <string name="cat_all">すべて</string>
+    <string name="cat_screenshots">スクリーンショット</string>
+    <string name="cat_camera">カメラ</string>
+    <string name="cat_downloads">ダウンロード</string>
+    <string name="cat_other">その他</string>
+    <string name="language">言語</string>
+    <string name="system_language">システム言語 (デフォルト)</string>
+    <string name="select_language">言語を選択</string>
+</resources>

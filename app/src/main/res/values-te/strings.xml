@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Pic Path</string>
+    <string name="search_hint">చిత్రాలను వెతకండి...</string>
+    <string name="path_copied">పాత్ క్లిప్‌బోర్డ్‌కు కాపీ చేయబడింది</string>
+    <string name="no_images_found">చిత్రాలు కనుగొనబడలేదు</string>
+    <string name="loading">చిత్రాలు లోడ్ అవుతున్నాయి...</string>
+    <string name="permission_required">చిత్రాలను చూడటానికి స్టోరేజ్ అనుమతి అవసరం</string>
+    <string name="grant_permission">అనుమతి ఇవ్వండి</string>
+    <string name="permission_denied">అనుమతి నిరాకరించబడింది. దయచేసి సెట్టింగ్స్‌లో స్టోరేజ్ అనుమతి ఇవ్వండి.</string>
+    <string name="open_settings">సెట్టింగ్స్ తెరువు</string>
+    <string name="about">గురించి</string>
+    <string name="check_for_updates">అప్‌డేట్స్ కోసం తనిఖీ చేయండి</string>
+    <string name="update_available">అప్‌డేట్ అందుబాటులో ఉంది</string>
+    <string name="up_to_date">మీరు అప్‌-టు-డేట్‌గా ఉన్నారు!</string>
+    <string name="back">వెనుకకు</string>
+    <string name="app_icon">యాప్ చిహ్నం</string>
+    <string name="app_description">Android కోసం వేగవంతమైన, సరళమైన చిత్ర మార్గం కాపీ చేయడం</string>
+    <string name="updates">అప్‌డేట్స్</string>
+    <string name="checking_updates">అప్‌డేట్స్ కోసం తనిఖీ చేస్తోంది...</string>
+    <string name="new_version_available">కొత్త వెర్షన్ అందుబాటులో ఉంది: %1$s</string>
+    <string name="downloading_update">అప్‌డేట్ డౌన్‌లోడ్ అవుతోంది...</string>
+    <string name="update_now">ఇప్పుడే అప్‌డేట్ చేయండి</string>
+    <string name="view_notes">నోట్స్ చూడండి</string>
+    <string name="check_updates_github">GitHub నుండి అప్‌డేట్స్ తనిఖీ చేయండి</string>
+    <string name="failed_check_updates">అప్‌డేట్స్ తనిఖీ చేయడం విఫలమైంది: %1$s</string>
+    <string name="failed_download_update">అప్‌డేట్ డౌన్‌లోడ్ చేయడం విఫలమైంది</string>
+    <string name="download_failed">డౌన్‌లోడ్ విఫలమైంది: %1$s</string>
+    <string name="license">లైసెన్స్</string>
+    <string name="mit_license">MIT లైసెన్స్</string>
+    <string name="copyright">కాపీరైట్ © 2024 Alexey Abramov</string>
+    <string name="license_description">MIT లైసెన్స్ కింద ఓపెన్ సోర్స్ సాఫ్ట్‌వేర్. మీరు ఈ సాఫ్ట్‌వేర్‌ను ఉపయోగించుకోవడానికి, మార్చడానికి మరియు పంపిణీ చేయడానికి స్వేచ్ఛ ఉంది.</string>
+    <string name="made_with_heart">Termuxలో Gemini, Codex మరియు Claude వినియోగదారుల కోసం ❤️ తో తయారు చేయబడింది</string>
+    <string name="release_notes_title">రిలీజ్ నోట్స్ - v%1$s</string>
+    <string name="close">మూసివేయి</string>
+    <string name="cat_all">అన్నీ</string>
+    <string name="cat_screenshots">స్క్రీన్‌షాట్లు</string>
+    <string name="cat_camera">కెమెరా</string>
+    <string name="cat_downloads">డౌన్‌లోడ్‌లు</string>
+    <string name="cat_other">ఇతరాలు</string>
+    <string name="language">భాష</string>
+    <string name="system_language">సిస్టమ్ భాష (డిఫాల్ట్)</string>
+    <string name="select_language">భాషను ఎంచుకోండి</string>
+</resources>

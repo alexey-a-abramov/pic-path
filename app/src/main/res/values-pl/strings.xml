@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Pic Path</string>
+    <string name="search_hint">Szukaj zdjęć...</string>
+    <string name="path_copied">Ścieżka skopiowana do schowka</string>
+    <string name="no_images_found">Nie znaleziono zdjęć</string>
+    <string name="loading">Ładowanie zdjęć...</string>
+    <string name="permission_required">Wymagane jest zezwolenie na dostęp do pamięci, aby wyświetlić zdjęcia</string>
+    <string name="grant_permission">Przyznaj uprawnienia</string>
+    <string name="permission_denied">Odmowa dostępu. Proszę przyznać uprawnienia w ustawieniach.</string>
+    <string name="open_settings">Otwórz Ustawienia</string>
+    <string name="about">O aplikacji</string>
+    <string name="check_for_updates">Sprawdź aktualizacje</string>
+    <string name="update_available">Dostępna aktualizacja</string>
+    <string name="up_to_date">Aplikacja jest aktualna!</string>
+    <string name="back">Wstecz</string>
+    <string name="app_icon">Ikona aplikacji</string>
+    <string name="app_description">Szybkie i proste kopiowanie ścieżek obrazów dla Androida</string>
+    <string name="updates">Aktualizacje</string>
+    <string name="checking_updates">Sprawdzanie aktualizacji...</string>
+    <string name="new_version_available">Dostępna nowa wersja: %1$s</string>
+    <string name="downloading_update">Pobieranie aktualizacji...</string>
+    <string name="update_now">Aktualizuj teraz</string>
+    <string name="view_notes">Pokaż opis</string>
+    <string name="check_updates_github">Sprawdź aktualizacje na GitHubie</string>
+    <string name="failed_check_updates">Błąd sprawdzania aktualizacji: %1$s</string>
+    <string name="failed_download_update">Błąd pobierania aktualizacji</string>
+    <string name="download_failed">Pobieranie nie powiodło się: %1$s</string>
+    <string name="license">Licencja</string>
+    <string name="mit_license">Licencja MIT</string>
+    <string name="copyright">Copyright © 2024 Alexey Abramov</string>
+    <string name="license_description">Oprogramowanie open source na licencji MIT. Możesz swobodnie używać, modyfikować i rozpowszechniać to oprogramowanie.</string>
+    <string name="made_with_heart">Stworzone z ❤️ dla użytkowników Gemini, Codex i Claude na Termux</string>
+    <string name="release_notes_title">Lista zmian - v%1$s</string>
+    <string name="close">Zamknij</string>
+    <string name="cat_all">Wszystkie</string>
+    <string name="cat_screenshots">Zrzuty ekranu</string>
+    <string name="cat_camera">Aparat</string>
+    <string name="cat_downloads">Pobrane</string>
+    <string name="cat_other">Inne</string>
+    <string name="language">Język</string>
+    <string name="system_language">Język systemowy (domyślny)</string>
+    <string name="select_language">Wybierz język</string>
+</resources>
