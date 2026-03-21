@@ -59,4 +59,16 @@
     <string name="error_report">Error Report</string>
     <string name="copy_stacktrace">Copy Stacktrace</string>
     <string name="restart_app">Restart App</string>
+    
+    <!-- Image Editor -->
+    <string name="edit">Edit</string>
+    <string name="crop">Crop</string>
+    <string name="arrow">Arrow</string>
+    <string name="text">Text</string>
+    <string name="undo">Undo</string>
+    <string name="done">Done</string>
+    <string name="cancel">Cancel</string>
+    <string name="enter_text_placeholder">Enter text</string>
+    <string name="add_text">Add text</string>
+    <string name="edit_image">Edit Image</string>
 </resources>

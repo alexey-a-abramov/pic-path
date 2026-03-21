@@ -77,6 +77,7 @@ fun ImageGridScreen(
     var showFullscreen by remember { mutableStateOf(false) }
     var fullscreenIndex by remember { mutableStateOf(0) }
     var shouldRefresh by remember { mutableStateOf(false) }
+    var targetPath by remember { mutableStateOf<String?>(null) }
 
     val categories = listOf("All", "Screenshots", "Camera", "Downloads", "Other")
     val categoryLabels = mapOf(
@@ -86,15 +87,20 @@ fun ImageGridScreen(
         "Downloads" to stringResource(R.string.cat_downloads),
         "Other" to stringResource(R.string.cat_other)
     )
-    
     val swipeRefreshState = rememberSwipeRefreshState(isRefreshing = isLoading)
 
-    // Auto-refresh after copy with delay for smooth UX
-    LaunchedEffect(shouldRefresh) {
-        if (shouldRefresh) {
-            kotlinx.coroutines.delay(300) // Small delay to avoid jarring refresh
-            viewModel.refreshIndex()
-            shouldRefresh = false
+    // Auto-refresh and navigate after edit
+    LaunchedEffect(images, targetPath) {
+        targetPath?.let { path ->
+            val index = images.indexOfFirst { it.path == path }
+            if (index != -1) {
+                fullscreenIndex = index
+                showFullscreen = true
+                targetPath = null
+            } else {
+                // Not found yet, might need refresh
+                viewModel.refreshIndex()
+            }
         }
     }
 
@@ -109,10 +115,14 @@ fun ImageGridScreen(
                         message = context.getString(R.string.path_copied)
                     )
                 }
-                shouldRefresh = true
+                targetPath = path
+            },
+            onRefresh = { 
+                viewModel.refreshIndex()
             }
         )
     } else {
+
         Scaffold(
             topBar = {
                 TopAppBar(

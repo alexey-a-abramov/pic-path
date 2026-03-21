@@ -33,6 +33,13 @@ import com.imageviewer.data.model.ImageFile
 import com.imageviewer.util.ClipboardHelper
 import kotlinx.coroutines.launch
 
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import com.imageviewer.ui.components.ImageEditor
+
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun FullscreenImageViewer(
@@ -40,6 +47,7 @@ fun FullscreenImageViewer(
     initialIndex: Int,
     onClose: () -> Unit,
     onCopyPath: (String) -> Unit,
+    onRefresh: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val pagerState = rememberPagerState(
@@ -48,55 +56,93 @@ fun FullscreenImageViewer(
     )
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
+    
+    var editingImage by remember { mutableStateOf<ImageFile?>(null) }
 
     Box(
         modifier = modifier
             .fillMaxSize()
             .background(Color.Black)
     ) {
-        // Image Pager
-        HorizontalPager(
-            state = pagerState,
-            modifier = Modifier.fillMaxSize()
-        ) { page ->
-            val image = images[page]
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .combinedClickable(
-                        onClick = { },
-                        onLongClick = {
-                            ClipboardHelper.copyToClipboard(context, image.path)
-                            onCopyPath(image.path)
-                        }
-                    )
-            ) {
-                AsyncImage(
-                    model = image.uri,
-                    contentDescription = image.displayName,
-                    modifier = Modifier.fillMaxSize(),
-                    contentScale = ContentScale.Fit
-                )
-
-                // Copy button overlay (70% transparent) - bottom right
-                IconButton(
-                    onClick = {
-                        ClipboardHelper.copyToClipboard(context, image.path)
-                        onCopyPath(image.path)
-                    },
+        if (editingImage != null) {
+            ImageEditor(
+                imageUri = editingImage!!.uri,
+                imagePath = editingImage!!.path,
+                onSave = { newPath ->
+                    onRefresh()
+                    onCopyPath(newPath)
+                    editingImage = null
+                },
+                onCancel = { editingImage = null }
+            )
+        } else {
+            // Image Pager
+            HorizontalPager(
+                state = pagerState,
+                modifier = Modifier.fillMaxSize()
+            ) { page ->
+                val image = images[page]
+                Box(
                     modifier = Modifier
-                        .align(Alignment.BottomEnd)
-                        .padding(16.dp)
-                        .size(48.dp)
-                        .clip(CircleShape)
-                        .background(Color.White.copy(alpha = 0.3f))
+                        .fillMaxSize()
+                        .combinedClickable(
+                            onClick = { },
+                            onLongClick = {
+                                ClipboardHelper.copyToClipboard(context, image.path)
+                                onCopyPath(image.path)
+                            }
+                        )
                 ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_copy),
-                        contentDescription = "Copy path",
-                        tint = Color.White,
-                        modifier = Modifier.size(24.dp)
+                    AsyncImage(
+                        model = image.uri,
+                        contentDescription = image.displayName,
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Fit
                     )
+
+                    // Buttons overlay - bottom right
+                    Row(
+                        modifier = Modifier
+                            .align(Alignment.BottomEnd)
+                            .padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        // Edit button
+                        IconButton(
+                            onClick = { editingImage = image },
+                            modifier = Modifier
+                                .padding(end = 8.dp)
+                                .size(48.dp)
+                                .clip(CircleShape)
+                                .background(Color.White.copy(alpha = 0.3f))
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Edit,
+                                contentDescription = "Edit image",
+                                tint = Color.White,
+                                modifier = Modifier.size(24.dp)
+                            )
+                        }
+
+                        // Copy button
+                        IconButton(
+                            onClick = {
+                                ClipboardHelper.copyToClipboard(context, image.path)
+                                onCopyPath(image.path)
+                            },
+                            modifier = Modifier
+                                .size(48.dp)
+                                .clip(CircleShape)
+                                .background(Color.White.copy(alpha = 0.3f))
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_copy),
+                                contentDescription = "Copy path",
+                                tint = Color.White,
+                                modifier = Modifier.size(24.dp)
+                            )
+                        }
+                    }
                 }
             }
         }

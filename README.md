@@ -43,11 +43,13 @@ When using Claude (or other AI tools) on Android, you often need to provide imag
 **🖼️ Dual View Modes**
 - **Grid View**: 3-column thumbnail grid for browsing
 - **Fullscreen View**: Single tap opens fullscreen with swipe navigation
+- **Image Editor**: Integrated editor with crop and annotation tools (arrows and text)
 
 **📋 Multiple Copy Methods**
 - **Copy Button**: 70% transparent button on every image (bottom-right)
+- **Edit Button**: Quick access to crop and annotate before copying path
 - **Long Press**: Press and hold anywhere on image
-- **Share Target**: Share images from any app to auto-copy path
+- **Share Target**: Share images from any app to auto-copy path or edit before copying
 
 **🔔 Smart Notifications**
 - System notification appears when path is copied
@@ -85,7 +87,19 @@ When using Claude (or other AI tools) on Android, you often need to provide imag
 5. See notification confirming copy
 6. Paste path in Claude on Termux!
 
-### Method 2: Share from Any App (Recommended)
+### Method 2: Edit, Annotate, and Copy (New! ⚡)
+
+1. Open an image in fullscreen or share it to Pic Path
+2. Tap the **Edit** button (pencil icon)
+3. Use the tools:
+   - **Crop**: Drag to select an area
+   - **Arrow**: Drag to draw arrows pointing to specific details
+   - **Text**: Tap and type to add labels or explanations
+4. Tap **Done** (check icon)
+5. The edited image is saved to `Pictures/PicPath/` and its path is **automatically copied**!
+6. Paste the path directly to your AI model to give it perfect context.
+
+### Method 3: Share from Any App (Recommended)
 
 1. Open Gallery, Files, or any app with images
 2. Select an image
@@ -95,7 +109,7 @@ When using Claude (or other AI tools) on Android, you often need to provide imag
 6. Notification appears with the path
 7. Switch to Termux and paste
 
-### Method 3: Search and Copy
+### Method 4: Search and Copy
 
 1. Open Pic Path
 2. Use search bar at top
@@ -293,6 +307,13 @@ Contributions are welcome! Here's how:
 ---
 
 ## 📝 Changelog
+
+### v1.2.0 (2026-03-05)
+- ✨ **New Image Editor**: Crop and annotate images before copying paths
+- 🏹 **Arrow Tool**: Point AI models exactly where to look
+- 📝 **Text Tool**: Add labels and context directly to your images
+- ✂️ **Crop Tool**: Focus on the most important parts of a screenshot
+- 💾 **Auto-Save & Copy**: Edited images are saved to `Pictures/PicPath` and their new paths are instantly copied
 
 ### v1.1.0 (2026-02-26)
 - 🔄 Auto-update feature with GitHub integration
