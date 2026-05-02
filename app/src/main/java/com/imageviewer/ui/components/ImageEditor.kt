@@ -64,7 +64,11 @@ sealed class Annotation {
 }
 
 private enum class EditMode { None, Crop, Arrow, Text }
-private enum class Handle { TopLeft, TopRight, BottomLeft, BottomRight, Inside }
+private enum class Handle {
+    TopLeft, TopRight, BottomLeft, BottomRight,
+    Top, Bottom, Left, Right,
+    Inside
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -147,6 +151,10 @@ fun ImageEditor(
                                         right = rect.right + dragAmount.x,
                                         bottom = rect.bottom + dragAmount.y
                                     )
+                                    Handle.Top -> rect.copy(top = rect.top + dragAmount.y)
+                                    Handle.Bottom -> rect.copy(bottom = rect.bottom + dragAmount.y)
+                                    Handle.Left -> rect.copy(left = rect.left + dragAmount.x)
+                                    Handle.Right -> rect.copy(right = rect.right + dragAmount.x)
                                     Handle.Inside -> rect.translate(dragAmount.x, dragAmount.y)
                                     null -> return@detectDragGestures
                                 }
@@ -198,6 +206,34 @@ fun ImageEditor(
                 drawCircle(Color.White, radius = handleSize, center = normalized.topRight)
                 drawCircle(Color.White, radius = handleSize, center = normalized.bottomLeft)
                 drawCircle(Color.White, radius = handleSize, center = normalized.bottomRight)
+
+                // Edge midpoint handles: short bars perpendicular to each edge.
+                val edgeBarHalf = 18.dp.toPx()
+                val edgeBarThickness = 4.dp.toPx()
+                // Top
+                drawRect(
+                    color = Color.White,
+                    topLeft = Offset(normalized.center.x - edgeBarHalf, normalized.top - edgeBarThickness / 2f),
+                    size = androidx.compose.ui.geometry.Size(edgeBarHalf * 2f, edgeBarThickness)
+                )
+                // Bottom
+                drawRect(
+                    color = Color.White,
+                    topLeft = Offset(normalized.center.x - edgeBarHalf, normalized.bottom - edgeBarThickness / 2f),
+                    size = androidx.compose.ui.geometry.Size(edgeBarHalf * 2f, edgeBarThickness)
+                )
+                // Left
+                drawRect(
+                    color = Color.White,
+                    topLeft = Offset(normalized.left - edgeBarThickness / 2f, normalized.center.y - edgeBarHalf),
+                    size = androidx.compose.ui.geometry.Size(edgeBarThickness, edgeBarHalf * 2f)
+                )
+                // Right
+                drawRect(
+                    color = Color.White,
+                    topLeft = Offset(normalized.right - edgeBarThickness / 2f, normalized.center.y - edgeBarHalf),
+                    size = androidx.compose.ui.geometry.Size(edgeBarThickness, edgeBarHalf * 2f)
+                )
             }
         }
 
@@ -359,15 +395,34 @@ private fun clampRectToView(rect: Rect, viewSize: IntSize): Rect {
 private fun handleAt(offset: Offset, rect: Rect?): Handle? {
     rect ?: return null
     val n = normalize(rect)
-    val threshold = 56f
-    return when {
-        (offset - n.topLeft).getDistance() < threshold -> Handle.TopLeft
-        (offset - n.topRight).getDistance() < threshold -> Handle.TopRight
-        (offset - n.bottomLeft).getDistance() < threshold -> Handle.BottomLeft
-        (offset - n.bottomRight).getDistance() < threshold -> Handle.BottomRight
-        n.contains(offset) -> Handle.Inside
-        else -> null
+    val cornerRadius = 56f
+    val edgeBand = 36f
+
+    // Corners win — they overlap with edges and are the most precise gesture.
+    val cornerHits = listOf(
+        Handle.TopLeft to n.topLeft,
+        Handle.TopRight to n.topRight,
+        Handle.BottomLeft to n.bottomLeft,
+        Handle.BottomRight to n.bottomRight
+    )
+    cornerHits.minByOrNull { (offset - it.second).getDistance() }
+        ?.takeIf { (offset - it.second).getDistance() < cornerRadius }
+        ?.let { return it.first }
+
+    // Edges: a band along each side. Require the perpendicular axis to be near
+    // the edge AND the parallel axis to fall within the rect's span.
+    val withinX = offset.x in (n.left - edgeBand)..(n.right + edgeBand)
+    val withinY = offset.y in (n.top - edgeBand)..(n.bottom + edgeBand)
+    if (withinX) {
+        if (kotlin.math.abs(offset.y - n.top) < edgeBand) return Handle.Top
+        if (kotlin.math.abs(offset.y - n.bottom) < edgeBand) return Handle.Bottom
     }
+    if (withinY) {
+        if (kotlin.math.abs(offset.x - n.left) < edgeBand) return Handle.Left
+        if (kotlin.math.abs(offset.x - n.right) < edgeBand) return Handle.Right
+    }
+
+    return if (n.contains(offset)) Handle.Inside else null
 }
 
 private fun androidx.compose.ui.graphics.drawscope.DrawScope.drawArrow(
