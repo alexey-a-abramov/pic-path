@@ -22,6 +22,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -64,6 +65,15 @@ fun FullscreenImageViewer(
     val scope = rememberCoroutineScope()
     var showControls by remember { mutableStateOf(true) }
     var editingImage by remember { mutableStateOf<ImageFile?>(null) }
+
+    // After an edit-and-save the parent updates initialIndex to point at the new
+    // file. Pager state was captured at first composition and won't move on its
+    // own — sync it here so the user lands on the edited copy.
+    LaunchedEffect(initialIndex, images.size) {
+        if (initialIndex in 0 until images.size && initialIndex != pagerState.currentPage) {
+            pagerState.scrollToPage(initialIndex)
+        }
+    }
 
     Box(
         modifier = modifier
