@@ -1,6 +1,7 @@
 package com.imageviewer.util
 
 import android.content.Context
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import kotlinx.coroutines.flow.Flow
@@ -28,6 +29,7 @@ enum class MultiCopyFormat(val id: String, val separator: String, val itemPrefix
 
 object SettingsManager {
     private val MULTI_COPY_FORMAT_KEY = stringPreferencesKey("multi_copy_format")
+    private val FOLDER_TRAILING_SLASH_KEY = booleanPreferencesKey("folder_trailing_slash")
 
     fun getMultiCopyFormat(context: Context): Flow<MultiCopyFormat> =
         context.dataStore.data.map { prefs ->
@@ -38,5 +40,23 @@ object SettingsManager {
         context.dataStore.edit { prefs ->
             prefs[MULTI_COPY_FORMAT_KEY] = format.id
         }
+    }
+
+    /** When true (default), copied folder paths end with `/`. */
+    fun getFolderTrailingSlash(context: Context): Flow<Boolean> =
+        context.dataStore.data.map { prefs ->
+            prefs[FOLDER_TRAILING_SLASH_KEY] ?: true
+        }
+
+    suspend fun setFolderTrailingSlash(context: Context, value: Boolean) {
+        context.dataStore.edit { prefs ->
+            prefs[FOLDER_TRAILING_SLASH_KEY] = value
+        }
+    }
+
+    /** Apply the user's trailing-slash preference to a raw folder path. */
+    fun applyFolderTrailingSlash(path: String, trailingSlash: Boolean): String {
+        val trimmed = path.trimEnd('/')
+        return if (trailingSlash) "$trimmed/" else trimmed
     }
 }

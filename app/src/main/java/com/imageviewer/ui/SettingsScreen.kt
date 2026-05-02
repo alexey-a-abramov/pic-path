@@ -22,6 +22,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -48,6 +49,8 @@ fun SettingsScreen(
     val scope = rememberCoroutineScope()
     val current = SettingsManager.getMultiCopyFormat(context)
         .collectAsState(initial = MultiCopyFormat.DEFAULT).value
+    val folderTrailingSlash = SettingsManager.getFolderTrailingSlash(context)
+        .collectAsState(initial = true).value
 
     Scaffold(
         topBar = {
@@ -96,6 +99,41 @@ fun SettingsScreen(
             }
 
             Spacer(Modifier.height(24.dp))
+            HorizontalDivider()
+            Spacer(Modifier.height(16.dp))
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable {
+                        scope.launch {
+                            SettingsManager.setFolderTrailingSlash(context, !folderTrailingSlash)
+                        }
+                    }
+                    .padding(vertical = 8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = stringResource(R.string.folder_trailing_slash_title),
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                    Text(
+                        text = stringResource(R.string.folder_trailing_slash_subtitle),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+                Switch(
+                    checked = folderTrailingSlash,
+                    onCheckedChange = { value ->
+                        scope.launch { SettingsManager.setFolderTrailingSlash(context, value) }
+                    }
+                )
+            }
+
+            Spacer(Modifier.height(8.dp))
             HorizontalDivider()
             Spacer(Modifier.height(8.dp))
 

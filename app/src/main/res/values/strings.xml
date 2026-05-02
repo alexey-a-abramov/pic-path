@@ -83,6 +83,8 @@
     <string name="fmt_semicolon_subtitle">Same idea as comma; useful when filenames already contain commas.</string>
     <string name="fmt_at_title">@-prefixed (Claude Code only)</string>
     <string name="fmt_at_subtitle">Forces Claude Code attach syntax. Breaks Gemini CLI / Codex.</string>
+    <string name="folder_trailing_slash_title">Folder paths end with /</string>
+    <string name="folder_trailing_slash_subtitle">When copying folder paths, append a trailing slash. Off = bare path.</string>
 
     <!-- Crash Activity -->
     <string name="app_crashed">App has stopped</string>
