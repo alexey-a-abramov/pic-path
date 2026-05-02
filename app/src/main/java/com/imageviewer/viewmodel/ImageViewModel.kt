@@ -3,23 +3,21 @@ package com.imageviewer.viewmodel
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
 import com.imageviewer.data.database.ImageDatabase
 import com.imageviewer.data.model.ImageFile
 import com.imageviewer.data.repository.BrowseMode
 import com.imageviewer.data.repository.ImageRepository
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 @OptIn(FlowPreview::class)
@@ -45,38 +43,22 @@ class ImageViewModel(application: Application) : AndroidViewModel(application) {
     private val _selectedImageIds = MutableStateFlow<Set<Long>>(emptySet())
     val selectedImageIds: StateFlow<Set<Long>> = _selectedImageIds.asStateFlow()
 
-    val images: StateFlow<List<ImageFile>>
+    /** Paginated grid stream. UI collects via `collectAsLazyPagingItems()`. */
+    val pagedImages: Flow<PagingData<ImageFile>>
 
     init {
         val database = ImageDatabase.getDatabase(application)
         repository = ImageRepository(database.imageDao(), application.contentResolver)
 
-        images = combine(
+        pagedImages = combine(
             _searchQuery.debounce(300).distinctUntilChanged(),
             _selectedCategory,
             _browseMode
         ) { query, category, mode -> Triple(query, category, mode) }
             .flatMapLatest { (query, category, mode) ->
-                repository.search(query, category, mode)
-                    // Read the cursor on IO so the UI thread is never the
-                    // one walking the CursorWindow.
-                    .flowOn(Dispatchers.IO)
-                    // Room's underlying cursor races with flatMapLatest cancellation
-                    // (and with deleteStale running concurrently with scanAndIndex):
-                    // it can throw IllegalStateException("Couldn't read row N, col 0")
-                    // mid-iteration. The next emission (debounced search, mode flip,
-                    // or the post-scan flow refresh) will repopulate, so swallow
-                    // the race and emit empty rather than crash.
-                    .catch { e ->
-                        android.util.Log.w("ImageViewModel", "search flow failed; emitting empty", e)
-                        emit(emptyList())
-                    }
+                repository.searchPaged(query, category, mode)
             }
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(5000),
-                initialValue = emptyList()
-            )
+            .cachedIn(viewModelScope)
     }
 
     fun loadImages() {
@@ -119,13 +101,8 @@ class ImageViewModel(application: Application) : AndroidViewModel(application) {
 
     fun toggleImageSelection(imageId: Long) {
         val current = _selectedImageIds.value.toMutableSet()
-        if (current.contains(imageId)) {
-            current.remove(imageId)
-        } else {
-            current.add(imageId)
-        }
+        if (current.contains(imageId)) current.remove(imageId) else current.add(imageId)
         _selectedImageIds.value = current
-
         if (current.isEmpty()) {
             _isSelectionMode.value = false
         }
@@ -136,15 +113,28 @@ class ImageViewModel(application: Application) : AndroidViewModel(application) {
         _isSelectionMode.value = false
     }
 
-    fun getSelectedPaths(): List<String> {
-        val selectedIds = _selectedImageIds.value
-        return images.value.filter { it.id in selectedIds }.map { it.path }
+    /** Fetches paths for the current selection. The query/category/mode triple
+     *  used for resolution is captured at call-time so a category change mid-call
+     *  doesn't change the row set under us. */
+    suspend fun selectedPaths(): List<String> {
+        val ids = _selectedImageIds.value
+        return repository.pathsForIds(ids, _browseMode.value)
     }
 
-    fun selectAll() {
+    /** Selects every row matching the *current* filter. Captures the filter args
+     *  at call-time for the same reason as selectedPaths(). */
+    suspend fun selectAll() {
+        val mode = _browseMode.value
+        val category = _selectedCategory.value
+        val query = _searchQuery.value
+        val ids = repository.matchingIds(query, category, mode)
         _isSelectionMode.value = true
-        _selectedImageIds.value = images.value.map { it.id }.toSet()
+        _selectedImageIds.value = ids.toSet()
     }
+
+    /** Look up the [ImageFile] for a given absolute path in the current mode. */
+    suspend fun findByPath(path: String): ImageFile? =
+        repository.findByPath(path, _browseMode.value)
 
     fun refreshIndex() {
         loadImages()

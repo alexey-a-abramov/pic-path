@@ -18,7 +18,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.itemsIndexed
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Checklist
 import androidx.compose.material.icons.filled.Close
@@ -31,15 +31,15 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.SegmentedButton
-import androidx.compose.material3.SegmentedButtonDefaults
-import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScrollableTabRow
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SegmentedButtonDefaults
+import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -49,6 +49,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -60,9 +61,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.paging.LoadState
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.imageviewer.R
+import com.imageviewer.data.model.ImageFile
 import com.imageviewer.data.repository.BrowseMode
 import com.imageviewer.ui.components.ImageGridItem
 import com.imageviewer.ui.components.SearchBar
@@ -70,8 +74,9 @@ import com.imageviewer.util.ClipboardHelper
 import com.imageviewer.util.MultiCopyFormat
 import com.imageviewer.util.SettingsManager
 import com.imageviewer.viewmodel.ImageViewModel
-import androidx.compose.runtime.collectAsState
 import kotlinx.coroutines.launch
+
+private const val SELECT_ALL_THRESHOLD = 12
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -81,7 +86,7 @@ fun ImageGridScreen(
     onNavigateToSettings: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
-    val images by viewModel.images.collectAsStateWithLifecycle()
+    val lazyItems = viewModel.pagedImages.collectAsLazyPagingItems()
     val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
     val searchQuery by viewModel.searchQuery.collectAsStateWithLifecycle()
     val selectedCategory by viewModel.selectedCategory.collectAsStateWithLifecycle()
@@ -95,9 +100,12 @@ fun ImageGridScreen(
     val multiCopyFormat by SettingsManager.getMultiCopyFormat(context)
         .collectAsState(initial = MultiCopyFormat.DEFAULT)
 
-    var showFullscreen by remember { mutableStateOf(false) }
+    // Fullscreen viewer state. The viewer takes a fixed snapshot list — for the
+    // grid-tap path this is the currently-loaded paging window; for the
+    // post-edit path it's a single-element list with the freshly saved image.
+    var fullscreenImages by remember { mutableStateOf<List<ImageFile>>(emptyList()) }
     var fullscreenIndex by remember { mutableStateOf(0) }
-    var targetPath by remember { mutableStateOf<String?>(null) }
+    var pendingEditedPath by remember { mutableStateOf<String?>(null) }
 
     val categories = listOf("All", "Screenshots", "Camera", "Downloads", "Other")
     val categoryLabels = mapOf(
@@ -112,282 +120,309 @@ fun ImageGridScreen(
 
     val permissionPromptText = stringResource(R.string.all_files_permission_required)
     val grantText = stringResource(R.string.grant)
+    val pathCopiedText = stringResource(R.string.path_copied)
 
     BackHandler(enabled = isSelectionMode) {
         viewModel.clearSelection()
     }
 
-    // After an edit-and-save, the new file's path is queued. When the rescan
-    // (kicked off once at save-time) picks it up, navigate to it. We never
-    // self-trigger another refresh from here — that produced an infinite loop
-    // of "rescan → empty briefly → still missing → rescan again".
-    LaunchedEffect(images, targetPath) {
-        val path = targetPath ?: return@LaunchedEffect
-        val index = images.indexOfFirst { it.path == path }
-        if (index != -1) {
-            fullscreenIndex = index
-            showFullscreen = true
-            targetPath = null
+    // After an edit-and-save, look up the saved file and open fullscreen on it
+    // as a single-image preview. We don't try to maintain pager state across
+    // a paginated refresh — too easy to loop. The grid will pick up the new
+    // file on its next refresh independently.
+    LaunchedEffect(pendingEditedPath) {
+        val path = pendingEditedPath ?: return@LaunchedEffect
+        val image = viewModel.findByPath(path)
+        if (image != null) {
+            fullscreenImages = listOf(image)
+            fullscreenIndex = 0
+            pendingEditedPath = null
         }
     }
 
-    if (showFullscreen) {
+    if (fullscreenImages.isNotEmpty()) {
         FullscreenImageViewer(
-            images = images,
+            images = fullscreenImages,
             initialIndex = fullscreenIndex,
-            onClose = { showFullscreen = false },
-            onCopyPath = { path ->
+            onClose = { fullscreenImages = emptyList() },
+            onCopyPath = {
                 scope.launch {
-                    snackbarHostState.showSnackbar(
-                        message = context.getString(R.string.path_copied)
-                    )
+                    snackbarHostState.showSnackbar(message = pathCopiedText)
                 }
-                targetPath = path
             },
-            onRefresh = { viewModel.refreshIndex() }
+            onRefresh = {
+                viewModel.refreshIndex()
+                lazyItems.refresh()
+            },
+            onEditSaved = { newPath ->
+                // Drop current viewer; the LaunchedEffect on pendingEditedPath
+                // will re-open with the saved file as a single-image preview.
+                fullscreenImages = emptyList()
+                pendingEditedPath = newPath
+            }
         )
-    } else {
+        return
+    }
 
-        Scaffold(
-            topBar = {
-                TopAppBar(
-                    title = {
-                        if (isSelectionMode) {
-                            Text(stringResource(R.string.selection_mode, selectedImageIds.size))
-                        } else {
-                            BrowseModeSelector(
-                                mode = browseMode,
-                                onSelect = { newMode ->
-                                    if (newMode == BrowseMode.AllFiles && !hasAllFilesAccess()) {
-                                        scope.launch {
-                                            val result = snackbarHostState.showSnackbar(
-                                                message = permissionPromptText,
-                                                actionLabel = grantText
-                                            )
-                                            if (result == SnackbarResult.ActionPerformed) {
-                                                openAllFilesAccessSettings(context)
-                                            }
+    val pagedTotal = lazyItems.itemCount
+    val refreshing = lazyItems.loadState.refresh is LoadState.Loading
+    val isEmpty = pagedTotal == 0 && lazyItems.loadState.refresh is LoadState.NotLoading
+
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {
+                    if (isSelectionMode) {
+                        Text(stringResource(R.string.selection_mode, selectedImageIds.size))
+                    } else {
+                        BrowseModeSelector(
+                            mode = browseMode,
+                            onSelect = { newMode ->
+                                if (newMode == BrowseMode.AllFiles && !hasAllFilesAccess()) {
+                                    scope.launch {
+                                        val result = snackbarHostState.showSnackbar(
+                                            message = permissionPromptText,
+                                            actionLabel = grantText
+                                        )
+                                        if (result == SnackbarResult.ActionPerformed) {
+                                            openAllFilesAccessSettings(context)
                                         }
-                                        return@BrowseModeSelector
                                     }
-                                    viewModel.selectBrowseMode(newMode)
+                                    return@BrowseModeSelector
                                 }
+                                viewModel.selectBrowseMode(newMode)
+                            }
+                        )
+                    }
+                },
+                navigationIcon = {
+                    if (isSelectionMode) {
+                        IconButton(onClick = { viewModel.clearSelection() }) {
+                            Icon(
+                                imageVector = Icons.Default.Close,
+                                contentDescription = stringResource(R.string.exit_selection)
                             )
                         }
-                    },
-                    navigationIcon = {
-                        if (isSelectionMode) {
-                            IconButton(onClick = { viewModel.clearSelection() }) {
-                                Icon(
-                                    imageVector = Icons.Default.Close,
-                                    contentDescription = stringResource(R.string.exit_selection)
-                                )
-                            }
-                        }
-                    },
-                    actions = {
-                        if (isSelectionMode) {
-                            if (images.size <= SELECT_ALL_THRESHOLD) {
-                                IconButton(onClick = { viewModel.selectAll() }) {
-                                    Icon(
-                                        imageVector = Icons.Default.SelectAll,
-                                        contentDescription = stringResource(R.string.select_all)
-                                    )
-                                }
-                            }
-                        } else {
-                            IconButton(onClick = { viewModel.toggleSelectionMode(true) }) {
-                                Icon(
-                                    imageVector = Icons.Default.Checklist,
-                                    contentDescription = stringResource(R.string.select_mode)
-                                )
-                            }
-                            IconButton(onClick = onNavigateToSettings) {
-                                Icon(
-                                    imageVector = Icons.Default.Settings,
-                                    contentDescription = stringResource(R.string.settings)
-                                )
-                            }
-                            IconButton(onClick = onNavigateToAbout) {
-                                Icon(
-                                    imageVector = Icons.Default.Info,
-                                    contentDescription = stringResource(R.string.about)
-                                )
-                            }
-                        }
                     }
-                )
-            },
-            bottomBar = {
-                if (isSelectionMode) {
-                    BottomAppBar {
-                        Row(
-                            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
-                            horizontalArrangement = Arrangement.spacedBy(12.dp)
-                        ) {
-                            if (images.size <= SELECT_ALL_THRESHOLD) {
-                                OutlinedButton(
-                                    onClick = { viewModel.selectAll() },
-                                    modifier = Modifier.weight(1f)
-                                ) {
-                                    Icon(Icons.Default.SelectAll, contentDescription = null)
-                                    Spacer(Modifier.width(8.dp))
-                                    Text(stringResource(R.string.select_all))
-                                }
-                            }
-                            Button(
-                                onClick = {
-                                    val paths = viewModel.getSelectedPaths()
-                                    val combined = ClipboardHelper.formatPathsForConsole(paths, multiCopyFormat)
-                                    ClipboardHelper.copyToClipboard(context, combined)
-                                    val count = paths.size
-                                    scope.launch {
-                                        snackbarHostState.showSnackbar(
-                                            message = context.getString(R.string.multiple_paths_copied, count)
-                                        )
-                                    }
-                                    viewModel.clearSelection()
-                                                    },
-                                enabled = selectedImageIds.isNotEmpty(),
-                                modifier = Modifier.weight(1f),
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = MaterialTheme.colorScheme.primary
+                },
+                actions = {
+                    if (isSelectionMode) {
+                        if (pagedTotal in 1..SELECT_ALL_THRESHOLD) {
+                            IconButton(onClick = { scope.launch { viewModel.selectAll() } }) {
+                                Icon(
+                                    imageVector = Icons.Default.SelectAll,
+                                    contentDescription = stringResource(R.string.select_all)
                                 )
-                            ) {
-                                Icon(Icons.Default.ContentCopy, contentDescription = null)
-                                Spacer(Modifier.width(8.dp))
-                                val fmtTag = stringResource(
-                                    when (multiCopyFormat) {
-                                        MultiCopyFormat.SPACE -> R.string.fmt_tag_space
-                                        MultiCopyFormat.COMMA -> R.string.fmt_tag_comma
-                                        MultiCopyFormat.SEMICOLON -> R.string.fmt_tag_semicolon
-                                        MultiCopyFormat.AT_PREFIX -> R.string.fmt_tag_at
-                                    }
-                                )
-                                Text(stringResource(R.string.copy_selected_fmt, selectedImageIds.size, fmtTag))
                             }
+                        }
+                    } else {
+                        IconButton(onClick = { viewModel.toggleSelectionMode(true) }) {
+                            Icon(
+                                imageVector = Icons.Default.Checklist,
+                                contentDescription = stringResource(R.string.select_mode)
+                            )
+                        }
+                        IconButton(onClick = onNavigateToSettings) {
+                            Icon(
+                                imageVector = Icons.Default.Settings,
+                                contentDescription = stringResource(R.string.settings)
+                            )
+                        }
+                        IconButton(onClick = onNavigateToAbout) {
+                            Icon(
+                                imageVector = Icons.Default.Info,
+                                contentDescription = stringResource(R.string.about)
+                            )
                         }
                     }
                 }
-            },
-            snackbarHost = {
-                SnackbarHost(hostState = snackbarHostState) { data ->
-                    Snackbar(
-                        snackbarData = data,
-                        modifier = Modifier.padding(16.dp)
-                    )
+            )
+        },
+        bottomBar = {
+            if (isSelectionMode) {
+                BottomAppBar {
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        if (pagedTotal in 1..SELECT_ALL_THRESHOLD) {
+                            OutlinedButton(
+                                onClick = { scope.launch { viewModel.selectAll() } },
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Icon(Icons.Default.SelectAll, contentDescription = null)
+                                Spacer(Modifier.width(8.dp))
+                                Text(stringResource(R.string.select_all))
+                            }
+                        }
+                        Button(
+                            onClick = {
+                                scope.launch {
+                                    val paths = viewModel.selectedPaths()
+                                    val combined = ClipboardHelper
+                                        .formatPathsForConsole(paths, multiCopyFormat)
+                                    ClipboardHelper.copyToClipboard(context, combined)
+                                    snackbarHostState.showSnackbar(
+                                        message = context.getString(
+                                            R.string.multiple_paths_copied,
+                                            paths.size
+                                        )
+                                    )
+                                    viewModel.clearSelection()
+                                }
+                            },
+                            enabled = selectedImageIds.isNotEmpty(),
+                            modifier = Modifier.weight(1f),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.primary
+                            )
+                        ) {
+                            Icon(Icons.Default.ContentCopy, contentDescription = null)
+                            Spacer(Modifier.width(8.dp))
+                            val fmtTag = stringResource(
+                                when (multiCopyFormat) {
+                                    MultiCopyFormat.SPACE -> R.string.fmt_tag_space
+                                    MultiCopyFormat.COMMA -> R.string.fmt_tag_comma
+                                    MultiCopyFormat.SEMICOLON -> R.string.fmt_tag_semicolon
+                                    MultiCopyFormat.AT_PREFIX -> R.string.fmt_tag_at
+                                }
+                            )
+                            Text(
+                                stringResource(
+                                    R.string.copy_selected_fmt,
+                                    selectedImageIds.size,
+                                    fmtTag
+                                )
+                            )
+                        }
+                    }
                 }
             }
-        ) { paddingValues ->
-            Column(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
-                if (browseMode == BrowseMode.Images) {
-                    ScrollableTabRow(
-                        selectedTabIndex = categories.indexOf(selectedCategory).coerceAtLeast(0),
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        categories.forEach { category ->
-                            Tab(
-                                selected = selectedCategory == category,
-                                onClick = { viewModel.selectCategory(category) },
-                                text = { Text(categoryLabels[category] ?: category) }
-                            )
-                        }
+        },
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState) { data ->
+                Snackbar(snackbarData = data, modifier = Modifier.padding(16.dp))
+            }
+        }
+    ) { paddingValues ->
+        Column(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
+            if (browseMode == BrowseMode.Images) {
+                ScrollableTabRow(
+                    selectedTabIndex = categories.indexOf(selectedCategory).coerceAtLeast(0),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    categories.forEach { category ->
+                        Tab(
+                            selected = selectedCategory == category,
+                            onClick = { viewModel.selectCategory(category) },
+                            text = { Text(categoryLabels[category] ?: category) }
+                        )
                     }
                 }
+            }
 
-                SearchBar(
-                    query = searchQuery,
-                    onQueryChange = { viewModel.searchImages(it) },
-                    placeholderRes = if (browseMode == BrowseMode.AllFiles)
-                        R.string.search_hint_files
-                    else
-                        R.string.search_hint
-                )
+            SearchBar(
+                query = searchQuery,
+                onQueryChange = { viewModel.searchImages(it) },
+                placeholderRes = if (browseMode == BrowseMode.AllFiles)
+                    R.string.search_hint_files
+                else
+                    R.string.search_hint
+            )
 
-                SwipeRefresh(
-                    state = swipeRefreshState,
-                    onRefresh = { viewModel.refreshIndex() },
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    Box(modifier = Modifier.fillMaxSize()) {
-                        when {
-                            isLoading && images.isEmpty() -> {
-                                Box(
-                                    modifier = Modifier.fillMaxSize(),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                        CircularProgressIndicator()
-                                        Text(
-                                            text = stringResource(R.string.loading),
-                                            modifier = Modifier.padding(top = 16.dp),
-                                            style = MaterialTheme.typography.bodyMedium
-                                        )
-                                    }
-                                }
-                            }
-                            images.isEmpty() -> {
-                                Box(
-                                    modifier = Modifier.fillMaxSize(),
-                                    contentAlignment = Alignment.Center
-                                ) {
+            SwipeRefresh(
+                state = swipeRefreshState,
+                onRefresh = {
+                    viewModel.refreshIndex()
+                    lazyItems.refresh()
+                },
+                modifier = Modifier.fillMaxSize()
+            ) {
+                Box(modifier = Modifier.fillMaxSize()) {
+                    when {
+                        (refreshing || isLoading) && pagedTotal == 0 -> {
+                            Box(
+                                modifier = Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                    CircularProgressIndicator()
                                     Text(
-                                        text = stringResource(
-                                            if (browseMode == BrowseMode.AllFiles)
-                                                R.string.no_files_found
-                                            else
-                                                R.string.no_images_found
-                                        ),
-                                        style = MaterialTheme.typography.bodyLarge
+                                        text = stringResource(R.string.loading),
+                                        modifier = Modifier.padding(top = 16.dp),
+                                        style = MaterialTheme.typography.bodyMedium
                                     )
                                 }
                             }
-                            else -> {
-                                LazyVerticalGrid(
-                                    columns = GridCells.Fixed(3),
-                                    contentPadding = PaddingValues(8.dp),
-                                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                                    modifier = Modifier.fillMaxSize()
-                                ) {
-                                    itemsIndexed(images, key = { _, image -> "${image.type}:${image.id}" }) { index, image ->
-                                        ImageGridItem(
-                                            image = image,
-                                            onClick = {
-                                                if (isSelectionMode) {
-                                                    viewModel.toggleImageSelection(image.id)
-                                                } else if (image.mimeType.startsWith("image/")) {
-                                                    fullscreenIndex = index
-                                                    showFullscreen = true
-                                                } else {
-                                                    ClipboardHelper.copyToClipboard(context, image.path)
-                                                    scope.launch {
-                                                        snackbarHostState.showSnackbar(
-                                                            message = context.getString(R.string.path_copied)
-                                                        )
-                                                    }
-                                                                                    }
-                                            },
-                                            onLongClick = {
-                                                // First long-press also copies the path; subsequent
-                                                // long-presses just toggle membership.
-                                                val wasEmpty = !isSelectionMode
-                                                if (wasEmpty) {
-                                                    viewModel.toggleSelectionMode(true)
-                                                }
-                                                viewModel.toggleImageSelection(image.id)
-                                                if (wasEmpty) {
-                                                    ClipboardHelper.copyToClipboard(context, image.path)
-                                                    scope.launch {
-                                                        snackbarHostState.showSnackbar(
-                                                            message = context.getString(R.string.path_copied)
-                                                        )
-                                                    }
-                                                                                    }
-                                            },
-                                            isSelected = selectedImageIds.contains(image.id)
-                                        )
+                        }
+                        isEmpty -> {
+                            Box(
+                                modifier = Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = stringResource(
+                                        if (browseMode == BrowseMode.AllFiles)
+                                            R.string.no_files_found
+                                        else
+                                            R.string.no_images_found
+                                    ),
+                                    style = MaterialTheme.typography.bodyLarge
+                                )
+                            }
+                        }
+                        else -> {
+                            LazyVerticalGrid(
+                                columns = GridCells.Fixed(3),
+                                contentPadding = PaddingValues(8.dp),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                verticalArrangement = Arrangement.spacedBy(8.dp),
+                                modifier = Modifier.fillMaxSize()
+                            ) {
+                                items(
+                                    count = pagedTotal,
+                                    key = { index ->
+                                        lazyItems.peek(index)?.let { "${it.type}:${it.id}" } ?: index
                                     }
+                                ) { index ->
+                                    val image = lazyItems[index] ?: return@items
+                                    ImageGridItem(
+                                        image = image,
+                                        onClick = {
+                                            if (isSelectionMode) {
+                                                viewModel.toggleImageSelection(image.id)
+                                            } else if (image.mimeType.startsWith("image/")) {
+                                                fullscreenImages = lazyItems
+                                                    .itemSnapshotList.items
+                                                fullscreenIndex = fullscreenImages
+                                                    .indexOfFirst { it.id == image.id && it.type == image.type }
+                                                    .coerceAtLeast(0)
+                                            } else {
+                                                ClipboardHelper.copyToClipboard(context, image.path)
+                                                scope.launch {
+                                                    snackbarHostState.showSnackbar(
+                                                        message = pathCopiedText
+                                                    )
+                                                }
+                                            }
+                                        },
+                                        onLongClick = {
+                                            // First long-press also copies the path; subsequent
+                                            // long-presses just toggle membership.
+                                            val wasEmpty = !isSelectionMode
+                                            if (wasEmpty) viewModel.toggleSelectionMode(true)
+                                            viewModel.toggleImageSelection(image.id)
+                                            if (wasEmpty) {
+                                                ClipboardHelper.copyToClipboard(context, image.path)
+                                                scope.launch {
+                                                    snackbarHostState.showSnackbar(
+                                                        message = pathCopiedText
+                                                    )
+                                                }
+                                            }
+                                        },
+                                        isSelected = selectedImageIds.contains(image.id)
+                                    )
                                 }
                             }
                         }
@@ -397,8 +432,6 @@ fun ImageGridScreen(
         }
     }
 }
-
-private const val SELECT_ALL_THRESHOLD = 12
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

@@ -55,10 +55,17 @@ fun FullscreenImageViewer(
     onClose: () -> Unit,
     onCopyPath: (String) -> Unit,
     onRefresh: () -> Unit,
+    onEditSaved: (String) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
+    if (images.isEmpty()) {
+        // Snapshot was empty — nothing to show, just bounce back.
+        LaunchedEffect(Unit) { onClose() }
+        return
+    }
+    val safeInitial = initialIndex.coerceIn(0, images.size - 1)
     val pagerState = rememberPagerState(
-        initialPage = initialIndex,
+        initialPage = safeInitial,
         pageCount = { images.size }
     )
     val context = LocalContext.current
@@ -66,12 +73,11 @@ fun FullscreenImageViewer(
     var showControls by remember { mutableStateOf(true) }
     var editingImage by remember { mutableStateOf<ImageFile?>(null) }
 
-    // After an edit-and-save the parent updates initialIndex to point at the new
-    // file. Pager state was captured at first composition and won't move on its
-    // own — sync it here so the user lands on the edited copy.
-    LaunchedEffect(initialIndex, images.size) {
-        if (initialIndex in 0 until images.size && initialIndex != pagerState.currentPage) {
-            pagerState.scrollToPage(initialIndex)
+    // If the parent updates initialIndex (e.g., an edit save resolved to a new
+    // index), follow it.
+    LaunchedEffect(safeInitial) {
+        if (safeInitial != pagerState.currentPage) {
+            pagerState.scrollToPage(safeInitial)
         }
     }
 
@@ -86,7 +92,7 @@ fun FullscreenImageViewer(
                 imagePath = editingImage!!.path,
                 onSave = { newPath ->
                     onRefresh()
-                    onCopyPath(newPath)
+                    onEditSaved(newPath)
                     editingImage = null
                 },
                 onCancel = { editingImage = null }
