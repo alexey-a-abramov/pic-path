@@ -63,6 +63,9 @@ class ImageRepository(
     fun foldersPaged(): Flow<PagingData<FolderEntry>> =
         Pager(gridConfig) { imageDao.pagedFolders(TYPE_IMAGE) }.flow
 
+    /** Distinct folder paths — used by Folders-mode Select All. */
+    suspend fun allFolders(): List<String> = imageDao.listAllFolders(TYPE_IMAGE)
+
     /** All matching ids for the current filter. Used by Select All. */
     suspend fun matchingIds(
         query: String,

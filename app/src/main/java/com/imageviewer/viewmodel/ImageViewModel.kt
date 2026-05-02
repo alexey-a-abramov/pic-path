@@ -48,6 +48,11 @@ class ImageViewModel(application: Application) : AndroidViewModel(application) {
     private val _selectedImageIds = MutableStateFlow<Set<Long>>(emptySet())
     val selectedImageIds: StateFlow<Set<Long>> = _selectedImageIds.asStateFlow()
 
+    /** Selected folder paths in Folders-mode top-level. Independent from
+     *  selectedImageIds so a browse-mode flip can clear both cleanly. */
+    private val _selectedFolderPaths = MutableStateFlow<Set<String>>(emptySet())
+    val selectedFolderPaths: StateFlow<Set<String>> = _selectedFolderPaths.asStateFlow()
+
     /** Paginated grid stream for image/file rows (used in all modes except
      *  Folders-without-selection, which uses pagedFolders below). */
     val pagedImages: Flow<PagingData<ImageFile>>
@@ -136,8 +141,18 @@ class ImageViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    fun toggleFolderSelection(folderPath: String) {
+        val current = _selectedFolderPaths.value.toMutableSet()
+        if (current.contains(folderPath)) current.remove(folderPath) else current.add(folderPath)
+        _selectedFolderPaths.value = current
+        if (current.isEmpty()) {
+            _isSelectionMode.value = false
+        }
+    }
+
     fun clearSelection() {
         _selectedImageIds.value = emptySet()
+        _selectedFolderPaths.value = emptySet()
         _isSelectionMode.value = false
     }
 
@@ -159,6 +174,13 @@ class ImageViewModel(application: Application) : AndroidViewModel(application) {
         val ids = repository.matchingIds(query, category, mode, folder)
         _isSelectionMode.value = true
         _selectedImageIds.value = ids.toSet()
+    }
+
+    /** Folders-mode Select All: every distinct folder path. */
+    suspend fun selectAllFolders() {
+        val all = repository.allFolders()
+        _isSelectionMode.value = true
+        _selectedFolderPaths.value = all.toSet()
     }
 
     /** Look up the [ImageFile] for a given absolute path in the current mode. */

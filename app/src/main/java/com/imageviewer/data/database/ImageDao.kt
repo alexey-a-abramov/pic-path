@@ -56,6 +56,10 @@ interface ImageDao {
     """)
     fun pagedFolders(type: String): PagingSource<Int, FolderEntry>
 
+    /** Distinct folder paths for [type], used by Folders-mode Select All. */
+    @Query("SELECT DISTINCT folder FROM images WHERE type = :type AND folder != '' ORDER BY folder")
+    suspend fun listAllFolders(type: String): List<String>
+
     // ---- Bulk-selection helpers (used by Select All and the multi-copy button).
     // These return one row per match but only the columns we need, so the
     // result set is small enough to materialize in a single suspend call. ----

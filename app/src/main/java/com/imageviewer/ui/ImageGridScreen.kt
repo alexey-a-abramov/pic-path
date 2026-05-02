@@ -94,12 +94,15 @@ fun ImageGridScreen(
     val selectedFolder by viewModel.selectedFolder.collectAsStateWithLifecycle()
     val isSelectionMode by viewModel.isSelectionMode.collectAsStateWithLifecycle()
     val selectedImageIds by viewModel.selectedImageIds.collectAsStateWithLifecycle()
+    val selectedFolderPaths by viewModel.selectedFolderPaths.collectAsStateWithLifecycle()
 
     val context = LocalContext.current
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
     val multiCopyFormat by SettingsManager.getMultiCopyFormat(context)
         .collectAsState(initial = MultiCopyFormat.DEFAULT)
+    val folderTrailingSlash by SettingsManager.getFolderTrailingSlash(context)
+        .collectAsState(initial = true)
 
     // Fullscreen viewer state. The viewer takes a fixed snapshot list — for the
     // grid-tap path this is the currently-loaded paging window; for the
@@ -173,6 +176,7 @@ fun ImageGridScreen(
     // tiles from `lazyFolders`. Otherwise it renders image tiles from `lazyItems`.
     val showingFolders = browseMode == BrowseMode.Folders && selectedFolder == null
     val pagedTotal = if (showingFolders) lazyFolders.itemCount else lazyItems.itemCount
+    val selectionCount = if (showingFolders) selectedFolderPaths.size else selectedImageIds.size
     val refreshing = if (showingFolders) {
         lazyFolders.loadState.refresh is LoadState.Loading
     } else {
@@ -189,7 +193,7 @@ fun ImageGridScreen(
                 title = {
                     when {
                         isSelectionMode -> Text(
-                            stringResource(R.string.selection_mode, selectedImageIds.size)
+                            stringResource(R.string.selection_mode, selectionCount)
                         )
                         // Drilled into a folder — show its name in the title.
                         browseMode == BrowseMode.Folders && selectedFolder != null -> Text(
@@ -237,7 +241,12 @@ fun ImageGridScreen(
                 actions = {
                     if (isSelectionMode) {
                         if (pagedTotal in 1..SELECT_ALL_THRESHOLD) {
-                            IconButton(onClick = { scope.launch { viewModel.selectAll() } }) {
+                            IconButton(onClick = {
+                                scope.launch {
+                                    if (showingFolders) viewModel.selectAllFolders()
+                                    else viewModel.selectAll()
+                                }
+                            }) {
                                 Icon(
                                     imageVector = Icons.Default.SelectAll,
                                     contentDescription = stringResource(R.string.select_all)
@@ -266,7 +275,12 @@ fun ImageGridScreen(
                     ) {
                         if (pagedTotal in 1..SELECT_ALL_THRESHOLD) {
                             OutlinedButton(
-                                onClick = { scope.launch { viewModel.selectAll() } },
+                                onClick = {
+                                    scope.launch {
+                                        if (showingFolders) viewModel.selectAllFolders()
+                                        else viewModel.selectAll()
+                                    }
+                                },
                                 modifier = Modifier.weight(1f)
                             ) {
                                 Icon(Icons.Default.SelectAll, contentDescription = null)
@@ -277,7 +291,13 @@ fun ImageGridScreen(
                         Button(
                             onClick = {
                                 scope.launch {
-                                    val paths = viewModel.selectedPaths()
+                                    val paths = if (showingFolders) {
+                                        selectedFolderPaths.map {
+                                            SettingsManager.applyFolderTrailingSlash(it, folderTrailingSlash)
+                                        }
+                                    } else {
+                                        viewModel.selectedPaths()
+                                    }
                                     val combined = ClipboardHelper
                                         .formatPathsForConsole(paths, multiCopyFormat)
                                     ClipboardHelper.copyToClipboard(context, combined)
@@ -290,7 +310,7 @@ fun ImageGridScreen(
                                     viewModel.clearSelection()
                                 }
                             },
-                            enabled = selectedImageIds.isNotEmpty(),
+                            enabled = selectionCount > 0,
                             modifier = Modifier.weight(1f),
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = MaterialTheme.colorScheme.primary
@@ -309,7 +329,7 @@ fun ImageGridScreen(
                             Text(
                                 stringResource(
                                     R.string.copy_selected_fmt,
-                                    selectedImageIds.size,
+                                    selectionCount,
                                     fmtTag
                                 )
                             )
@@ -413,7 +433,30 @@ fun ImageGridScreen(
                                     val entry = lazyFolders[index] ?: return@items
                                     FolderGridItem(
                                         entry = entry,
-                                        onClick = { viewModel.selectFolder(entry.folder) }
+                                        onClick = {
+                                            if (isSelectionMode) {
+                                                viewModel.toggleFolderSelection(entry.folder)
+                                            } else {
+                                                viewModel.selectFolder(entry.folder)
+                                            }
+                                        },
+                                        onLongClick = {
+                                            // Mirror the image long-press: enter selection mode,
+                                            // add this folder, and copy its (settings-formatted)
+                                            // path on the very first long-press.
+                                            val wasEmpty = !isSelectionMode
+                                            if (wasEmpty) viewModel.toggleSelectionMode(true)
+                                            viewModel.toggleFolderSelection(entry.folder)
+                                            if (wasEmpty) {
+                                                val formatted = SettingsManager
+                                                    .applyFolderTrailingSlash(entry.folder, folderTrailingSlash)
+                                                ClipboardHelper.copyToClipboard(context, formatted)
+                                                scope.launch {
+                                                    snackbarHostState.showSnackbar(message = pathCopiedText)
+                                                }
+                                            }
+                                        },
+                                        isSelected = selectedFolderPaths.contains(entry.folder)
                                     )
                                 }
                             }

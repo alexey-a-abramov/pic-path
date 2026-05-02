@@ -1,7 +1,8 @@
 package com.imageviewer.ui.components
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -28,17 +30,23 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.imageviewer.data.model.FolderEntry
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun FolderGridItem(
     entry: FolderEntry,
     onClick: () -> Unit,
+    onLongClick: () -> Unit,
+    isSelected: Boolean = false,
     modifier: Modifier = Modifier
 ) {
     Card(
         modifier = modifier
             .aspectRatio(1f)
-            .clickable(onClick = onClick),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+            .combinedClickable(onClick = onClick, onLongClick = onLongClick),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        border = if (isSelected)
+            androidx.compose.foundation.BorderStroke(4.dp, MaterialTheme.colorScheme.primary)
+        else null
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
             if (entry.sampleMimeType.startsWith("image/")) {
@@ -83,6 +91,22 @@ fun FolderGridItem(
                     text = entry.count.toString(),
                     color = Color.White.copy(alpha = 0.8f),
                     style = MaterialTheme.typography.bodySmall
+                )
+            }
+            if (isSelected) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.4f))
+                )
+                Icon(
+                    imageVector = Icons.Default.CheckCircle,
+                    contentDescription = "Selected",
+                    tint = Color.White,
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(4.dp)
+                        .size(24.dp)
                 )
             }
         }
