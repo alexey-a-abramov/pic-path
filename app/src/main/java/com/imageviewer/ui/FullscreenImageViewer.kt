@@ -18,11 +18,17 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.core.content.FileProvider
+import java.io.File
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -218,6 +224,14 @@ fun FullscreenImageViewer(
                                 modifier = Modifier.size(24.dp)
                             )
                         }
+                        IconButton(onClick = { shareFile(context, current.path, current.mimeType) }) {
+                            Icon(
+                                imageVector = Icons.Default.Share,
+                                contentDescription = "Share",
+                                tint = Color.White,
+                                modifier = Modifier.size(24.dp)
+                            )
+                        }
                         IconButton(
                             onClick = {
                                 ClipboardHelper.copyToClipboard(context, current.path)
@@ -236,4 +250,18 @@ fun FullscreenImageViewer(
             }
         }
     }
+}
+
+private fun shareFile(context: Context, path: String, mimeType: String) {
+    val file = File(path)
+    if (!file.exists()) return
+    val uri: Uri = runCatching {
+        FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
+    }.getOrElse { Uri.fromFile(file) }
+    val send = Intent(Intent.ACTION_SEND).apply {
+        type = mimeType.ifBlank { "*/*" }
+        putExtra(Intent.EXTRA_STREAM, uri)
+        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+    }
+    context.startActivity(Intent.createChooser(send, null))
 }
