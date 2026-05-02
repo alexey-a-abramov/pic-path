@@ -84,7 +84,13 @@ dependencies {
     val roomVersion = "2.6.1"
     implementation("androidx.room:room-runtime:$roomVersion")
     implementation("androidx.room:room-ktx:$roomVersion")
+    implementation("androidx.room:room-paging:$roomVersion")
     ksp("androidx.room:room-compiler:$roomVersion")
+
+    // Paging 3 + Compose integration
+    val pagingVersion = "3.3.2"
+    implementation("androidx.paging:paging-runtime-ktx:$pagingVersion")
+    implementation("androidx.paging:paging-compose:3.3.2")
 
     // Coil for Image Loading
     implementation("io.coil-kt:coil-compose:2.5.0")
