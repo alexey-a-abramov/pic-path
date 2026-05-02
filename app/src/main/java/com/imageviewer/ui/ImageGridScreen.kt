@@ -404,7 +404,10 @@ fun ImageGridScreen(
                                 items(
                                     count = lazyFolders.itemCount,
                                     key = { index ->
-                                        lazyFolders.peek(index)?.folder ?: index
+                                        runCatching { lazyFolders.peek(index) }
+                                            .getOrNull()
+                                            ?.folder
+                                            ?: "i:$index"
                                     }
                                 ) { index ->
                                     val entry = lazyFolders[index] ?: return@items
@@ -425,8 +428,18 @@ fun ImageGridScreen(
                             ) {
                                 items(
                                     count = pagedTotal,
+                                    // Wrap in runCatching: when paging shrinks (refresh,
+                                    // mode flip), Compose can call this lambda with an
+                                    // index from the previous frame's count while the
+                                    // ItemSnapshotList has already shrunk — peek then
+                                    // throws IndexOutOfBoundsException. Falling back to
+                                    // an index-derived key is safe because the lambda
+                                    // will be re-keyed once the next frame settles.
                                     key = { index ->
-                                        lazyItems.peek(index)?.let { "${it.type}:${it.id}" } ?: index
+                                        runCatching { lazyItems.peek(index) }
+                                            .getOrNull()
+                                            ?.let { "${it.type}:${it.id}" }
+                                            ?: "i:$index"
                                     }
                                 ) { index ->
                                     val image = lazyItems[index] ?: return@items
