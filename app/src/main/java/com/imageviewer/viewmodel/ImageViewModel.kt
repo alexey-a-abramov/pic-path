@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.imageviewer.data.database.ImageDatabase
+import com.imageviewer.data.model.FolderEntry
 import com.imageviewer.data.model.ImageFile
 import com.imageviewer.data.repository.BrowseMode
 import com.imageviewer.data.repository.ImageRepository
@@ -37,14 +38,22 @@ class ImageViewModel(application: Application) : AndroidViewModel(application) {
     private val _browseMode = MutableStateFlow(BrowseMode.Images)
     val browseMode: StateFlow<BrowseMode> = _browseMode.asStateFlow()
 
+    /** When non-null in Folders mode, the grid shows images inside this folder. */
+    private val _selectedFolder = MutableStateFlow<String?>(null)
+    val selectedFolder: StateFlow<String?> = _selectedFolder.asStateFlow()
+
     private val _isSelectionMode = MutableStateFlow(false)
     val isSelectionMode: StateFlow<Boolean> = _isSelectionMode.asStateFlow()
 
     private val _selectedImageIds = MutableStateFlow<Set<Long>>(emptySet())
     val selectedImageIds: StateFlow<Set<Long>> = _selectedImageIds.asStateFlow()
 
-    /** Paginated grid stream. UI collects via `collectAsLazyPagingItems()`. */
+    /** Paginated grid stream for image/file rows (used in all modes except
+     *  Folders-without-selection, which uses pagedFolders below). */
     val pagedImages: Flow<PagingData<ImageFile>>
+
+    /** Paginated stream of folder entries for Folders mode top level. */
+    val pagedFolders: Flow<PagingData<FolderEntry>>
 
     init {
         val database = ImageDatabase.getDatabase(application)
@@ -53,13 +62,25 @@ class ImageViewModel(application: Application) : AndroidViewModel(application) {
         pagedImages = combine(
             _searchQuery.debounce(300).distinctUntilChanged(),
             _selectedCategory,
-            _browseMode
-        ) { query, category, mode -> Triple(query, category, mode) }
-            .flatMapLatest { (query, category, mode) ->
-                repository.searchPaged(query, category, mode)
+            _browseMode,
+            _selectedFolder
+        ) { query, category, mode, folder ->
+            QueryArgs(query, category, mode, folder)
+        }
+            .flatMapLatest { (query, category, mode, folder) ->
+                repository.searchPaged(query, category, mode, folder)
             }
             .cachedIn(viewModelScope)
+
+        pagedFolders = repository.foldersPaged().cachedIn(viewModelScope)
     }
+
+    private data class QueryArgs(
+        val query: String,
+        val category: String,
+        val mode: BrowseMode,
+        val folder: String?
+    )
 
     fun loadImages() {
         viewModelScope.launch {
@@ -88,8 +109,15 @@ class ImageViewModel(application: Application) : AndroidViewModel(application) {
         if (_browseMode.value == mode) return
         _browseMode.value = mode
         _searchQuery.value = ""
+        _selectedFolder.value = null
         clearSelection()
         loadImages()
+    }
+
+    fun selectFolder(folder: String?) {
+        _selectedFolder.value = folder
+        _searchQuery.value = ""
+        clearSelection()
     }
 
     fun toggleSelectionMode(enabled: Boolean) {
@@ -113,7 +141,7 @@ class ImageViewModel(application: Application) : AndroidViewModel(application) {
         _isSelectionMode.value = false
     }
 
-    /** Fetches paths for the current selection. The query/category/mode triple
+    /** Fetches paths for the current selection. The query/category/mode/folder
      *  used for resolution is captured at call-time so a category change mid-call
      *  doesn't change the row set under us. */
     suspend fun selectedPaths(): List<String> {
@@ -127,7 +155,8 @@ class ImageViewModel(application: Application) : AndroidViewModel(application) {
         val mode = _browseMode.value
         val category = _selectedCategory.value
         val query = _searchQuery.value
-        val ids = repository.matchingIds(query, category, mode)
+        val folder = _selectedFolder.value
+        val ids = repository.matchingIds(query, category, mode, folder)
         _isSelectionMode.value = true
         _selectedImageIds.value = ids.toSet()
     }

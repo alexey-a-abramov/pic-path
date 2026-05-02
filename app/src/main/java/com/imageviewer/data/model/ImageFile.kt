@@ -12,7 +12,8 @@ data class ImageFile(
     val size: Long,
     val mimeType: String,
     val category: String = "All",
-    val type: String = TYPE_IMAGE
+    val type: String = TYPE_IMAGE,
+    val folder: String = ""
 ) {
     companion object {
         const val TYPE_IMAGE = "image"

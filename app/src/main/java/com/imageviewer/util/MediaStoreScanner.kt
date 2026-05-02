@@ -83,7 +83,8 @@ class MediaStoreScanner(private val contentResolver: ContentResolver) {
                         size = size,
                         mimeType = mimeType,
                         category = category,
-                        type = TYPE_IMAGE
+                        type = TYPE_IMAGE,
+                        folder = path.substringBeforeLast('/', "")
                     )
                 )
             }
@@ -148,7 +149,8 @@ class MediaStoreScanner(private val contentResolver: ContentResolver) {
                         size = size,
                         mimeType = mime,
                         category = "All",
-                        type = TYPE_FILE
+                        type = TYPE_FILE,
+                        folder = path.substringBeforeLast('/', "")
                     )
                 )
             }

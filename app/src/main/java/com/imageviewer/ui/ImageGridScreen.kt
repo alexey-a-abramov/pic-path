@@ -20,6 +20,7 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.SelectAll
@@ -66,6 +67,7 @@ import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.imageviewer.R
 import com.imageviewer.data.model.ImageFile
 import com.imageviewer.data.repository.BrowseMode
+import com.imageviewer.ui.components.FolderGridItem
 import com.imageviewer.ui.components.ImageGridItem
 import com.imageviewer.ui.components.SearchBar
 import com.imageviewer.util.ClipboardHelper
@@ -84,10 +86,12 @@ fun ImageGridScreen(
     modifier: Modifier = Modifier
 ) {
     val lazyItems = viewModel.pagedImages.collectAsLazyPagingItems()
+    val lazyFolders = viewModel.pagedFolders.collectAsLazyPagingItems()
     val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
     val searchQuery by viewModel.searchQuery.collectAsStateWithLifecycle()
     val selectedCategory by viewModel.selectedCategory.collectAsStateWithLifecycle()
     val browseMode by viewModel.browseMode.collectAsStateWithLifecycle()
+    val selectedFolder by viewModel.selectedFolder.collectAsStateWithLifecycle()
     val isSelectionMode by viewModel.isSelectionMode.collectAsStateWithLifecycle()
     val selectedImageIds by viewModel.selectedImageIds.collectAsStateWithLifecycle()
 
@@ -121,6 +125,10 @@ fun ImageGridScreen(
 
     BackHandler(enabled = isSelectionMode) {
         viewModel.clearSelection()
+    }
+    // Inside a folder → first back press exits to the folder list.
+    BackHandler(enabled = !isSelectionMode && browseMode == BrowseMode.Folders && selectedFolder != null) {
+        viewModel.selectFolder(null)
     }
 
     // After an edit-and-save, look up the saved file and open fullscreen on it
@@ -161,18 +169,34 @@ fun ImageGridScreen(
         return
     }
 
-    val pagedTotal = lazyItems.itemCount
-    val refreshing = lazyItems.loadState.refresh is LoadState.Loading
-    val isEmpty = pagedTotal == 0 && lazyItems.loadState.refresh is LoadState.NotLoading
+    // When in Folders mode without a selected folder, the grid renders folder
+    // tiles from `lazyFolders`. Otherwise it renders image tiles from `lazyItems`.
+    val showingFolders = browseMode == BrowseMode.Folders && selectedFolder == null
+    val pagedTotal = if (showingFolders) lazyFolders.itemCount else lazyItems.itemCount
+    val refreshing = if (showingFolders) {
+        lazyFolders.loadState.refresh is LoadState.Loading
+    } else {
+        lazyItems.loadState.refresh is LoadState.Loading
+    }
+    val isEmpty = pagedTotal == 0 && (
+        if (showingFolders) lazyFolders.loadState.refresh is LoadState.NotLoading
+        else lazyItems.loadState.refresh is LoadState.NotLoading
+    )
 
     Scaffold(
         topBar = {
             TopAppBar(
                 title = {
-                    if (isSelectionMode) {
-                        Text(stringResource(R.string.selection_mode, selectedImageIds.size))
-                    } else {
-                        BrowseModeSelector(
+                    when {
+                        isSelectionMode -> Text(
+                            stringResource(R.string.selection_mode, selectedImageIds.size)
+                        )
+                        // Drilled into a folder — show its name in the title.
+                        browseMode == BrowseMode.Folders && selectedFolder != null -> Text(
+                            text = selectedFolder!!.substringAfterLast('/').ifBlank { selectedFolder!! },
+                            maxLines = 1
+                        )
+                        else -> BrowseModeSelector(
                             mode = browseMode,
                             onSelect = { newMode ->
                                 if (newMode == BrowseMode.AllFiles && !hasAllFilesAccess()) {
@@ -193,11 +217,19 @@ fun ImageGridScreen(
                     }
                 },
                 navigationIcon = {
-                    if (isSelectionMode) {
-                        IconButton(onClick = { viewModel.clearSelection() }) {
+                    when {
+                        isSelectionMode -> IconButton(onClick = { viewModel.clearSelection() }) {
                             Icon(
                                 imageVector = Icons.Default.Close,
                                 contentDescription = stringResource(R.string.exit_selection)
+                            )
+                        }
+                        browseMode == BrowseMode.Folders && selectedFolder != null -> IconButton(
+                            onClick = { viewModel.selectFolder(null) }
+                        ) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = stringResource(R.string.back)
                             )
                         }
                     }
@@ -308,14 +340,17 @@ fun ImageGridScreen(
                 }
             }
 
-            SearchBar(
-                query = searchQuery,
-                onQueryChange = { viewModel.searchImages(it) },
-                placeholderRes = if (browseMode == BrowseMode.AllFiles)
-                    R.string.search_hint_files
-                else
-                    R.string.search_hint
-            )
+            // The folder list is browsed by tap, not by typing — hide search there.
+            if (!showingFolders) {
+                SearchBar(
+                    query = searchQuery,
+                    onQueryChange = { viewModel.searchImages(it) },
+                    placeholderRes = if (browseMode == BrowseMode.AllFiles)
+                        R.string.search_hint_files
+                    else
+                        R.string.search_hint
+                )
+            }
 
             SwipeRefresh(
                 state = swipeRefreshState,
@@ -356,6 +391,28 @@ fun ImageGridScreen(
                                     ),
                                     style = MaterialTheme.typography.bodyLarge
                                 )
+                            }
+                        }
+                        showingFolders -> {
+                            LazyVerticalGrid(
+                                columns = GridCells.Fixed(3),
+                                contentPadding = PaddingValues(8.dp),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                verticalArrangement = Arrangement.spacedBy(8.dp),
+                                modifier = Modifier.fillMaxSize()
+                            ) {
+                                items(
+                                    count = lazyFolders.itemCount,
+                                    key = { index ->
+                                        lazyFolders.peek(index)?.folder ?: index
+                                    }
+                                ) { index ->
+                                    val entry = lazyFolders[index] ?: return@items
+                                    FolderGridItem(
+                                        entry = entry,
+                                        onClick = { viewModel.selectFolder(entry.folder) }
+                                    )
+                                }
                             }
                         }
                         else -> {
@@ -426,7 +483,7 @@ private fun BrowseModeSelector(
     mode: BrowseMode,
     onSelect: (BrowseMode) -> Unit
 ) {
-    val options = listOf(BrowseMode.Images, BrowseMode.AllFiles)
+    val options = listOf(BrowseMode.Images, BrowseMode.AllFiles, BrowseMode.Folders)
     SingleChoiceSegmentedButtonRow {
         options.forEachIndexed { index, option ->
             SegmentedButton(
@@ -439,6 +496,7 @@ private fun BrowseModeSelector(
                         when (option) {
                             BrowseMode.Images -> R.string.mode_images
                             BrowseMode.AllFiles -> R.string.mode_all_files
+                            BrowseMode.Folders -> R.string.mode_folders
                         }
                     )
                 )

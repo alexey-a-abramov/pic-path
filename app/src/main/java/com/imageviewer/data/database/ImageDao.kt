@@ -5,6 +5,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import com.imageviewer.data.model.FolderEntry
 import com.imageviewer.data.model.ImageFile
 
 @Dao
@@ -31,6 +32,30 @@ interface ImageDao {
     @Query("SELECT * FROM images WHERE type = :type AND LOWER(displayName) GLOB :pattern ORDER BY dateAdded DESC")
     fun pagedSearchByGlob(pattern: String, type: String): PagingSource<Int, ImageFile>
 
+    @Query("SELECT * FROM images WHERE type = :type AND folder = :folder ORDER BY dateAdded DESC")
+    fun pagedByFolder(folder: String, type: String): PagingSource<Int, ImageFile>
+
+    @Query("SELECT * FROM images WHERE type = :type AND folder = :folder AND displayName LIKE '%' || :query || '%' ORDER BY dateAdded DESC")
+    fun pagedByFolderAndName(folder: String, query: String, type: String): PagingSource<Int, ImageFile>
+
+    /**
+     * One row per folder containing images of [type]. The sample URI/mimeType
+     * come from the folder's most recently added file (used as a thumbnail).
+     */
+    @Query("""
+        SELECT
+            folder AS folder,
+            COUNT(*) AS count,
+            (SELECT uri      FROM images i2 WHERE i2.type = images.type AND i2.folder = images.folder ORDER BY dateAdded DESC LIMIT 1) AS sampleUri,
+            (SELECT mimeType FROM images i2 WHERE i2.type = images.type AND i2.folder = images.folder ORDER BY dateAdded DESC LIMIT 1) AS sampleMimeType,
+            MAX(dateAdded) AS lastModified
+        FROM images
+        WHERE type = :type AND folder != ''
+        GROUP BY folder
+        ORDER BY lastModified DESC
+    """)
+    fun pagedFolders(type: String): PagingSource<Int, FolderEntry>
+
     // ---- Bulk-selection helpers (used by Select All and the multi-copy button).
     // These return one row per match but only the columns we need, so the
     // result set is small enough to materialize in a single suspend call. ----
@@ -49,6 +74,12 @@ interface ImageDao {
 
     @Query("SELECT id FROM images WHERE type = :type AND LOWER(displayName) GLOB :pattern ORDER BY dateAdded DESC")
     suspend fun listIdsSearchByGlob(pattern: String, type: String): List<Long>
+
+    @Query("SELECT id FROM images WHERE type = :type AND folder = :folder ORDER BY dateAdded DESC")
+    suspend fun listIdsByFolder(folder: String, type: String): List<Long>
+
+    @Query("SELECT id FROM images WHERE type = :type AND folder = :folder AND displayName LIKE '%' || :query || '%' ORDER BY dateAdded DESC")
+    suspend fun listIdsByFolderAndName(folder: String, query: String, type: String): List<Long>
 
     @Query("SELECT path FROM images WHERE type = :type AND id IN (:ids) ORDER BY dateAdded DESC")
     suspend fun listPathsForIds(ids: List<Long>, type: String): List<String>
