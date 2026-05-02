@@ -30,6 +30,7 @@ enum class MultiCopyFormat(val id: String, val separator: String, val itemPrefix
 object SettingsManager {
     private val MULTI_COPY_FORMAT_KEY = stringPreferencesKey("multi_copy_format")
     private val FOLDER_TRAILING_SLASH_KEY = booleanPreferencesKey("folder_trailing_slash")
+    private val SHARE_OPENS_VIEWER_KEY = booleanPreferencesKey("share_opens_viewer")
 
     fun getMultiCopyFormat(context: Context): Flow<MultiCopyFormat> =
         context.dataStore.data.map { prefs ->
@@ -58,5 +59,21 @@ object SettingsManager {
     fun applyFolderTrailingSlash(path: String, trailingSlash: Boolean): String {
         val trimmed = path.trimEnd('/')
         return if (trailingSlash) "$trimmed/" else trimmed
+    }
+
+    /**
+     * When true, sharing an image into the app opens the detailed view (so the
+     * user can crop/annotate/share-on); when false (default), the app just
+     * copies the path to the clipboard, shows a toast, and finishes.
+     */
+    fun getShareOpensViewer(context: Context): Flow<Boolean> =
+        context.dataStore.data.map { prefs ->
+            prefs[SHARE_OPENS_VIEWER_KEY] ?: false
+        }
+
+    suspend fun setShareOpensViewer(context: Context, value: Boolean) {
+        context.dataStore.edit { prefs ->
+            prefs[SHARE_OPENS_VIEWER_KEY] = value
+        }
     }
 }

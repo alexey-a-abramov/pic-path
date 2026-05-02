@@ -22,7 +22,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -33,14 +32,17 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
+import com.imageviewer.data.model.ImageFile
+import com.imageviewer.ui.FullscreenImageViewer
 import com.imageviewer.ui.ImageViewerApp
-import com.imageviewer.ui.SharedImageViewer
 import com.imageviewer.util.ClipboardHelper
 import com.imageviewer.util.LanguageManager
+import com.imageviewer.util.SettingsManager
 import com.imageviewer.util.UriHelper
 import com.imageviewer.viewmodel.ImageViewModel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 class MainActivity : ComponentActivity() {
 
@@ -49,6 +51,7 @@ class MainActivity : ComponentActivity() {
     private var permissionDenied by mutableStateOf(false)
     private var sharedImageUri by mutableStateOf<Uri?>(null)
     private var sharedImagePath by mutableStateOf<String?>(null)
+    private var sharedImageMime by mutableStateOf<String?>(null)
     private var hasResumedOnce = false
 
     private val requestPermissionLauncher = registerForActivityResult(
@@ -90,15 +93,39 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    // Show shared image viewer if there's a shared image
                     val imageUri = sharedImageUri
                     if (imageUri != null) {
-                        SharedImageViewer(
-                            imageUri = imageUri,
-                            imagePath = sharedImagePath,
+                        // Setting "Share opens detailed view" was on. Reuse the
+                        // grid's fullscreen viewer so the user gets edit / share /
+                        // copy / path display in one place.
+                        val mime = sharedImageMime ?: "image/*"
+                        val path = sharedImagePath ?: imageUri.toString()
+                        val sharedImage = ImageFile(
+                            id = 0L,
+                            displayName = path.substringAfterLast('/').ifBlank { "shared" },
+                            uri = imageUri.toString(),
+                            path = path,
+                            dateAdded = 0L,
+                            size = 0L,
+                            mimeType = mime,
+                            category = "All",
+                            type = ImageFile.TYPE_IMAGE,
+                            folder = path.substringBeforeLast('/', "")
+                        )
+                        FullscreenImageViewer(
+                            images = listOf(sharedImage),
+                            initialIndex = 0,
                             onClose = {
                                 sharedImageUri = null
                                 sharedImagePath = null
+                                sharedImageMime = null
+                                finish()
+                            },
+                            onCopyPath = { /* Toast already shown by ClipboardHelper */ },
+                            onRefresh = { /* no-op when shown standalone */ },
+                            onEditSaved = { newPath ->
+                                ClipboardHelper.copyToClipboard(this@MainActivity, newPath)
+                                finish()
                             }
                         )
                     } else {
@@ -143,14 +170,23 @@ class MainActivity : ComponentActivity() {
             if (intent?.action != Intent.ACTION_SEND) return
             val uri = intent.getParcelableExtra<Uri>(Intent.EXTRA_STREAM) ?: return
             val path = UriHelper.getPathFromUri(this, uri)
+            val isImage = intent.type?.startsWith("image/") == true
 
-            if (intent.type?.startsWith("image/") == true) {
+            // Single short blocking read of the boolean preference; cached after
+            // first access. Default false on any failure so the share never hangs.
+            val openViewer = isImage && runCatching {
+                runBlocking {
+                    SettingsManager.getShareOpensViewer(this@MainActivity).first()
+                }
+            }.getOrDefault(false)
+
+            if (openViewer) {
                 sharedImageUri = uri
                 sharedImagePath = path
+                sharedImageMime = intent.type
                 path?.let { ClipboardHelper.copyToClipboard(this, it) }
             } else {
-                // Any other file: copy path and exit immediately so the user lands back
-                // wherever they were sharing from.
+                // Default: copy + Toast + finish for any shared item (image or other).
                 if (path != null) {
                     ClipboardHelper.copyToClipboard(this, path)
                 } else {

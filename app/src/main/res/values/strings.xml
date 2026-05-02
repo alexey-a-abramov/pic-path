@@ -85,6 +85,8 @@
     <string name="fmt_at_subtitle">Forces Claude Code attach syntax. Breaks Gemini CLI / Codex.</string>
     <string name="folder_trailing_slash_title">Folder paths end with /</string>
     <string name="folder_trailing_slash_subtitle">When copying folder paths, append a trailing slash. Off = bare path.</string>
+    <string name="share_opens_viewer_title">Share opens detailed view</string>
+    <string name="share_opens_viewer_subtitle">Off (default): sharing an image just copies the path and closes. On: opens the editor for crop/annotate/share-on.</string>
 
     <!-- Crash Activity -->
     <string name="app_crashed">App has stopped</string>

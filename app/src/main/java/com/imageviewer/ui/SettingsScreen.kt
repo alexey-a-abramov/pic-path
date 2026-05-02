@@ -51,6 +51,8 @@ fun SettingsScreen(
         .collectAsState(initial = MultiCopyFormat.DEFAULT).value
     val folderTrailingSlash = SettingsManager.getFolderTrailingSlash(context)
         .collectAsState(initial = true).value
+    val shareOpensViewer = SettingsManager.getShareOpensViewer(context)
+        .collectAsState(initial = false).value
 
     Scaffold(
         topBar = {
@@ -129,6 +131,41 @@ fun SettingsScreen(
                     checked = folderTrailingSlash,
                     onCheckedChange = { value ->
                         scope.launch { SettingsManager.setFolderTrailingSlash(context, value) }
+                    }
+                )
+            }
+
+            Spacer(Modifier.height(8.dp))
+            HorizontalDivider()
+            Spacer(Modifier.height(16.dp))
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable {
+                        scope.launch {
+                            SettingsManager.setShareOpensViewer(context, !shareOpensViewer)
+                        }
+                    }
+                    .padding(vertical = 8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = stringResource(R.string.share_opens_viewer_title),
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                    Text(
+                        text = stringResource(R.string.share_opens_viewer_subtitle),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+                Switch(
+                    checked = shareOpensViewer,
+                    onCheckedChange = { value ->
+                        scope.launch { SettingsManager.setShareOpensViewer(context, value) }
                     }
                 )
             }
