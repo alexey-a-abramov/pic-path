@@ -6,33 +6,15 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.imageviewer.data.model.ImageFile
-import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ImageDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(images: List<ImageFile>)
 
-    // ---- Legacy Flow<List<>> queries (kept until callers migrate) ----
-
-    @Query("SELECT * FROM images WHERE type = :type ORDER BY dateAdded DESC")
-    fun getAllByType(type: String): Flow<List<ImageFile>>
-
-    @Query("SELECT * FROM images WHERE type = :type AND displayName LIKE '%' || :query || '%' ORDER BY dateAdded DESC")
-    fun searchByName(query: String, type: String): Flow<List<ImageFile>>
-
-    @Query("SELECT * FROM images WHERE type = :type AND category = :category ORDER BY dateAdded DESC")
-    fun getByCategory(category: String, type: String): Flow<List<ImageFile>>
-
-    @Query("SELECT * FROM images WHERE type = :type AND category = :category AND displayName LIKE '%' || :query || '%' ORDER BY dateAdded DESC")
-    fun searchByNameAndCategory(query: String, category: String, type: String): Flow<List<ImageFile>>
-
-    @Query("SELECT * FROM images WHERE type = :type AND LOWER(displayName) GLOB :pattern ORDER BY dateAdded DESC")
-    fun searchByGlob(pattern: String, type: String): Flow<List<ImageFile>>
-
-    // ---- Paging variants (Room generates the PagingSource impls; these never
-    // load the whole result set into a single List, so they don't trip the
-    // CursorWindow race when the previous query is being cancelled.) ----
+    // ---- Paging variants for the grid. Room generates the PagingSource impls;
+    // these never load the whole result set into a single List, so they don't
+    // trip the CursorWindow race when the previous query is being cancelled. ----
 
     @Query("SELECT * FROM images WHERE type = :type ORDER BY dateAdded DESC")
     fun pagedAllByType(type: String): PagingSource<Int, ImageFile>
