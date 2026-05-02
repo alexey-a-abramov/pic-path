@@ -3,6 +3,7 @@ package com.imageviewer.ui
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -29,6 +30,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -40,6 +42,9 @@ import com.imageviewer.data.model.ImageFile
 import com.imageviewer.ui.components.ImageEditor
 import com.imageviewer.util.ClipboardHelper
 import kotlinx.coroutines.launch
+import kotlin.math.abs
+
+private const val SWIPE_DISMISS_THRESHOLD_PX = 200f
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -82,9 +87,19 @@ fun FullscreenImageViewer(
                 modifier = Modifier.fillMaxSize()
             ) { page ->
                 val image = images[page]
+                var verticalDrag = 0f
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
+                        .pointerInput(Unit) {
+                            detectVerticalDragGestures(
+                                onDragStart = { verticalDrag = 0f },
+                                onDragEnd = {
+                                    if (abs(verticalDrag) > SWIPE_DISMISS_THRESHOLD_PX) onClose()
+                                },
+                                onVerticalDrag = { _, dy -> verticalDrag += dy }
+                            )
+                        }
                         .combinedClickable(
                             onClick = { showControls = !showControls },
                             onLongClick = {
@@ -176,7 +191,7 @@ fun FullscreenImageViewer(
                             text = current.path,
                             color = Color.White,
                             modifier = Modifier.weight(1f),
-                            maxLines = 2,
+                            maxLines = 5,
                             overflow = TextOverflow.Ellipsis
                         )
                         IconButton(onClick = { editingImage = current }) {
