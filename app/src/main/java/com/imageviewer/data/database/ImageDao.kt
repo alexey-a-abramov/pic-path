@@ -29,4 +29,7 @@ interface ImageDao {
 
     @Query("DELETE FROM images WHERE type = :type")
     suspend fun deleteAllByType(type: String)
+
+    @Query("DELETE FROM images WHERE type = :type AND id NOT IN (:keepIds)")
+    suspend fun deleteStale(type: String, keepIds: List<Long>)
 }

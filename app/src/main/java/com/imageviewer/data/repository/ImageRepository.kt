@@ -36,18 +36,15 @@ class ImageRepository(
     }
 
     suspend fun scanAndIndex(mode: BrowseMode) {
-        when (mode) {
-            BrowseMode.Images -> {
-                val items = scanner.scanImages()
-                imageDao.deleteAllByType(TYPE_IMAGE)
-                imageDao.insertAll(items)
-            }
-            BrowseMode.AllFiles -> {
-                val items = scanner.scanAllFiles()
-                imageDao.deleteAllByType(TYPE_FILE)
-                imageDao.insertAll(items)
-            }
+        val (items, type) = when (mode) {
+            BrowseMode.Images -> scanner.scanImages() to TYPE_IMAGE
+            BrowseMode.AllFiles -> scanner.scanAllFiles() to TYPE_FILE
         }
+        // Upsert first, then drop stale rows. With the composite (id, type) PK,
+        // INSERT OR REPLACE acts as upsert. This avoids the brief empty-grid
+        // flash that delete-all-then-insert produced on every refresh.
+        imageDao.insertAll(items)
+        imageDao.deleteStale(type, items.map { it.id })
     }
 
     /**
