@@ -59,6 +59,32 @@ android {
     }
 }
 
+// Copy the assembled debug APK to a shared "builds" directory so other tools
+// (Termux side-load, file managers, etc.) can pick it up without digging into
+// app/build/outputs/. Override the destination with -PbuildsDir=/some/path.
+val buildsCopyDir: String =
+    (project.findProperty("buildsDir") as? String) ?: "/storage/emulated/0/builds"
+
+val copyApkToBuilds = tasks.register<Copy>("copyApkToBuilds") {
+    description = "Copies the debug APK into $buildsCopyDir/pic-path.apk"
+    group = "distribution"
+    from(layout.buildDirectory.file("outputs/apk/debug/app-debug.apk"))
+    into(buildsCopyDir)
+    rename { "pic-path.apk" }
+    doFirst { file(buildsCopyDir).mkdirs() }
+}
+
+// AGP registers assembleDebug after this script's top-level runs; wire the
+// finalizer (and the dependency) in afterEvaluate when the task exists.
+afterEvaluate {
+    tasks.named("assembleDebug") {
+        finalizedBy(copyApkToBuilds)
+    }
+    copyApkToBuilds.configure {
+        dependsOn("assembleDebug")
+    }
+}
+
 dependencies {
     // Compose BOM
     implementation(platform("androidx.compose:compose-bom:2024.12.01"))
