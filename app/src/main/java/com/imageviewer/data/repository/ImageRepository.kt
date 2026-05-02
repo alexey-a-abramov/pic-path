@@ -9,8 +9,10 @@ import com.imageviewer.data.model.FolderEntry
 import com.imageviewer.data.model.ImageFile
 import com.imageviewer.data.model.ImageFile.Companion.TYPE_FILE
 import com.imageviewer.data.model.ImageFile.Companion.TYPE_IMAGE
+import com.imageviewer.util.FolderTree
 import com.imageviewer.util.MediaStoreScanner
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 enum class BrowseMode { Images, AllFiles, Folders }
 
@@ -50,20 +52,10 @@ class ImageRepository(
             BrowseMode.Folders -> imageDao.pagedAllByType(TYPE_IMAGE) // unused — folders use foldersPaged
         }
 
-    /**
-     * Folder list for Folders mode. Optional [query] filters folders whose path
-     * contains the substring (case-insensitive).
-     */
-    fun foldersPaged(query: String = ""): Flow<PagingData<FolderEntry>> =
-        Pager(gridConfig) {
-            if (query.isBlank()) imageDao.pagedFolders(TYPE_IMAGE)
-            else imageDao.pagedFoldersSearch(query.lowercase(), TYPE_IMAGE)
-        }.flow
-
-    /** Distinct folder paths — used by Folders-mode Select All. */
-    suspend fun allFolders(query: String = ""): List<String> =
-        if (query.isBlank()) imageDao.listAllFolders(TYPE_IMAGE)
-        else imageDao.listAllFoldersMatching(query.lowercase(), TYPE_IMAGE)
+    /** Hierarchical folder tree, rebuilt whenever the underlying leaf-folder
+     *  set changes (i.e. on rescan). Folders mode reads from this. */
+    fun folderTree(): Flow<FolderTree> =
+        imageDao.foldersSnapshot(TYPE_IMAGE).map { FolderTree.build(it) }
 
     /** All matching ids for the current filter. Used by Select All in image modes. */
     suspend fun matchingIds(

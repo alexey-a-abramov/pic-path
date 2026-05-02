@@ -12,9 +12,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -66,10 +69,12 @@ import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.imageviewer.R
 import com.imageviewer.data.model.ImageFile
+import com.imageviewer.data.model.NavigableFolderEntry
 import com.imageviewer.data.repository.BrowseMode
 import com.imageviewer.ui.components.FolderGridItem
 import com.imageviewer.ui.components.ImageGridItem
 import com.imageviewer.ui.components.SearchBar
+import com.imageviewer.util.FolderTree
 import com.imageviewer.util.ClipboardHelper
 import com.imageviewer.util.MultiCopyFormat
 import com.imageviewer.util.SettingsManager
@@ -86,7 +91,8 @@ fun ImageGridScreen(
     modifier: Modifier = Modifier
 ) {
     val lazyItems = viewModel.pagedImages.collectAsLazyPagingItems()
-    val lazyFolders = viewModel.pagedFolders.collectAsLazyPagingItems()
+    val tree by viewModel.folderTree.collectAsStateWithLifecycle()
+    val currentFolderPath by viewModel.currentFolderPath.collectAsStateWithLifecycle()
     val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
     val searchQuery by viewModel.searchQuery.collectAsStateWithLifecycle()
     val selectedCategory by viewModel.selectedCategory.collectAsStateWithLifecycle()
@@ -128,6 +134,19 @@ fun ImageGridScreen(
     BackHandler(enabled = isSelectionMode) {
         viewModel.clearSelection()
     }
+    // Folders mode: system back climbs the breadcrumb one level until we're
+    // at the tree's anchor root, then falls through to default activity finish.
+    BackHandler(
+        enabled = !isSelectionMode &&
+            browseMode == BrowseMode.Folders &&
+            tree != null &&
+            currentFolderPath != null &&
+            currentFolderPath != tree?.rootPath
+    ) {
+        val parent = currentFolderPath?.substringBeforeLast('/', tree!!.rootPath)
+            ?.ifEmpty { tree!!.rootPath }
+        viewModel.navigateToFolder(parent)
+    }
 
     // After an edit-and-save, look up the saved file and open fullscreen on it
     // as a single-image preview. We don't try to maintain pager state across
@@ -167,22 +186,35 @@ fun ImageGridScreen(
         return
     }
 
-    // Folders mode renders folder tiles from `lazyFolders`. Tap copies the
-    // folder's path; long-press enters multi-select. There is no drill-in to
-    // browse the folder's contents — that's deliberate, this mode is for
-    // grabbing folder paths.
     val showingFolders = browseMode == BrowseMode.Folders
-    val pagedTotal = if (showingFolders) lazyFolders.itemCount else lazyItems.itemCount
+
+    // What the user sees in Folders mode at this instant: either the children
+    // of the current breadcrumb level, or a flat search result when there's a
+    // query. Both come straight from the in-memory FolderTree.
+    val folderEntries: List<NavigableFolderEntry> =
+        remember(tree, currentFolderPath, searchQuery, showingFolders) {
+            val t = tree
+            when {
+                !showingFolders || t == null -> emptyList()
+                searchQuery.isNotBlank() -> t.search(searchQuery)
+                else -> t.childrenOf(currentFolderPath ?: t.rootPath)
+            }
+        }
+    val crumbs: List<FolderTree.Crumb> =
+        remember(tree, currentFolderPath, searchQuery, showingFolders) {
+            val t = tree
+            when {
+                !showingFolders || t == null || searchQuery.isNotBlank() -> emptyList()
+                else -> t.breadcrumb(currentFolderPath ?: t.rootPath)
+            }
+        }
+
+    val pagedTotal = if (showingFolders) folderEntries.size else lazyItems.itemCount
     val selectionCount = if (showingFolders) selectedFolderPaths.size else selectedImageIds.size
-    val refreshing = if (showingFolders) {
-        lazyFolders.loadState.refresh is LoadState.Loading
-    } else {
-        lazyItems.loadState.refresh is LoadState.Loading
-    }
-    val isEmpty = pagedTotal == 0 && (
-        if (showingFolders) lazyFolders.loadState.refresh is LoadState.NotLoading
-        else lazyItems.loadState.refresh is LoadState.NotLoading
-    )
+    val refreshing = if (showingFolders) tree == null
+        else lazyItems.loadState.refresh is LoadState.Loading
+    val isEmpty = if (showingFolders) (tree != null && folderEntries.isEmpty())
+        else (pagedTotal == 0 && lazyItems.loadState.refresh is LoadState.NotLoading)
 
     Scaffold(
         topBar = {
@@ -227,7 +259,7 @@ fun ImageGridScreen(
                         if (pagedTotal in 1..SELECT_ALL_THRESHOLD) {
                             IconButton(onClick = {
                                 scope.launch {
-                                    if (showingFolders) viewModel.selectAllFolders()
+                                    if (showingFolders) viewModel.selectAllFolders(folderEntries.map { it.path })
                                     else viewModel.selectAll()
                                 }
                             }) {
@@ -260,9 +292,10 @@ fun ImageGridScreen(
                         if (pagedTotal in 1..SELECT_ALL_THRESHOLD) {
                             OutlinedButton(
                                 onClick = {
-                                    scope.launch {
-                                        if (showingFolders) viewModel.selectAllFolders()
-                                        else viewModel.selectAll()
+                                    if (showingFolders) {
+                                        viewModel.selectAllFolders(folderEntries.map { it.path })
+                                    } else {
+                                        scope.launch { viewModel.selectAll() }
                                     }
                                 },
                                 modifier = Modifier.weight(1f)
@@ -354,6 +387,13 @@ fun ImageGridScreen(
                 }
             )
 
+            if (showingFolders && crumbs.isNotEmpty()) {
+                FolderBreadcrumb(
+                    crumbs = crumbs,
+                    onJump = { viewModel.navigateToFolder(it) }
+                )
+            }
+
             SwipeRefresh(
                 state = swipeRefreshState,
                 onRefresh = {
@@ -404,25 +444,22 @@ fun ImageGridScreen(
                                 modifier = Modifier.fillMaxSize()
                             ) {
                                 items(
-                                    count = lazyFolders.itemCount,
-                                    key = { index ->
-                                        runCatching { lazyFolders.peek(index) }
-                                            .getOrNull()
-                                            ?.folder
-                                            ?: "i:$index"
-                                    }
+                                    count = folderEntries.size,
+                                    key = { index -> folderEntries[index].path }
                                 ) { index ->
-                                    val entry = lazyFolders[index] ?: return@items
+                                    val entry = folderEntries[index]
                                     FolderGridItem(
                                         entry = entry,
                                         onClick = {
                                             if (isSelectionMode) {
-                                                viewModel.toggleFolderSelection(entry.folder)
+                                                viewModel.toggleFolderSelection(entry.path)
+                                            } else if (entry.hasChildren) {
+                                                // Drill into the sub-tree.
+                                                viewModel.navigateToFolder(entry.path)
                                             } else {
-                                                // Single tap: copy folder path (with the
-                                                // user's trailing-slash preference applied).
+                                                // Leaf: tap copies the path.
                                                 val formatted = SettingsManager
-                                                    .applyFolderTrailingSlash(entry.folder, folderTrailingSlash)
+                                                    .applyFolderTrailingSlash(entry.path, folderTrailingSlash)
                                                 ClipboardHelper.copyToClipboard(context, formatted)
                                                 scope.launch {
                                                     snackbarHostState.showSnackbar(message = pathCopiedText)
@@ -431,21 +468,21 @@ fun ImageGridScreen(
                                         },
                                         onLongClick = {
                                             // Mirror the image long-press: enter selection mode,
-                                            // add this folder, and copy its (settings-formatted)
-                                            // path on the very first long-press.
+                                            // add this folder, and copy its path on the first
+                                            // long-press (regardless of whether it has children).
                                             val wasEmpty = !isSelectionMode
                                             if (wasEmpty) viewModel.toggleSelectionMode(true)
-                                            viewModel.toggleFolderSelection(entry.folder)
+                                            viewModel.toggleFolderSelection(entry.path)
                                             if (wasEmpty) {
                                                 val formatted = SettingsManager
-                                                    .applyFolderTrailingSlash(entry.folder, folderTrailingSlash)
+                                                    .applyFolderTrailingSlash(entry.path, folderTrailingSlash)
                                                 ClipboardHelper.copyToClipboard(context, formatted)
                                                 scope.launch {
                                                     snackbarHostState.showSnackbar(message = pathCopiedText)
                                                 }
                                             }
                                         },
-                                        isSelected = selectedFolderPaths.contains(entry.folder)
+                                        isSelected = selectedFolderPaths.contains(entry.path)
                                     )
                                 }
                             }
@@ -518,6 +555,39 @@ fun ImageGridScreen(
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun FolderBreadcrumb(
+    crumbs: List<FolderTree.Crumb>,
+    onJump: (String) -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .horizontalScroll(rememberScrollState())
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        crumbs.forEachIndexed { index, crumb ->
+            if (index > 0) {
+                Text(
+                    text = " / ",
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+            val isLast = index == crumbs.size - 1
+            Text(
+                text = crumb.label,
+                color = if (isLast) MaterialTheme.colorScheme.onSurface
+                else MaterialTheme.colorScheme.primary,
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = if (isLast) Modifier
+                else Modifier.clickable { onJump(crumb.path) }
+            )
         }
     }
 }

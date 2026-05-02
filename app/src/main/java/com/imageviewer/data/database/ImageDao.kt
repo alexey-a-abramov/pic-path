@@ -33,8 +33,10 @@ interface ImageDao {
     fun pagedSearchByGlob(pattern: String, type: String): PagingSource<Int, ImageFile>
 
     /**
-     * One row per folder containing images of [type]. The sample URI/mimeType
-     * come from the folder's most recently added file (used as a thumbnail).
+     * One row per leaf folder (folder containing images directly) of [type].
+     * Returned as a snapshot so the Repository can build a hierarchical tree
+     * for the Folders browse mode. Typical libraries have on the order of
+     * tens to a few hundred leaf folders, well within Room's window.
      */
     @Query("""
         SELECT
@@ -48,32 +50,7 @@ interface ImageDao {
         GROUP BY folder
         ORDER BY lastModified DESC
     """)
-    fun pagedFolders(type: String): PagingSource<Int, FolderEntry>
-
-    /**
-     * Folders whose path matches the given LIKE pattern (case-insensitive).
-     * Used by the search bar in Folders mode.
-     */
-    @Query("""
-        SELECT
-            folder AS folder,
-            COUNT(*) AS count,
-            (SELECT uri      FROM images i2 WHERE i2.type = images.type AND i2.folder = images.folder ORDER BY dateAdded DESC LIMIT 1) AS sampleUri,
-            (SELECT mimeType FROM images i2 WHERE i2.type = images.type AND i2.folder = images.folder ORDER BY dateAdded DESC LIMIT 1) AS sampleMimeType,
-            MAX(dateAdded) AS lastModified
-        FROM images
-        WHERE type = :type AND folder != '' AND LOWER(folder) LIKE '%' || :query || '%'
-        GROUP BY folder
-        ORDER BY lastModified DESC
-    """)
-    fun pagedFoldersSearch(query: String, type: String): PagingSource<Int, FolderEntry>
-
-    /** Distinct folder paths for [type], used by Folders-mode Select All. */
-    @Query("SELECT DISTINCT folder FROM images WHERE type = :type AND folder != '' ORDER BY folder")
-    suspend fun listAllFolders(type: String): List<String>
-
-    @Query("SELECT DISTINCT folder FROM images WHERE type = :type AND folder != '' AND LOWER(folder) LIKE '%' || :query || '%' ORDER BY folder")
-    suspend fun listAllFoldersMatching(query: String, type: String): List<String>
+    fun foldersSnapshot(type: String): kotlinx.coroutines.flow.Flow<List<FolderEntry>>
 
     // ---- Bulk-selection helpers (used by Select All and the multi-copy button).
     // These return one row per match but only the columns we need, so the

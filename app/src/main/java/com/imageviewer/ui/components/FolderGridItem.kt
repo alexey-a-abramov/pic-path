@@ -22,26 +22,33 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import com.imageviewer.data.model.FolderEntry
+import com.imageviewer.data.model.NavigableFolderEntry
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun FolderGridItem(
-    entry: FolderEntry,
+    entry: NavigableFolderEntry,
     onClick: () -> Unit,
     onLongClick: () -> Unit,
     isSelected: Boolean = false,
     modifier: Modifier = Modifier
 ) {
+    // Leaf folders (no sub-directories) are visually de-emphasized so the
+    // navigable interior folders stand out.
+    val tileAlpha = if (entry.hasChildren) 1f else 0.55f
+    val displayCount = if (entry.hasChildren) entry.totalImageCount else entry.directImageCount
+
     Card(
         modifier = modifier
             .aspectRatio(1f)
+            .alpha(tileAlpha)
             .combinedClickable(onClick = onClick, onLongClick = onLongClick),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         border = if (isSelected)
@@ -49,7 +56,8 @@ fun FolderGridItem(
         else null
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
-            if (entry.sampleMimeType.startsWith("image/")) {
+            val mime = entry.sampleMimeType.orEmpty()
+            if (entry.sampleUri != null && mime.startsWith("image/")) {
                 AsyncImage(
                     model = entry.sampleUri,
                     contentDescription = entry.name,
@@ -88,7 +96,7 @@ fun FolderGridItem(
                     textAlign = TextAlign.Start
                 )
                 Text(
-                    text = entry.count.toString(),
+                    text = displayCount.toString(),
                     color = Color.White.copy(alpha = 0.8f),
                     style = MaterialTheme.typography.bodySmall
                 )

@@ -6,19 +6,22 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.imageviewer.data.database.ImageDatabase
-import com.imageviewer.data.model.FolderEntry
 import com.imageviewer.data.model.ImageFile
+import com.imageviewer.data.model.NavigableFolderEntry
 import com.imageviewer.data.repository.BrowseMode
 import com.imageviewer.data.repository.ImageRepository
+import com.imageviewer.util.FolderTree
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 @OptIn(FlowPreview::class)
@@ -44,16 +47,22 @@ class ImageViewModel(application: Application) : AndroidViewModel(application) {
     private val _selectedImageIds = MutableStateFlow<Set<Long>>(emptySet())
     val selectedImageIds: StateFlow<Set<Long>> = _selectedImageIds.asStateFlow()
 
-    /** Selected folder paths in Folders-mode top-level. Independent from
-     *  selectedImageIds so a browse-mode flip can clear both cleanly. */
     private val _selectedFolderPaths = MutableStateFlow<Set<String>>(emptySet())
     val selectedFolderPaths: StateFlow<Set<String>> = _selectedFolderPaths.asStateFlow()
+
+    /** Where the user is in the folder tree (null = the tree's anchor root). */
+    private val _currentFolderPath = MutableStateFlow<String?>(null)
+    val currentFolderPath: StateFlow<String?> = _currentFolderPath.asStateFlow()
 
     /** Paginated image/file rows for Images and Files modes. */
     val pagedImages: Flow<PagingData<ImageFile>>
 
-    /** Paginated folder entries for Folders mode, filtered by [searchQuery]. */
-    val pagedFolders: Flow<PagingData<FolderEntry>>
+    /**
+     * Hot snapshot of the folder tree. Folders mode UI derives breadcrumbs and
+     * the visible tile list from this; the snapshot is small enough to fit in
+     * memory comfortably (typical libraries: tens of leaf folders).
+     */
+    val folderTree: StateFlow<FolderTree?>
 
     init {
         val database = ImageDatabase.getDatabase(application)
@@ -69,11 +78,12 @@ class ImageViewModel(application: Application) : AndroidViewModel(application) {
             }
             .cachedIn(viewModelScope)
 
-        pagedFolders = _searchQuery
-            .debounce(300)
-            .distinctUntilChanged()
-            .flatMapLatest { query -> repository.foldersPaged(query) }
-            .cachedIn(viewModelScope)
+        folderTree = repository.folderTree()
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5_000),
+                initialValue = null
+            )
     }
 
     fun loadImages() {
@@ -103,15 +113,21 @@ class ImageViewModel(application: Application) : AndroidViewModel(application) {
         if (_browseMode.value == mode) return
         _browseMode.value = mode
         _searchQuery.value = ""
+        _currentFolderPath.value = null
         clearSelection()
         loadImages()
     }
 
+    /** Drill into a sub-folder (or jump to a breadcrumb segment). */
+    fun navigateToFolder(path: String?) {
+        _currentFolderPath.value = path
+        _searchQuery.value = ""
+        clearSelection()
+    }
+
     fun toggleSelectionMode(enabled: Boolean) {
         _isSelectionMode.value = enabled
-        if (!enabled) {
-            clearSelection()
-        }
+        if (!enabled) clearSelection()
     }
 
     fun toggleImageSelection(imageId: Long) {
@@ -138,15 +154,11 @@ class ImageViewModel(application: Application) : AndroidViewModel(application) {
         _isSelectionMode.value = false
     }
 
-    /** Fetches paths for the current selection. The query/category/mode used for
-     *  resolution is captured at call-time so a category change mid-call doesn't
-     *  change the row set under us. */
     suspend fun selectedPaths(): List<String> {
         val ids = _selectedImageIds.value
         return repository.pathsForIds(ids, _browseMode.value)
     }
 
-    /** Selects every row matching the *current* filter (Images/Files modes). */
     suspend fun selectAll() {
         val mode = _browseMode.value
         val category = _selectedCategory.value
@@ -156,15 +168,14 @@ class ImageViewModel(application: Application) : AndroidViewModel(application) {
         _selectedImageIds.value = ids.toSet()
     }
 
-    /** Folders-mode Select All — every folder matching the current search query. */
-    suspend fun selectAllFolders() {
-        val query = _searchQuery.value
-        val all = repository.allFolders(query)
+    /** Folders-mode Select All — every visible entry at the current location
+     *  (or every search match when search is active). */
+    fun selectAllFolders(visiblePaths: List<String>) {
+        if (visiblePaths.isEmpty()) return
         _isSelectionMode.value = true
-        _selectedFolderPaths.value = all.toSet()
+        _selectedFolderPaths.value = visiblePaths.toSet()
     }
 
-    /** Look up the [ImageFile] for a given absolute path in the current mode. */
     suspend fun findByPath(path: String): ImageFile? =
         repository.findByPath(path, _browseMode.value)
 
