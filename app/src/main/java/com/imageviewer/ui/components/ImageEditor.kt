@@ -1,7 +1,5 @@
 package com.imageviewer.ui.components
 
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.net.Uri
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -11,15 +9,14 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowOutward
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Crop
 import androidx.compose.material.icons.filled.FormatSize
 import androidx.compose.material.icons.filled.Undo
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -33,16 +30,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.NativeCanvas
 import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.PathFillType
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.input.pointer.pointerInput
@@ -54,23 +50,21 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.imageviewer.R
-import com.imageviewer.data.model.ImageFile
-import com.imageviewer.util.ClipboardHelper
 import com.imageviewer.util.ImageEditorUtil
+import kotlinx.coroutines.launch
 import kotlin.math.atan2
 import kotlin.math.cos
+import kotlin.math.max
+import kotlin.math.min
 import kotlin.math.sin
-
-import androidx.compose.ui.graphics.PathFillType
 
 sealed class Annotation {
     data class Arrow(val start: Offset, val end: Offset, val color: Color = Color.Red) : Annotation()
     data class Text(val position: Offset, val text: String, val color: Color = Color.Red) : Annotation()
 }
 
-enum class EditMode {
-    None, Crop, Arrow, Text
-}
+private enum class EditMode { None, Crop, Arrow, Text }
+private enum class Handle { TopLeft, TopRight, BottomLeft, BottomRight, Inside }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -84,186 +78,167 @@ fun ImageEditor(
     val annotations = remember { mutableStateListOf<Annotation>() }
     var currentArrowStart by remember { mutableStateOf<Offset?>(null) }
     var currentArrowEnd by remember { mutableStateOf<Offset?>(null) }
-    
-    // Improved Crop State
+
     var cropRect by remember { mutableStateOf<Rect?>(null) }
     var draggingHandle by remember { mutableStateOf<Handle?>(null) }
 
     var textEntryPosition by remember { mutableStateOf<Offset?>(null) }
     var textEntryValue by remember { mutableStateOf("") }
-    
+
+    var saving by remember { mutableStateOf(false) }
+
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
     var viewSize by remember { mutableStateOf(IntSize.Zero) }
     val parsedUri = remember(imageUri) { Uri.parse(imageUri) }
 
     Box(modifier = Modifier.fillMaxSize().background(Color.Black)) {
-        // Base Image
         AsyncImage(
             model = parsedUri,
             contentDescription = null,
-            modifier = Modifier.fillMaxSize()
-                .onGloballyPositioned { coordinates ->
-                    viewSize = coordinates.size
-                    // Initialize crop rect to 80% of view if in crop mode and not set
+            modifier = Modifier
+                .fillMaxSize()
+                .onGloballyPositioned { coords ->
+                    viewSize = coords.size
                     if (mode == EditMode.Crop && cropRect == null && viewSize != IntSize.Zero) {
-                        val w = viewSize.width.toFloat()
-                        val h = viewSize.height.toFloat()
-                        cropRect = Rect(w * 0.1f, h * 0.1f, w * 0.9f, h * 0.9f)
+                        cropRect = defaultCropRect(viewSize)
                     }
                 }
-                .pointerInput(mode, cropRect) {
+                .pointerInput(mode) {
                     when (mode) {
-                        EditMode.Arrow -> {
-                            detectDragGestures(
-                                onDragStart = { offset ->
-                                    currentArrowStart = offset
-                                    currentArrowEnd = offset
-                                },
-                                onDrag = { change, _ ->
-                                    currentArrowEnd = change.position
-                                },
-                                onDragEnd = {
-                                    if (currentArrowStart != null && currentArrowEnd != null) {
-                                        annotations.add(Annotation.Arrow(currentArrowStart!!, currentArrowEnd!!))
-                                    }
-                                    currentArrowStart = null
-                                    currentArrowEnd = null
-                                }
-                            )
-                        }
-                        EditMode.Text -> {
-                            detectTapGestures { offset ->
-                                textEntryPosition = offset
-                                textEntryValue = ""
+                        EditMode.Arrow -> detectDragGestures(
+                            onDragStart = { offset ->
+                                currentArrowStart = offset
+                                currentArrowEnd = offset
+                            },
+                            onDrag = { change, _ -> currentArrowEnd = change.position },
+                            onDragEnd = {
+                                val s = currentArrowStart
+                                val e = currentArrowEnd
+                                if (s != null && e != null) annotations.add(Annotation.Arrow(s, e))
+                                currentArrowStart = null
+                                currentArrowEnd = null
                             }
+                        )
+                        EditMode.Text -> detectTapGestures { offset ->
+                            textEntryPosition = offset
+                            textEntryValue = ""
                         }
-                        EditMode.Crop -> {
-                            detectDragGestures(
-                                onDragStart = { offset ->
-                                    draggingHandle = cropRect?.let { getHandleAt(offset, it) }
-                                },
-                                onDrag = { change, _ ->
-                                    cropRect?.let { rect ->
-                                        cropRect = when (draggingHandle) {
-                                            Handle.TopLeft -> rect.copy(left = change.position.x, top = change.position.y)
-                                            Handle.TopRight -> rect.copy(right = change.position.x, top = change.position.y)
-                                            Handle.BottomLeft -> rect.copy(left = change.position.x, bottom = change.position.y)
-                                            Handle.BottomRight -> rect.copy(right = change.position.x, bottom = change.position.y)
-                                            null -> {
-                                                // If not dragging a handle, maybe move the whole rect?
-                                                if (rect.contains(change.position)) {
-                                                    rect.translate(change.scrollDelta.x, change.scrollDelta.y)
-                                                } else rect
-                                            }
-                                        }
-                                    }
-                                },
-                                onDragEnd = { draggingHandle = null }
-                            )
-                        }
-                        else -> {}
+                        EditMode.Crop -> detectDragGestures(
+                            onDragStart = { offset ->
+                                draggingHandle = handleAt(offset, cropRect)
+                            },
+                            onDrag = { _, dragAmount ->
+                                val rect = cropRect ?: return@detectDragGestures
+                                val updated = when (draggingHandle) {
+                                    Handle.TopLeft -> rect.copy(
+                                        left = rect.left + dragAmount.x,
+                                        top = rect.top + dragAmount.y
+                                    )
+                                    Handle.TopRight -> rect.copy(
+                                        right = rect.right + dragAmount.x,
+                                        top = rect.top + dragAmount.y
+                                    )
+                                    Handle.BottomLeft -> rect.copy(
+                                        left = rect.left + dragAmount.x,
+                                        bottom = rect.bottom + dragAmount.y
+                                    )
+                                    Handle.BottomRight -> rect.copy(
+                                        right = rect.right + dragAmount.x,
+                                        bottom = rect.bottom + dragAmount.y
+                                    )
+                                    Handle.Inside -> rect.translate(dragAmount.x, dragAmount.y)
+                                    null -> return@detectDragGestures
+                                }
+                                cropRect = clampRectToView(updated, viewSize)
+                            },
+                            onDragEnd = { draggingHandle = null }
+                        )
+                        EditMode.None -> {}
                     }
                 },
             contentScale = ContentScale.Fit
         )
 
-        // Drawing Canvas
         Canvas(modifier = Modifier.fillMaxSize()) {
-            // Draw existing annotations
-            annotations.forEach { annotation ->
-                when (annotation) {
-                    is Annotation.Arrow -> {
-                        drawArrow(annotation.start, annotation.end, annotation.color)
-                    }
-                    is Annotation.Text -> {
-                        drawContext.canvas.nativeCanvas.drawText(
-                            annotation.text,
-                            annotation.position.x,
-                            annotation.position.y,
-                            android.graphics.Paint().apply {
-                                color = android.graphics.Color.RED
-                                textSize = 60f
-                                isFakeBoldText = true
-                            }
-                        )
-                    }
+            annotations.forEach { ann ->
+                when (ann) {
+                    is Annotation.Arrow -> drawArrow(ann.start, ann.end, ann.color)
+                    is Annotation.Text -> drawContext.canvas.nativeCanvas.drawText(
+                        ann.text,
+                        ann.position.x,
+                        ann.position.y,
+                        android.graphics.Paint().apply {
+                            color = android.graphics.Color.RED
+                            textSize = 60f
+                            isFakeBoldText = true
+                        }
+                    )
                 }
             }
-
-            // Draw current arrow being dragged
             if (currentArrowStart != null && currentArrowEnd != null) {
                 drawArrow(currentArrowStart!!, currentArrowEnd!!, Color.Red.copy(alpha = 0.5f))
             }
-
-            // Draw crop rect and handles
             cropRect?.let { rect ->
-                // Scrim with hole
+                val normalized = normalize(rect)
                 val path = Path().apply {
                     addRect(Rect(0f, 0f, size.width, size.height))
-                    addRect(rect)
+                    addRect(normalized)
                     fillType = PathFillType.EvenOdd
                 }
                 drawPath(path, Color.Black.copy(alpha = 0.7f))
-
-                // Border
                 drawRect(
                     color = Color.White,
-                    topLeft = rect.topLeft,
-                    size = rect.size,
+                    topLeft = normalized.topLeft,
+                    size = normalized.size,
                     style = Stroke(width = 2.dp.toPx())
                 )
-
-                // Handles
                 val handleSize = 12.dp.toPx()
-                drawCircle(Color.White, radius = handleSize, center = rect.topLeft)
-                drawCircle(Color.White, radius = handleSize, center = rect.topRight)
-                drawCircle(Color.White, radius = handleSize, center = rect.bottomLeft)
-                drawCircle(Color.White, radius = handleSize, center = rect.bottomRight)
+                drawCircle(Color.White, radius = handleSize, center = normalized.topLeft)
+                drawCircle(Color.White, radius = handleSize, center = normalized.topRight)
+                drawCircle(Color.White, radius = handleSize, center = normalized.bottomLeft)
+                drawCircle(Color.White, radius = handleSize, center = normalized.bottomRight)
             }
         }
 
-        // Text Input Overlay
         textEntryPosition?.let { position ->
-            Box(modifier = Modifier.fillMaxSize()) {
-                Surface(
-                    modifier = Modifier.align(Alignment.Center).padding(16.dp),
-                    color = Color.Black.copy(alpha = 0.8f),
-                    shape = MaterialTheme.shapes.medium
-                ) {
-                    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(8.dp)) {
-                        TextField(
-                            value = textEntryValue,
-                            onValueChange = { textEntryValue = it },
-                            placeholder = { Text(stringResource(R.string.enter_text_placeholder)) },
-                            colors = TextFieldDefaults.colors(
-                                focusedTextColor = Color.White,
-                                unfocusedTextColor = Color.White,
-                                focusedContainerColor = Color.Transparent,
-                                unfocusedContainerColor = Color.Transparent
-                            )
+            Surface(
+                modifier = Modifier.align(Alignment.Center).padding(16.dp),
+                color = Color.Black.copy(alpha = 0.8f),
+                shape = MaterialTheme.shapes.medium
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(8.dp)) {
+                    TextField(
+                        value = textEntryValue,
+                        onValueChange = { textEntryValue = it },
+                        placeholder = { Text(stringResource(R.string.enter_text_placeholder)) },
+                        colors = TextFieldDefaults.colors(
+                            focusedTextColor = Color.White,
+                            unfocusedTextColor = Color.White,
+                            focusedContainerColor = Color.Transparent,
+                            unfocusedContainerColor = Color.Transparent
                         )
-                        IconButton(onClick = {
-                            if (textEntryValue.isNotBlank()) {
-                                annotations.add(Annotation.Text(position, textEntryValue))
-                            }
-                            textEntryPosition = null
-                        }) {
-                            Icon(Icons.Default.Check, contentDescription = stringResource(R.string.add_text), tint = Color.White)
+                    )
+                    IconButton(onClick = {
+                        if (textEntryValue.isNotBlank()) {
+                            annotations.add(Annotation.Text(position, textEntryValue))
                         }
+                        textEntryPosition = null
+                    }) {
+                        Icon(Icons.Default.Check, contentDescription = stringResource(R.string.add_text), tint = Color.White)
                     }
                 }
             }
         }
 
-        // Top Toolbar
         Row(
             modifier = Modifier.align(Alignment.TopStart).padding(16.dp).background(Color.Black.copy(alpha = 0.5f)),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            IconButton(onClick = onCancel) {
+            IconButton(onClick = onCancel, enabled = !saving) {
                 Icon(Icons.Default.Close, contentDescription = stringResource(R.string.cancel), tint = Color.White)
             }
-            if (annotations.isNotEmpty() || cropRect != null) {
+            if ((annotations.isNotEmpty() || cropRect != null) && !saving) {
                 IconButton(onClick = {
                     if (mode == EditMode.Crop) cropRect = null
                     else if (annotations.isNotEmpty()) annotations.removeAt(annotations.size - 1)
@@ -273,50 +248,124 @@ fun ImageEditor(
             }
         }
 
-        // Bottom Toolbar
         Row(
             modifier = Modifier.align(Alignment.BottomCenter).padding(16.dp).background(Color.Black.copy(alpha = 0.5f)),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            IconButton(onClick = { 
-                mode = EditMode.Crop 
-                if (cropRect == null && viewSize != IntSize.Zero) {
-                    val w = viewSize.width.toFloat()
-                    val h = viewSize.height.toFloat()
-                    cropRect = Rect(w * 0.1f, h * 0.1f, w * 0.9f, h * 0.9f)
+            ToolbarToggle(
+                icon = Icons.Default.Crop,
+                label = stringResource(R.string.crop),
+                selected = mode == EditMode.Crop,
+                enabled = !saving,
+                onClick = {
+                    mode = EditMode.Crop
+                    if (cropRect == null && viewSize != IntSize.Zero) {
+                        cropRect = defaultCropRect(viewSize)
+                    }
                 }
-            }, modifier = Modifier.background(if (mode == EditMode.Crop) Color.White.copy(alpha = 0.2f) else Color.Transparent)) {
-                Icon(Icons.Default.Crop, contentDescription = stringResource(R.string.crop), tint = Color.White)
-            }
-            IconButton(onClick = { mode = EditMode.Arrow }, modifier = Modifier.background(if (mode == EditMode.Arrow) Color.White.copy(alpha = 0.2f) else Color.Transparent)) {
-                Icon(Icons.Default.ArrowOutward, contentDescription = stringResource(R.string.arrow), tint = Color.White)
-            }
-            IconButton(onClick = { mode = EditMode.Text }, modifier = Modifier.background(if (mode == EditMode.Text) Color.White.copy(alpha = 0.2f) else Color.Transparent)) {
-                Icon(Icons.Default.FormatSize, contentDescription = stringResource(R.string.text), tint = Color.White)
-            }
-            IconButton(onClick = {
-                val savedPath = ImageEditorUtil.saveEditedImage(context, parsedUri, cropRect, annotations, viewSize)
-                if (savedPath != null) {
-                    // Copy to clipboard as path AND as URI (for file paste)
-                    ClipboardHelper.copyToClipboard(context, savedPath)
-                    onSave(savedPath)
+            )
+            ToolbarToggle(
+                icon = Icons.Default.ArrowOutward,
+                label = stringResource(R.string.arrow),
+                selected = mode == EditMode.Arrow,
+                enabled = !saving,
+                onClick = { mode = EditMode.Arrow }
+            )
+            ToolbarToggle(
+                icon = Icons.Default.FormatSize,
+                label = stringResource(R.string.text),
+                selected = mode == EditMode.Text,
+                enabled = !saving,
+                onClick = { mode = EditMode.Text }
+            )
+            IconButton(
+                enabled = !saving,
+                onClick = {
+                    if (saving || viewSize == IntSize.Zero) return@IconButton
+                    saving = true
+                    val finalCrop = cropRect?.let { normalize(it) }
+                    val snapshotAnnotations = annotations.toList()
+                    scope.launch {
+                        val result = ImageEditorUtil.saveEditedCopy(
+                            context = context,
+                            originalUri = parsedUri,
+                            originalPath = imagePath,
+                            cropRect = finalCrop,
+                            annotations = snapshotAnnotations,
+                            viewSize = viewSize
+                        )
+                        saving = false
+                        if (result != null) onSave(result.absolutePath)
+                    }
                 }
-            }) {
+            ) {
                 Icon(Icons.Default.Check, contentDescription = stringResource(R.string.done), tint = Color.Green)
+            }
+        }
+
+        if (saving) {
+            Box(
+                modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.4f)),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator(color = Color.White)
             }
         }
     }
 }
 
-private enum class Handle { TopLeft, TopRight, BottomLeft, BottomRight }
+@Composable
+private fun ToolbarToggle(
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    label: String,
+    selected: Boolean,
+    enabled: Boolean,
+    onClick: () -> Unit
+) {
+    IconButton(
+        onClick = onClick,
+        enabled = enabled,
+        modifier = Modifier.background(if (selected) Color.White.copy(alpha = 0.2f) else Color.Transparent)
+    ) {
+        Icon(icon, contentDescription = label, tint = Color.White)
+    }
+}
 
-private fun getHandleAt(offset: Offset, rect: Rect): Handle? {
-    val threshold = 40f
+private fun defaultCropRect(viewSize: IntSize): Rect {
+    val w = viewSize.width.toFloat()
+    val h = viewSize.height.toFloat()
+    return Rect(w * 0.1f, h * 0.1f, w * 0.9f, h * 0.9f)
+}
+
+private fun normalize(rect: Rect): Rect = Rect(
+    left = min(rect.left, rect.right),
+    top = min(rect.top, rect.bottom),
+    right = max(rect.left, rect.right),
+    bottom = max(rect.top, rect.bottom)
+)
+
+private fun clampRectToView(rect: Rect, viewSize: IntSize): Rect {
+    if (viewSize == IntSize.Zero) return rect
+    val w = viewSize.width.toFloat()
+    val h = viewSize.height.toFloat()
+    return Rect(
+        left = rect.left.coerceIn(0f, w),
+        top = rect.top.coerceIn(0f, h),
+        right = rect.right.coerceIn(0f, w),
+        bottom = rect.bottom.coerceIn(0f, h)
+    )
+}
+
+private fun handleAt(offset: Offset, rect: Rect?): Handle? {
+    rect ?: return null
+    val n = normalize(rect)
+    val threshold = 56f
     return when {
-        (offset - rect.topLeft).getDistance() < threshold -> Handle.TopLeft
-        (offset - rect.topRight).getDistance() < threshold -> Handle.TopRight
-        (offset - rect.bottomLeft).getDistance() < threshold -> Handle.BottomLeft
-        (offset - rect.bottomRight).getDistance() < threshold -> Handle.BottomRight
+        (offset - n.topLeft).getDistance() < threshold -> Handle.TopLeft
+        (offset - n.topRight).getDistance() < threshold -> Handle.TopRight
+        (offset - n.bottomLeft).getDistance() < threshold -> Handle.BottomLeft
+        (offset - n.bottomRight).getDistance() < threshold -> Handle.BottomRight
+        n.contains(offset) -> Handle.Inside
         else -> null
     }
 }
@@ -327,25 +376,11 @@ private fun androidx.compose.ui.graphics.drawscope.DrawScope.drawArrow(
     color: Color
 ) {
     val strokeWidth = 10f
-    drawLine(
-        color = color,
-        start = start,
-        end = end,
-        strokeWidth = strokeWidth
-    )
-    
+    drawLine(color = color, start = start, end = end, strokeWidth = strokeWidth)
     val angle = atan2(end.y - start.y, end.x - start.x)
     val arrowSize = 40f
-    
-    val p1 = Offset(
-        end.x - arrowSize * cos(angle - 0.5f),
-        end.y - arrowSize * sin(angle - 0.5f)
-    )
-    val p2 = Offset(
-        end.x - arrowSize * cos(angle + 0.5f),
-        end.y - arrowSize * sin(angle + 0.5f)
-    )
-    
+    val p1 = Offset(end.x - arrowSize * cos(angle - 0.5f), end.y - arrowSize * sin(angle - 0.5f))
+    val p2 = Offset(end.x - arrowSize * cos(angle + 0.5f), end.y - arrowSize * sin(angle + 0.5f))
     drawLine(color = color, start = end, end = p1, strokeWidth = strokeWidth)
     drawLine(color = color, start = end, end = p2, strokeWidth = strokeWidth)
 }
