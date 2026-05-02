@@ -7,6 +7,7 @@
     <string name="select_browse_mode">Select browse mode</string>
     <string name="search_hint">Search images...</string>
     <string name="search_hint_files">Search files (use * and ?)…</string>
+    <string name="search_hint_folders">Search folders…</string>
     <string name="all_files_permission_required">All-files mode needs storage access</string>
     <string name="grant">Grant</string>
     <string name="path_copied">Path copied to clipboard</string>

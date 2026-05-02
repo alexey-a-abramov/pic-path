@@ -91,7 +91,6 @@ fun ImageGridScreen(
     val searchQuery by viewModel.searchQuery.collectAsStateWithLifecycle()
     val selectedCategory by viewModel.selectedCategory.collectAsStateWithLifecycle()
     val browseMode by viewModel.browseMode.collectAsStateWithLifecycle()
-    val selectedFolder by viewModel.selectedFolder.collectAsStateWithLifecycle()
     val isSelectionMode by viewModel.isSelectionMode.collectAsStateWithLifecycle()
     val selectedImageIds by viewModel.selectedImageIds.collectAsStateWithLifecycle()
     val selectedFolderPaths by viewModel.selectedFolderPaths.collectAsStateWithLifecycle()
@@ -128,10 +127,6 @@ fun ImageGridScreen(
 
     BackHandler(enabled = isSelectionMode) {
         viewModel.clearSelection()
-    }
-    // Inside a folder → first back press exits to the folder list.
-    BackHandler(enabled = !isSelectionMode && browseMode == BrowseMode.Folders && selectedFolder != null) {
-        viewModel.selectFolder(null)
     }
 
     // After an edit-and-save, look up the saved file and open fullscreen on it
@@ -172,9 +167,11 @@ fun ImageGridScreen(
         return
     }
 
-    // When in Folders mode without a selected folder, the grid renders folder
-    // tiles from `lazyFolders`. Otherwise it renders image tiles from `lazyItems`.
-    val showingFolders = browseMode == BrowseMode.Folders && selectedFolder == null
+    // Folders mode renders folder tiles from `lazyFolders`. Tap copies the
+    // folder's path; long-press enters multi-select. There is no drill-in to
+    // browse the folder's contents — that's deliberate, this mode is for
+    // grabbing folder paths.
+    val showingFolders = browseMode == BrowseMode.Folders
     val pagedTotal = if (showingFolders) lazyFolders.itemCount else lazyItems.itemCount
     val selectionCount = if (showingFolders) selectedFolderPaths.size else selectedImageIds.size
     val refreshing = if (showingFolders) {
@@ -194,11 +191,6 @@ fun ImageGridScreen(
                     when {
                         isSelectionMode -> Text(
                             stringResource(R.string.selection_mode, selectionCount)
-                        )
-                        // Drilled into a folder — show its name in the title.
-                        browseMode == BrowseMode.Folders && selectedFolder != null -> Text(
-                            text = selectedFolder!!.substringAfterLast('/').ifBlank { selectedFolder!! },
-                            maxLines = 1
                         )
                         else -> BrowseModeSelector(
                             mode = browseMode,
@@ -221,19 +213,11 @@ fun ImageGridScreen(
                     }
                 },
                 navigationIcon = {
-                    when {
-                        isSelectionMode -> IconButton(onClick = { viewModel.clearSelection() }) {
+                    if (isSelectionMode) {
+                        IconButton(onClick = { viewModel.clearSelection() }) {
                             Icon(
                                 imageVector = Icons.Default.Close,
                                 contentDescription = stringResource(R.string.exit_selection)
-                            )
-                        }
-                        browseMode == BrowseMode.Folders && selectedFolder != null -> IconButton(
-                            onClick = { viewModel.selectFolder(null) }
-                        ) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = stringResource(R.string.back)
                             )
                         }
                     }
@@ -360,17 +344,15 @@ fun ImageGridScreen(
                 }
             }
 
-            // The folder list is browsed by tap, not by typing — hide search there.
-            if (!showingFolders) {
-                SearchBar(
-                    query = searchQuery,
-                    onQueryChange = { viewModel.searchImages(it) },
-                    placeholderRes = if (browseMode == BrowseMode.AllFiles)
-                        R.string.search_hint_files
-                    else
-                        R.string.search_hint
-                )
-            }
+            SearchBar(
+                query = searchQuery,
+                onQueryChange = { viewModel.searchImages(it) },
+                placeholderRes = when (browseMode) {
+                    BrowseMode.AllFiles -> R.string.search_hint_files
+                    BrowseMode.Folders -> R.string.search_hint_folders
+                    BrowseMode.Images -> R.string.search_hint
+                }
+            )
 
             SwipeRefresh(
                 state = swipeRefreshState,
@@ -437,7 +419,14 @@ fun ImageGridScreen(
                                             if (isSelectionMode) {
                                                 viewModel.toggleFolderSelection(entry.folder)
                                             } else {
-                                                viewModel.selectFolder(entry.folder)
+                                                // Single tap: copy folder path (with the
+                                                // user's trailing-slash preference applied).
+                                                val formatted = SettingsManager
+                                                    .applyFolderTrailingSlash(entry.folder, folderTrailingSlash)
+                                                ClipboardHelper.copyToClipboard(context, formatted)
+                                                scope.launch {
+                                                    snackbarHostState.showSnackbar(message = pathCopiedText)
+                                                }
                                             }
                                         },
                                         onLongClick = {

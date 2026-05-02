@@ -38,10 +38,6 @@ class ImageViewModel(application: Application) : AndroidViewModel(application) {
     private val _browseMode = MutableStateFlow(BrowseMode.Images)
     val browseMode: StateFlow<BrowseMode> = _browseMode.asStateFlow()
 
-    /** When non-null in Folders mode, the grid shows images inside this folder. */
-    private val _selectedFolder = MutableStateFlow<String?>(null)
-    val selectedFolder: StateFlow<String?> = _selectedFolder.asStateFlow()
-
     private val _isSelectionMode = MutableStateFlow(false)
     val isSelectionMode: StateFlow<Boolean> = _isSelectionMode.asStateFlow()
 
@@ -53,11 +49,10 @@ class ImageViewModel(application: Application) : AndroidViewModel(application) {
     private val _selectedFolderPaths = MutableStateFlow<Set<String>>(emptySet())
     val selectedFolderPaths: StateFlow<Set<String>> = _selectedFolderPaths.asStateFlow()
 
-    /** Paginated grid stream for image/file rows (used in all modes except
-     *  Folders-without-selection, which uses pagedFolders below). */
+    /** Paginated image/file rows for Images and Files modes. */
     val pagedImages: Flow<PagingData<ImageFile>>
 
-    /** Paginated stream of folder entries for Folders mode top level. */
+    /** Paginated folder entries for Folders mode, filtered by [searchQuery]. */
     val pagedFolders: Flow<PagingData<FolderEntry>>
 
     init {
@@ -67,25 +62,19 @@ class ImageViewModel(application: Application) : AndroidViewModel(application) {
         pagedImages = combine(
             _searchQuery.debounce(300).distinctUntilChanged(),
             _selectedCategory,
-            _browseMode,
-            _selectedFolder
-        ) { query, category, mode, folder ->
-            QueryArgs(query, category, mode, folder)
-        }
-            .flatMapLatest { (query, category, mode, folder) ->
-                repository.searchPaged(query, category, mode, folder)
+            _browseMode
+        ) { query, category, mode -> Triple(query, category, mode) }
+            .flatMapLatest { (query, category, mode) ->
+                repository.searchPaged(query, category, mode)
             }
             .cachedIn(viewModelScope)
 
-        pagedFolders = repository.foldersPaged().cachedIn(viewModelScope)
+        pagedFolders = _searchQuery
+            .debounce(300)
+            .distinctUntilChanged()
+            .flatMapLatest { query -> repository.foldersPaged(query) }
+            .cachedIn(viewModelScope)
     }
-
-    private data class QueryArgs(
-        val query: String,
-        val category: String,
-        val mode: BrowseMode,
-        val folder: String?
-    )
 
     fun loadImages() {
         viewModelScope.launch {
@@ -114,15 +103,8 @@ class ImageViewModel(application: Application) : AndroidViewModel(application) {
         if (_browseMode.value == mode) return
         _browseMode.value = mode
         _searchQuery.value = ""
-        _selectedFolder.value = null
         clearSelection()
         loadImages()
-    }
-
-    fun selectFolder(folder: String?) {
-        _selectedFolder.value = folder
-        _searchQuery.value = ""
-        clearSelection()
     }
 
     fun toggleSelectionMode(enabled: Boolean) {
@@ -156,29 +138,28 @@ class ImageViewModel(application: Application) : AndroidViewModel(application) {
         _isSelectionMode.value = false
     }
 
-    /** Fetches paths for the current selection. The query/category/mode/folder
-     *  used for resolution is captured at call-time so a category change mid-call
-     *  doesn't change the row set under us. */
+    /** Fetches paths for the current selection. The query/category/mode used for
+     *  resolution is captured at call-time so a category change mid-call doesn't
+     *  change the row set under us. */
     suspend fun selectedPaths(): List<String> {
         val ids = _selectedImageIds.value
         return repository.pathsForIds(ids, _browseMode.value)
     }
 
-    /** Selects every row matching the *current* filter. Captures the filter args
-     *  at call-time for the same reason as selectedPaths(). */
+    /** Selects every row matching the *current* filter (Images/Files modes). */
     suspend fun selectAll() {
         val mode = _browseMode.value
         val category = _selectedCategory.value
         val query = _searchQuery.value
-        val folder = _selectedFolder.value
-        val ids = repository.matchingIds(query, category, mode, folder)
+        val ids = repository.matchingIds(query, category, mode)
         _isSelectionMode.value = true
         _selectedImageIds.value = ids.toSet()
     }
 
-    /** Folders-mode Select All: every distinct folder path. */
+    /** Folders-mode Select All — every folder matching the current search query. */
     suspend fun selectAllFolders() {
-        val all = repository.allFolders()
+        val query = _searchQuery.value
+        val all = repository.allFolders(query)
         _isSelectionMode.value = true
         _selectedFolderPaths.value = all.toSet()
     }

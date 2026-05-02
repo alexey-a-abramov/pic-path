@@ -27,68 +27,61 @@ class ImageRepository(
         initialLoadSize = 120
     )
 
-    /**
-     * Paginated images stream. When [folder] is non-null, results are restricted
-     * to that folder (used by Folders mode after the user drills into one).
-     */
+    /** Paginated images stream for Images and Files modes. */
     fun searchPaged(
         query: String,
         category: String,
-        mode: BrowseMode,
-        folder: String? = null
+        mode: BrowseMode
     ): Flow<PagingData<ImageFile>> =
-        Pager(gridConfig) { sourceFor(query, category, mode, folder) }.flow
+        Pager(gridConfig) { sourceFor(query, category, mode) }.flow
 
-    private fun sourceFor(query: String, category: String, mode: BrowseMode, folder: String?) =
-        when {
-            folder != null -> {
-                val type = if (mode == BrowseMode.AllFiles) TYPE_FILE else TYPE_IMAGE
-                if (query.isBlank()) imageDao.pagedByFolder(folder, type)
-                else imageDao.pagedByFolderAndName(folder, query, type)
-            }
-            mode == BrowseMode.Images -> when {
+    private fun sourceFor(query: String, category: String, mode: BrowseMode) =
+        when (mode) {
+            BrowseMode.Images -> when {
                 category == "All" && query.isBlank() -> imageDao.pagedAllByType(TYPE_IMAGE)
                 category == "All" && query.isNotBlank() -> imageDao.pagedSearchByName(query, TYPE_IMAGE)
                 category != "All" && query.isBlank() -> imageDao.pagedByCategory(category, TYPE_IMAGE)
                 else -> imageDao.pagedSearchByNameAndCategory(query, category, TYPE_IMAGE)
             }
-            mode == BrowseMode.AllFiles -> {
+            BrowseMode.AllFiles -> {
                 if (query.isBlank()) imageDao.pagedAllByType(TYPE_FILE)
                 else imageDao.pagedSearchByGlob(toGlob(query).lowercase(), TYPE_FILE)
             }
-            else -> imageDao.pagedAllByType(TYPE_IMAGE) // Folders without folder = handled separately
+            BrowseMode.Folders -> imageDao.pagedAllByType(TYPE_IMAGE) // unused — folders use foldersPaged
         }
 
-    /** Folder list for Folders mode (one row per directory containing images). */
-    fun foldersPaged(): Flow<PagingData<FolderEntry>> =
-        Pager(gridConfig) { imageDao.pagedFolders(TYPE_IMAGE) }.flow
+    /**
+     * Folder list for Folders mode. Optional [query] filters folders whose path
+     * contains the substring (case-insensitive).
+     */
+    fun foldersPaged(query: String = ""): Flow<PagingData<FolderEntry>> =
+        Pager(gridConfig) {
+            if (query.isBlank()) imageDao.pagedFolders(TYPE_IMAGE)
+            else imageDao.pagedFoldersSearch(query.lowercase(), TYPE_IMAGE)
+        }.flow
 
     /** Distinct folder paths — used by Folders-mode Select All. */
-    suspend fun allFolders(): List<String> = imageDao.listAllFolders(TYPE_IMAGE)
+    suspend fun allFolders(query: String = ""): List<String> =
+        if (query.isBlank()) imageDao.listAllFolders(TYPE_IMAGE)
+        else imageDao.listAllFoldersMatching(query.lowercase(), TYPE_IMAGE)
 
-    /** All matching ids for the current filter. Used by Select All. */
+    /** All matching ids for the current filter. Used by Select All in image modes. */
     suspend fun matchingIds(
         query: String,
         category: String,
-        mode: BrowseMode,
-        folder: String? = null
-    ): List<Long> = when {
-        folder != null -> {
-            val type = if (mode == BrowseMode.AllFiles) TYPE_FILE else TYPE_IMAGE
-            if (query.isBlank()) imageDao.listIdsByFolder(folder, type)
-            else imageDao.listIdsByFolderAndName(folder, query, type)
-        }
-        mode == BrowseMode.Images -> when {
+        mode: BrowseMode
+    ): List<Long> = when (mode) {
+        BrowseMode.Images -> when {
             category == "All" && query.isBlank() -> imageDao.listIdsAllByType(TYPE_IMAGE)
             category == "All" && query.isNotBlank() -> imageDao.listIdsSearchByName(query, TYPE_IMAGE)
             category != "All" && query.isBlank() -> imageDao.listIdsByCategory(category, TYPE_IMAGE)
             else -> imageDao.listIdsSearchByNameAndCategory(query, category, TYPE_IMAGE)
         }
-        mode == BrowseMode.AllFiles -> {
+        BrowseMode.AllFiles -> {
             if (query.isBlank()) imageDao.listIdsAllByType(TYPE_FILE)
             else imageDao.listIdsSearchByGlob(toGlob(query).lowercase(), TYPE_FILE)
         }
-        else -> emptyList()
+        BrowseMode.Folders -> emptyList() // folders use allFolders()
     }
 
     /** Resolve a selection (set of ids) back to absolute filesystem paths. */
