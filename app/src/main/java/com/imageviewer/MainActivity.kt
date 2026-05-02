@@ -49,6 +49,7 @@ class MainActivity : ComponentActivity() {
     private var permissionDenied by mutableStateOf(false)
     private var sharedImageUri by mutableStateOf<Uri?>(null)
     private var sharedImagePath by mutableStateOf<String?>(null)
+    private var hasResumedOnce = false
 
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -125,6 +126,16 @@ class MainActivity : ComponentActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         handleIntent(intent)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Skip the very first onResume: onCreate already kicked off loadImages()
+        // after the permission check, and scanning twice back-to-back is wasted work.
+        if (hasResumedOnce && hasPermission && sharedImageUri == null) {
+            viewModel.refreshIndex()
+        }
+        hasResumedOnce = true
     }
 
     private fun handleIntent(intent: Intent?) {
