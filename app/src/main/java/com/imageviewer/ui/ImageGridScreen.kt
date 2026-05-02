@@ -20,10 +20,8 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Checklist
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.ContentCopy
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.SelectAll
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.BottomAppBar
@@ -82,7 +80,6 @@ private const val SELECT_ALL_THRESHOLD = 12
 @Composable
 fun ImageGridScreen(
     viewModel: ImageViewModel,
-    onNavigateToAbout: () -> Unit = {},
     onNavigateToSettings: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
@@ -216,22 +213,12 @@ fun ImageGridScreen(
                             }
                         }
                     } else {
-                        IconButton(onClick = { viewModel.toggleSelectionMode(true) }) {
-                            Icon(
-                                imageVector = Icons.Default.Checklist,
-                                contentDescription = stringResource(R.string.select_mode)
-                            )
-                        }
+                        // Long-press a tile to enter selection mode — no separate
+                        // toolbar button. Keeps the bar uncluttered.
                         IconButton(onClick = onNavigateToSettings) {
                             Icon(
                                 imageVector = Icons.Default.Settings,
                                 contentDescription = stringResource(R.string.settings)
-                            )
-                        }
-                        IconButton(onClick = onNavigateToAbout) {
-                            Icon(
-                                imageVector = Icons.Default.Info,
-                                contentDescription = stringResource(R.string.about)
                             )
                         }
                     }

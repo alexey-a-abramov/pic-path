@@ -2,7 +2,8 @@
 <resources>
     <string name="app_name">Pic Path</string>
     <string name="mode_images">Images</string>
-    <string name="mode_all_files">All files</string>
+    <string name="mode_all_files">Files</string>
+    <string name="mode_folders">Folders</string>
     <string name="select_browse_mode">Select browse mode</string>
     <string name="search_hint">Search images...</string>
     <string name="search_hint_files">Search files (use * and ?)…</string>

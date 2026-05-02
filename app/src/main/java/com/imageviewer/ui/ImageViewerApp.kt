@@ -22,15 +22,15 @@ fun ImageViewerApp(viewModel: ImageViewModel) {
             color = MaterialTheme.colorScheme.background
         ) {
             when {
-                showSettingsScreen -> SettingsScreen(
-                    onNavigateBack = { showSettingsScreen = false }
-                )
                 showAboutScreen -> AboutScreen(
                     onNavigateBack = { showAboutScreen = false }
                 )
+                showSettingsScreen -> SettingsScreen(
+                    onNavigateBack = { showSettingsScreen = false },
+                    onNavigateToAbout = { showAboutScreen = true }
+                )
                 else -> ImageGridScreen(
                     viewModel = viewModel,
-                    onNavigateToAbout = { showAboutScreen = true },
                     onNavigateToSettings = { showSettingsScreen = true }
                 )
             }
