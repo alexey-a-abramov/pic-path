@@ -12,11 +12,14 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 @OptIn(FlowPreview::class)
@@ -55,6 +58,19 @@ class ImageViewModel(application: Application) : AndroidViewModel(application) {
         ) { query, category, mode -> Triple(query, category, mode) }
             .flatMapLatest { (query, category, mode) ->
                 repository.search(query, category, mode)
+                    // Read the cursor on IO so the UI thread is never the
+                    // one walking the CursorWindow.
+                    .flowOn(Dispatchers.IO)
+                    // Room's underlying cursor races with flatMapLatest cancellation
+                    // (and with deleteStale running concurrently with scanAndIndex):
+                    // it can throw IllegalStateException("Couldn't read row N, col 0")
+                    // mid-iteration. The next emission (debounced search, mode flip,
+                    // or the post-scan flow refresh) will repopulate, so swallow
+                    // the race and emit empty rather than crash.
+                    .catch { e ->
+                        android.util.Log.w("ImageViewModel", "search flow failed; emitting empty", e)
+                        emit(emptyList())
+                    }
             }
             .stateIn(
                 scope = viewModelScope,
