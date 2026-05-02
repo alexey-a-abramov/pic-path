@@ -3,42 +3,43 @@ package com.imageviewer.ui
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.imageviewer.R
 import com.imageviewer.data.model.ImageFile
+import com.imageviewer.ui.components.ImageEditor
 import com.imageviewer.util.ClipboardHelper
 import kotlinx.coroutines.launch
-
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import com.imageviewer.ui.components.ImageEditor
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -56,7 +57,7 @@ fun FullscreenImageViewer(
     )
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    
+    var showControls by remember { mutableStateOf(true) }
     var editingImage by remember { mutableStateOf<ImageFile?>(null) }
 
     Box(
@@ -76,7 +77,6 @@ fun FullscreenImageViewer(
                 onCancel = { editingImage = null }
             )
         } else {
-            // Image Pager
             HorizontalPager(
                 state = pagerState,
                 modifier = Modifier.fillMaxSize()
@@ -86,7 +86,7 @@ fun FullscreenImageViewer(
                     modifier = Modifier
                         .fillMaxSize()
                         .combinedClickable(
-                            onClick = { },
+                            onClick = { showControls = !showControls },
                             onLongClick = {
                                 ClipboardHelper.copyToClipboard(context, image.path)
                                 onCopyPath(image.path)
@@ -99,23 +99,87 @@ fun FullscreenImageViewer(
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Fit
                     )
+                }
+            }
 
-                    // Buttons overlay - bottom right
+            if (showControls) {
+                val current = images.getOrNull(pagerState.currentPage)
+
+                IconButton(
+                    onClick = onClose,
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(16.dp)
+                        .background(Color.Black.copy(alpha = 0.5f))
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Close,
+                        contentDescription = "Close",
+                        tint = Color.White,
+                        modifier = Modifier.size(32.dp)
+                    )
+                }
+
+                if (pagerState.currentPage > 0) {
+                    IconButton(
+                        onClick = {
+                            scope.launch {
+                                pagerState.animateScrollToPage(pagerState.currentPage - 1)
+                            }
+                        },
+                        modifier = Modifier
+                            .align(Alignment.CenterStart)
+                            .padding(16.dp)
+                            .background(Color.Black.copy(alpha = 0.5f))
+                    ) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Previous",
+                            tint = Color.White,
+                            modifier = Modifier.size(32.dp)
+                        )
+                    }
+                }
+
+                if (pagerState.currentPage < images.size - 1) {
+                    IconButton(
+                        onClick = {
+                            scope.launch {
+                                pagerState.animateScrollToPage(pagerState.currentPage + 1)
+                            }
+                        },
+                        modifier = Modifier
+                            .align(Alignment.CenterEnd)
+                            .padding(16.dp)
+                            .background(Color.Black.copy(alpha = 0.5f))
+                    ) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                            contentDescription = "Next",
+                            tint = Color.White,
+                            modifier = Modifier.size(32.dp)
+                        )
+                    }
+                }
+
+                if (current != null) {
                     Row(
                         modifier = Modifier
-                            .align(Alignment.BottomEnd)
-                            .padding(16.dp),
-                        verticalAlignment = Alignment.CenterVertically
+                            .align(Alignment.BottomCenter)
+                            .fillMaxWidth()
+                            .background(Color.Black.copy(alpha = 0.55f))
+                            .padding(horizontal = 16.dp, vertical = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        // Edit button
-                        IconButton(
-                            onClick = { editingImage = image },
-                            modifier = Modifier
-                                .padding(end = 8.dp)
-                                .size(48.dp)
-                                .clip(CircleShape)
-                                .background(Color.White.copy(alpha = 0.3f))
-                        ) {
+                        Text(
+                            text = current.path,
+                            color = Color.White,
+                            modifier = Modifier.weight(1f),
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                        IconButton(onClick = { editingImage = current }) {
                             Icon(
                                 imageVector = Icons.Default.Edit,
                                 contentDescription = "Edit image",
@@ -123,17 +187,11 @@ fun FullscreenImageViewer(
                                 modifier = Modifier.size(24.dp)
                             )
                         }
-
-                        // Copy button
                         IconButton(
                             onClick = {
-                                ClipboardHelper.copyToClipboard(context, image.path)
-                                onCopyPath(image.path)
-                            },
-                            modifier = Modifier
-                                .size(48.dp)
-                                .clip(CircleShape)
-                                .background(Color.White.copy(alpha = 0.3f))
+                                ClipboardHelper.copyToClipboard(context, current.path)
+                                onCopyPath(current.path)
+                            }
                         ) {
                             Icon(
                                 painter = painterResource(id = R.drawable.ic_copy),
@@ -143,71 +201,6 @@ fun FullscreenImageViewer(
                             )
                         }
                     }
-                }
-            }
-        }
-
-        // Close button (top right)
-        IconButton(
-            onClick = onClose,
-            modifier = Modifier
-                .align(Alignment.TopEnd)
-                .padding(16.dp)
-                .background(Color.Black.copy(alpha = 0.5f))
-        ) {
-            Icon(
-                imageVector = Icons.Default.Close,
-                contentDescription = "Close",
-                tint = Color.White,
-                modifier = Modifier.size(32.dp)
-            )
-        }
-
-        // Navigation arrows
-        Row(
-            modifier = Modifier
-                .align(Alignment.CenterStart)
-                .padding(16.dp)
-        ) {
-            if (pagerState.currentPage > 0) {
-                IconButton(
-                    onClick = {
-                        scope.launch {
-                            pagerState.animateScrollToPage(pagerState.currentPage - 1)
-                        }
-                    },
-                    modifier = Modifier.background(Color.Black.copy(alpha = 0.5f))
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.ArrowBack,
-                        contentDescription = "Previous",
-                        tint = Color.White,
-                        modifier = Modifier.size(32.dp)
-                    )
-                }
-            }
-        }
-
-        Row(
-            modifier = Modifier
-                .align(Alignment.CenterEnd)
-                .padding(16.dp)
-        ) {
-            if (pagerState.currentPage < images.size - 1) {
-                IconButton(
-                    onClick = {
-                        scope.launch {
-                            pagerState.animateScrollToPage(pagerState.currentPage + 1)
-                        }
-                    },
-                    modifier = Modifier.background(Color.Black.copy(alpha = 0.5f))
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.ArrowForward,
-                        contentDescription = "Next",
-                        tint = Color.White,
-                        modifier = Modifier.size(32.dp)
-                    )
                 }
             }
         }

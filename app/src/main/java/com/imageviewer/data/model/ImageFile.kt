@@ -1,11 +1,9 @@
 package com.imageviewer.data.model
 
 import androidx.room.Entity
-import androidx.room.PrimaryKey
 
-@Entity(tableName = "images")
+@Entity(tableName = "images", primaryKeys = ["id", "type"])
 data class ImageFile(
-    @PrimaryKey
     val id: Long,
     val displayName: String,
     val uri: String,
@@ -13,5 +11,11 @@ data class ImageFile(
     val dateAdded: Long,
     val size: Long,
     val mimeType: String,
-    val category: String = "All"
-)
+    val category: String = "All",
+    val type: String = TYPE_IMAGE
+) {
+    companion object {
+        const val TYPE_IMAGE = "image"
+        const val TYPE_FILE = "file"
+    }
+}

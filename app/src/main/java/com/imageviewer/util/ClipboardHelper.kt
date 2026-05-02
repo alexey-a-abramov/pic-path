@@ -34,7 +34,17 @@ object ClipboardHelper {
             clipboard.setPrimaryClip(clip)
         }
 
-        // Show fading message
         Toast.makeText(context, context.getString(R.string.path_copied), Toast.LENGTH_SHORT).show()
     }
+
+    /**
+     * Single-line, separator-joined absolute paths so pasting into a terminal prompt
+     * (e.g. Claude Code on Termux) doesn't trigger Enter. Newlines are intentionally
+     * never used here regardless of [format] — they auto-submit in Termux.
+     */
+    fun formatPathsForConsole(
+        paths: List<String>,
+        format: MultiCopyFormat = MultiCopyFormat.DEFAULT
+    ): String =
+        paths.joinToString(separator = format.separator) { "${format.itemPrefix}$it" }
 }

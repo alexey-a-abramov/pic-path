@@ -129,16 +129,27 @@ class MainActivity : ComponentActivity() {
 
     private fun handleIntent(intent: Intent?) {
         try {
-            if (intent?.action == Intent.ACTION_SEND && intent.type?.startsWith("image/") == true) {
-                (intent.getParcelableExtra<Uri>(Intent.EXTRA_STREAM))?.let { uri ->
-                    sharedImageUri = uri
-                    sharedImagePath = UriHelper.getPathFromUri(this, uri)
+            if (intent?.action != Intent.ACTION_SEND) return
+            val uri = intent.getParcelableExtra<Uri>(Intent.EXTRA_STREAM) ?: return
+            val path = UriHelper.getPathFromUri(this, uri)
 
-                    // Auto-copy the path
-                    sharedImagePath?.let { path ->
-                        ClipboardHelper.copyToClipboard(this, path)
-                    }
+            if (intent.type?.startsWith("image/") == true) {
+                sharedImageUri = uri
+                sharedImagePath = path
+                path?.let { ClipboardHelper.copyToClipboard(this, it) }
+            } else {
+                // Any other file: copy path and exit immediately so the user lands back
+                // wherever they were sharing from.
+                if (path != null) {
+                    ClipboardHelper.copyToClipboard(this, path)
+                } else {
+                    android.widget.Toast.makeText(
+                        this,
+                        getString(R.string.no_path_for_shared_file),
+                        android.widget.Toast.LENGTH_SHORT
+                    ).show()
                 }
+                finish()
             }
         } catch (e: Exception) {
             android.util.Log.e("MainActivity", "Error handling intent", e)

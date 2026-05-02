@@ -1,9 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Pic Path</string>
+    <string name="mode_images">Images</string>
+    <string name="mode_all_files">All files</string>
+    <string name="select_browse_mode">Select browse mode</string>
     <string name="search_hint">Search images...</string>
+    <string name="search_hint_files">Search files (use * and ?)…</string>
+    <string name="all_files_permission_required">All-files mode needs storage access</string>
+    <string name="grant">Grant</string>
     <string name="path_copied">Path copied to clipboard</string>
+    <string name="no_path_for_shared_file">No filesystem path available for this shared item</string>
     <string name="no_images_found">No images found</string>
+    <string name="no_files_found">No files found</string>
     <string name="loading">Loading images...</string>
     <string name="permission_required">Storage permission is required to view images</string>
     <string name="grant_permission">Grant Permission</string>
@@ -49,11 +57,32 @@
     <string name="select_language">Select Language</string>
     
     <!-- Selection Mode -->
-    <string name="selection_mode">Selection Mode</string>
+    <string name="selection_mode">%1$d selected</string>
     <string name="clear">Clear</string>
-    <string name="copy_selected">Copy Selected (%1$d)</string>
-    <string name="multiple_paths_copied">Multiple paths copied to clipboard</string>
+    <string name="copy_selected">Copy %1$d paths</string>
+    <string name="copy_selected_fmt">Copy %1$d paths · %2$s</string>
+    <string name="fmt_tag_space">space-sep</string>
+    <string name="fmt_tag_comma">comma-sep</string>
+    <string name="fmt_tag_semicolon">semicolon-sep</string>
+    <string name="fmt_tag_at">@-prefix</string>
+    <string name="multiple_paths_copied">%1$d paths copied (space-separated)</string>
+    <string name="select_mode">Select multiple</string>
+    <string name="select_all">Select all</string>
+    <string name="exit_selection">Exit selection</string>
     
+    <!-- Settings -->
+    <string name="settings">Settings</string>
+    <string name="multi_copy_format_title">Multi-image clipboard format</string>
+    <string name="multi_copy_format_subtitle">How multiple selected paths are joined when copied. Single-item copies are unaffected.</string>
+    <string name="fmt_space_title">Space-separated (default)</string>
+    <string name="fmt_space_subtitle">Universal: Claude / Gemini / Codex auto-detection on Termux.</string>
+    <string name="fmt_comma_title">Comma-separated</string>
+    <string name="fmt_comma_subtitle">More readable; Claude Code may not auto-attach as images.</string>
+    <string name="fmt_semicolon_title">Semicolon-separated</string>
+    <string name="fmt_semicolon_subtitle">Same idea as comma; useful when filenames already contain commas.</string>
+    <string name="fmt_at_title">@-prefixed (Claude Code only)</string>
+    <string name="fmt_at_subtitle">Forces Claude Code attach syntax. Breaks Gemini CLI / Codex.</string>
+
     <!-- Crash Activity -->
     <string name="app_crashed">App has stopped</string>
     <string name="error_report">Error Report</string>

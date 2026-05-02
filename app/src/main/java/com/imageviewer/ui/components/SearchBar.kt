@@ -19,7 +19,8 @@ import com.imageviewer.R
 fun SearchBar(
     query: String,
     onQueryChange: (String) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    placeholderRes: Int = R.string.search_hint
 ) {
     OutlinedTextField(
         value = query,
@@ -27,7 +28,7 @@ fun SearchBar(
         modifier = modifier
             .fillMaxWidth()
             .padding(16.dp),
-        placeholder = { Text(stringResource(R.string.search_hint)) },
+        placeholder = { Text(stringResource(placeholderRes)) },
         leadingIcon = {
             Icon(
                 imageVector = Icons.Default.Search,

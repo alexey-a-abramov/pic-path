@@ -3,32 +3,31 @@ package com.imageviewer.ui.components
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.Icons.AutoMirrored
+import androidx.compose.material.icons.automirrored.filled.InsertDriveFile
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import com.imageviewer.R
 import com.imageviewer.data.model.ImageFile
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -36,7 +35,6 @@ import com.imageviewer.data.model.ImageFile
 fun ImageGridItem(
     image: ImageFile,
     onClick: () -> Unit,
-    onCopyClick: () -> Unit,
     onLongClick: () -> Unit,
     isSelected: Boolean = false,
     modifier: Modifier = Modifier
@@ -52,12 +50,39 @@ fun ImageGridItem(
         border = if (isSelected) androidx.compose.foundation.BorderStroke(4.dp, MaterialTheme.colorScheme.primary) else null
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
-            AsyncImage(
-                model = image.uri,
-                contentDescription = image.displayName,
-                modifier = Modifier.fillMaxSize(),
-                contentScale = ContentScale.Crop
-            )
+            if (image.mimeType.startsWith("image/")) {
+                AsyncImage(
+                    model = image.uri,
+                    contentDescription = image.displayName,
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop
+                )
+            } else {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(MaterialTheme.colorScheme.surfaceVariant)
+                        .padding(8.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Icon(
+                        imageVector = AutoMirrored.Filled.InsertDriveFile,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.size(40.dp)
+                    )
+                    Text(
+                        text = image.displayName,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        textAlign = TextAlign.Center,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.padding(top = 4.dp)
+                    )
+                }
+            }
 
             if (isSelected) {
                 Box(
@@ -74,26 +99,6 @@ fun ImageGridItem(
                         .padding(4.dp)
                         .size(24.dp)
                 )
-            }
-
-            // Copy button overlay (70% transparent) - bottom right
-            if (!isSelected) {
-                IconButton(
-                    onClick = onCopyClick,
-                    modifier = Modifier
-                        .align(Alignment.BottomEnd)
-                        .padding(4.dp)
-                        .size(36.dp)
-                        .clip(CircleShape)
-                        .background(Color.White.copy(alpha = 0.3f))
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_copy),
-                        contentDescription = "Copy path",
-                        tint = Color.White,
-                        modifier = Modifier.size(20.dp)
-                    )
-                }
             }
         }
     }

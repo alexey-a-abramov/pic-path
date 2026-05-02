@@ -12,18 +12,21 @@ interface ImageDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(images: List<ImageFile>)
 
-    @Query("SELECT * FROM images WHERE displayName LIKE '%' || :query || '%' ORDER BY dateAdded DESC")
-    fun searchByName(query: String): Flow<List<ImageFile>>
+    @Query("SELECT * FROM images WHERE type = :type ORDER BY dateAdded DESC")
+    fun getAllByType(type: String): Flow<List<ImageFile>>
 
-    @Query("SELECT * FROM images WHERE category = :category AND displayName LIKE '%' || :query || '%' ORDER BY dateAdded DESC")
-    fun searchByNameAndCategory(query: String, category: String): Flow<List<ImageFile>>
+    @Query("SELECT * FROM images WHERE type = :type AND displayName LIKE '%' || :query || '%' ORDER BY dateAdded DESC")
+    fun searchByName(query: String, type: String): Flow<List<ImageFile>>
 
-    @Query("SELECT * FROM images ORDER BY dateAdded DESC")
-    fun getAll(): Flow<List<ImageFile>>
+    @Query("SELECT * FROM images WHERE type = :type AND category = :category ORDER BY dateAdded DESC")
+    fun getByCategory(category: String, type: String): Flow<List<ImageFile>>
 
-    @Query("SELECT * FROM images WHERE category = :category ORDER BY dateAdded DESC")
-    fun getByCategory(category: String): Flow<List<ImageFile>>
+    @Query("SELECT * FROM images WHERE type = :type AND category = :category AND displayName LIKE '%' || :query || '%' ORDER BY dateAdded DESC")
+    fun searchByNameAndCategory(query: String, category: String, type: String): Flow<List<ImageFile>>
 
-    @Query("DELETE FROM images")
-    suspend fun deleteAll()
+    @Query("SELECT * FROM images WHERE type = :type AND LOWER(displayName) GLOB :pattern ORDER BY dateAdded DESC")
+    fun searchByGlob(pattern: String, type: String): Flow<List<ImageFile>>
+
+    @Query("DELETE FROM images WHERE type = :type")
+    suspend fun deleteAllByType(type: String)
 }

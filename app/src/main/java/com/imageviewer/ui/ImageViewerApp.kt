@@ -14,20 +14,24 @@ import com.imageviewer.viewmodel.ImageViewModel
 @Composable
 fun ImageViewerApp(viewModel: ImageViewModel) {
     var showAboutScreen by remember { mutableStateOf(false) }
+    var showSettingsScreen by remember { mutableStateOf(false) }
 
     MaterialTheme {
         Surface(
             modifier = Modifier.fillMaxSize(),
             color = MaterialTheme.colorScheme.background
         ) {
-            if (showAboutScreen) {
-                AboutScreen(
+            when {
+                showSettingsScreen -> SettingsScreen(
+                    onNavigateBack = { showSettingsScreen = false }
+                )
+                showAboutScreen -> AboutScreen(
                     onNavigateBack = { showAboutScreen = false }
                 )
-            } else {
-                ImageGridScreen(
+                else -> ImageGridScreen(
                     viewModel = viewModel,
-                    onNavigateToAbout = { showAboutScreen = true }
+                    onNavigateToAbout = { showAboutScreen = true },
+                    onNavigateToSettings = { showSettingsScreen = true }
                 )
             }
         }

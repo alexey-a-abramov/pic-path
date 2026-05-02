@@ -5,6 +5,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.imageviewer.data.database.ImageDatabase
 import com.imageviewer.data.model.ImageFile
+import com.imageviewer.data.repository.BrowseMode
 import com.imageviewer.data.repository.ImageRepository
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -32,6 +33,9 @@ class ImageViewModel(application: Application) : AndroidViewModel(application) {
     private val _selectedCategory = MutableStateFlow("Screenshots")
     val selectedCategory: StateFlow<String> = _selectedCategory.asStateFlow()
 
+    private val _browseMode = MutableStateFlow(BrowseMode.Images)
+    val browseMode: StateFlow<BrowseMode> = _browseMode.asStateFlow()
+
     private val _isSelectionMode = MutableStateFlow(false)
     val isSelectionMode: StateFlow<Boolean> = _isSelectionMode.asStateFlow()
 
@@ -44,15 +48,13 @@ class ImageViewModel(application: Application) : AndroidViewModel(application) {
         val database = ImageDatabase.getDatabase(application)
         repository = ImageRepository(database.imageDao(), application.contentResolver)
 
-        // Set up search flow with debouncing and category filtering
         images = combine(
             _searchQuery.debounce(300).distinctUntilChanged(),
-            _selectedCategory
-        ) { query, category ->
-            Pair(query, category)
-        }
-            .flatMapLatest { (query, category) ->
-                repository.searchImages(query, category)
+            _selectedCategory,
+            _browseMode
+        ) { query, category, mode -> Triple(query, category, mode) }
+            .flatMapLatest { (query, category, mode) ->
+                repository.search(query, category, mode)
             }
             .stateIn(
                 scope = viewModelScope,
@@ -65,10 +67,9 @@ class ImageViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             _isLoading.value = true
             try {
-                repository.scanAndIndexImages()
+                repository.scanAndIndex(_browseMode.value)
             } catch (e: Exception) {
                 android.util.Log.e("ImageViewModel", "Error loading images", e)
-                // Re-throw to trigger crash handler
                 throw e
             } finally {
                 _isLoading.value = false
@@ -83,6 +84,14 @@ class ImageViewModel(application: Application) : AndroidViewModel(application) {
     fun selectCategory(category: String) {
         _selectedCategory.value = category
         clearSelection()
+    }
+
+    fun selectBrowseMode(mode: BrowseMode) {
+        if (_browseMode.value == mode) return
+        _browseMode.value = mode
+        _searchQuery.value = ""
+        clearSelection()
+        loadImages()
     }
 
     fun toggleSelectionMode(enabled: Boolean) {
@@ -100,7 +109,7 @@ class ImageViewModel(application: Application) : AndroidViewModel(application) {
             current.add(imageId)
         }
         _selectedImageIds.value = current
-        
+
         if (current.isEmpty()) {
             _isSelectionMode.value = false
         }
@@ -114,6 +123,11 @@ class ImageViewModel(application: Application) : AndroidViewModel(application) {
     fun getSelectedPaths(): List<String> {
         val selectedIds = _selectedImageIds.value
         return images.value.filter { it.id in selectedIds }.map { it.path }
+    }
+
+    fun selectAll() {
+        _isSelectionMode.value = true
+        _selectedImageIds.value = images.value.map { it.id }.toSet()
     }
 
     fun refreshIndex() {
