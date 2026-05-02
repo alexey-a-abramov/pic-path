@@ -117,18 +117,17 @@ fun ImageGridScreen(
         viewModel.clearSelection()
     }
 
-    // After an edit-and-save, the new file's path is queued; jump back into
-    // fullscreen on it as soon as the rescan picks it up.
+    // After an edit-and-save, the new file's path is queued. When the rescan
+    // (kicked off once at save-time) picks it up, navigate to it. We never
+    // self-trigger another refresh from here — that produced an infinite loop
+    // of "rescan → empty briefly → still missing → rescan again".
     LaunchedEffect(images, targetPath) {
-        targetPath?.let { path ->
-            val index = images.indexOfFirst { it.path == path }
-            if (index != -1) {
-                fullscreenIndex = index
-                showFullscreen = true
-                targetPath = null
-            } else {
-                viewModel.refreshIndex()
-            }
+        val path = targetPath ?: return@LaunchedEffect
+        val index = images.indexOfFirst { it.path == path }
+        if (index != -1) {
+            fullscreenIndex = index
+            showFullscreen = true
+            targetPath = null
         }
     }
 
