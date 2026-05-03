@@ -15,7 +15,7 @@ android {
         minSdk = 29
         targetSdk = 34
 
-        // Version contract:
+        // Version contract — see docs/release.md for the full picture:
         //   `baseVersion` is the manual major.minor — bump it in this file only when
         //   you intend a meaningful release. Build counter (the patch component) is
         //   sourced from the VERSION_CODE env var, which CI sets to github.run_number.
