@@ -5,6 +5,10 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.calculatePan
+import androidx.compose.foundation.gestures.calculateZoom
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -50,6 +54,7 @@ import androidx.compose.ui.graphics.PathFillType
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.pointer.pointerInput
@@ -119,12 +124,46 @@ fun ImageEditor(
 
     var saving by remember { mutableStateOf(false) }
 
+    /** Two-finger pan/zoom state. graphicsLayer transforms the image+annotations
+     *  layer visually; gesture coords inside the wrapper stay in untransformed
+     *  layout space, so the existing screen→bitmap save math continues to work. */
+    var canvasScale by remember { mutableStateOf(1f) }
+    var canvasPan by remember { mutableStateOf(Offset.Zero) }
+
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     var viewSize by remember { mutableStateOf(IntSize.Zero) }
     val parsedUri = remember(imageUri) { Uri.parse(imageUri) }
 
     Box(modifier = Modifier.fillMaxSize().background(Color.Black)) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .graphicsLayer(
+                    scaleX = canvasScale,
+                    scaleY = canvasScale,
+                    translationX = canvasPan.x,
+                    translationY = canvasPan.y
+                )
+                .pointerInput(Unit) {
+                    awaitEachGesture {
+                        awaitFirstDown(requireUnconsumed = false)
+                        do {
+                            val event = awaitPointerEvent()
+                            if (event.changes.size >= 2) {
+                                val zoom = event.calculateZoom()
+                                val pan = event.calculatePan()
+                                if (zoom != 1f || pan != Offset.Zero) {
+                                    val newScale = (canvasScale * zoom).coerceIn(1f, 6f)
+                                    canvasScale = newScale
+                                    canvasPan = if (newScale > 1f) canvasPan + pan else Offset.Zero
+                                    event.changes.forEach { it.consume() }
+                                }
+                            }
+                        } while (event.changes.any { it.pressed })
+                    }
+                }
+        ) {
         AsyncImage(
             model = parsedUri,
             contentDescription = null,
@@ -152,6 +191,11 @@ fun ImageEditor(
                                 }
                                 currentArrowStart = null
                                 currentArrowEnd = null
+                            },
+                            onDragCancel = {
+                                // Two-finger pan/zoom kicked in — drop the in-flight arrow.
+                                currentArrowStart = null
+                                currentArrowEnd = null
                             }
                         )
                         EditMode.Freehand -> detectDragGestures(
@@ -165,7 +209,8 @@ fun ImageEditor(
                                     annotations.add(Annotation.Stroke(currentStroke.toList(), currentColor))
                                 }
                                 currentStroke.clear()
-                            }
+                            },
+                            onDragCancel = { currentStroke.clear() }
                         )
                         EditMode.Text -> detectTapGestures { offset ->
                             textEntryPosition = offset
@@ -203,7 +248,8 @@ fun ImageEditor(
                                 }
                                 cropRect = clampRectToView(updated, viewSize)
                             },
-                            onDragEnd = { draggingHandle = null }
+                            onDragEnd = { draggingHandle = null },
+                            onDragCancel = { draggingHandle = null }
                         )
                         EditMode.None -> {}
                     }
@@ -282,6 +328,7 @@ fun ImageEditor(
                     size = androidx.compose.ui.geometry.Size(edgeBarThickness, edgeBarHalf * 2f)
                 )
             }
+        }
         }
 
         textEntryPosition?.let { position ->
