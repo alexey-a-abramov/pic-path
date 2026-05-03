@@ -14,15 +14,25 @@ android {
         applicationId = "com.imageviewer"
         minSdk = 29
         targetSdk = 34
-        versionCode = 2
-        versionName = "1.1.0"
+
+        // Version contract:
+        //   `baseVersion` is the manual major.minor — bump it in this file only when
+        //   you intend a meaningful release. Build counter (the patch component) is
+        //   sourced from the VERSION_CODE env var, which CI sets to github.run_number.
+        //   Local builds get build=1 so versionName is stable for development.
+        val baseVersion = "0.1"
+        val build = System.getenv("VERSION_CODE")?.toIntOrNull() ?: 1
+        val fullVersion = "$baseVersion.$build"
+
+        versionCode = build
+        versionName = fullVersion
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true
         }
 
-        buildConfigField("String", "VERSION_NAME", "\"${versionName}\"")
+        buildConfigField("String", "VERSION_NAME", "\"$fullVersion\"")
         buildConfigField("String", "GITHUB_REPO", "\"alexey-a-abramov/pic-path\"")
     }
 

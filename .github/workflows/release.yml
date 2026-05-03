@@ -1,0 +1,116 @@
+name: Release
+
+# Every push to main publishes a release. Doc-only pushes are skipped via
+# paths-ignore. Any commit whose subject contains [skip ci] is also skipped —
+# the workflow uses that to avoid retriggering itself when it cleans up
+# RELEASE_NOTES.md after a hand-crafted release.
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - 'docs/**'
+      - 'README.md'
+      - 'LICENSE'
+      - '.gitignore'
+
+permissions:
+  contents: write  # required to push tags, create releases, and commit the cleanup
+
+jobs:
+  release:
+    if: "!contains(github.event.head_commit.message, '[skip ci]')"
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # release-notes generator wants full history
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: gradle/actions/setup-gradle@v3
+
+      # baseVersion lives in app/build.gradle.kts as the manual major.minor knob.
+      # The build counter (patch component) is github.run_number — monotonic per
+      # workflow, free, no PAT required. See docs/release.md for the rationale.
+      - name: Compute version
+        id: ver
+        run: |
+          BASE=$(grep -oP 'val baseVersion = "\K[^"]+' app/build.gradle.kts)
+          if [ -z "$BASE" ]; then
+            echo "::error::Could not parse baseVersion from app/build.gradle.kts"
+            exit 1
+          fi
+          FULL="${BASE}.${{ github.run_number }}"
+          echo "base=$BASE" >> "$GITHUB_OUTPUT"
+          echo "full=$FULL" >> "$GITHUB_OUTPUT"
+          echo "tag=v${FULL}" >> "$GITHUB_OUTPUT"
+          echo "Computed version: v${FULL}"
+
+      - name: Run unit tests
+        env:
+          VERSION_CODE: ${{ github.run_number }}
+        run: ./gradlew test --no-daemon
+
+      # Debug build (signed with the platform debug key — installs on user devices
+      # via "Install from Unknown Sources"). Upgrade path to a real signed release
+      # build is documented in docs/release.md.
+      - name: Build APK
+        env:
+          VERSION_CODE: ${{ github.run_number }}
+        run: ./gradlew assembleDebug --no-daemon -PbuildsDir=app/build/outputs/staging
+
+      - name: Stage release asset
+        run: |
+          mkdir -p release-assets
+          cp app/build/outputs/apk/debug/app-debug.apk \
+             "release-assets/pic-path-${{ steps.ver.outputs.tag }}.apk"
+          ls -la release-assets/
+
+      # Two paths: hand-crafted RELEASE_NOTES.md (file present + non-empty) takes
+      # priority; otherwise we ask GitHub to auto-aggregate commits since the
+      # previous release.
+      - name: Determine release-notes source
+        id: notes
+        run: |
+          if [ -s RELEASE_NOTES.md ]; then
+            echo "use_file=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "use_file=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create release (hand-crafted notes)
+        if: steps.notes.outputs.use_file == 'true'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.ver.outputs.tag }}
+          name: Pic Path ${{ steps.ver.outputs.tag }}
+          body_path: RELEASE_NOTES.md
+          files: release-assets/pic-path-*.apk
+          fail_on_unmatched_files: true
+
+      - name: Create release (auto-generated notes)
+        if: steps.notes.outputs.use_file == 'false'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.ver.outputs.tag }}
+          name: Pic Path ${{ steps.ver.outputs.tag }}
+          generate_release_notes: true
+          files: release-assets/pic-path-*.apk
+          fail_on_unmatched_files: true
+
+      # Hand-crafted notes are one-shot: clear the file after the release so the
+      # next push gets fresh auto-generated notes. The cleanup commit is marked
+      # [skip ci] so it doesn't recursively trigger this workflow.
+      - name: Clear RELEASE_NOTES.md after use
+        if: steps.notes.outputs.use_file == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git rm RELEASE_NOTES.md
+          git commit -m "chore: clear RELEASE_NOTES.md after ${{ steps.ver.outputs.tag }} [skip ci]"
+          git push
