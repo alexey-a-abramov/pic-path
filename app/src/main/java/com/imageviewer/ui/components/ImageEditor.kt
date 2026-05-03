@@ -66,6 +66,7 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.imageviewer.R
+import com.imageviewer.util.EditorSaveResult
 import com.imageviewer.util.ImageEditorUtil
 import kotlinx.coroutines.launch
 import kotlin.math.atan2
@@ -104,7 +105,7 @@ private enum class Handle {
 fun ImageEditor(
     imageUri: String,
     imagePath: String,
-    onSave: (String) -> Unit,
+    onSave: (EditorSaveResult) -> Unit,
     onCancel: () -> Unit
 ) {
     var mode by remember { mutableStateOf(EditMode.None) }
@@ -445,7 +446,7 @@ fun ImageEditor(
                                 viewSize = viewSize
                             )
                             saving = false
-                            if (result != null) onSave(result.absolutePath)
+                            if (result != null) onSave(result)
                         }
                     }
                 ) {

@@ -11,6 +11,11 @@
     <string name="all_files_permission_required">All-files mode needs storage access</string>
     <string name="grant">Grant</string>
     <string name="path_copied">Path copied to clipboard</string>
+    <string name="image_copied">Image copied to clipboard</string>
+    <string name="copy_path">Copy path</string>
+    <string name="copy_image">Copy image</string>
+    <string name="edit_image_chooser_title">Edit saved. Copy:</string>
+    <string name="done_action">Done</string>
     <string name="no_path_for_shared_file">No filesystem path available for this shared item</string>
     <string name="no_images_found">No images found</string>
     <string name="no_files_found">No files found</string>

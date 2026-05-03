@@ -29,10 +29,12 @@ import kotlin.math.min
 import kotlin.math.sin
 
 /**
- * Result of a save attempt. Always carries the absolute filesystem path so the rest of
- * the app can copy it to clipboard and navigate to it after MediaStore re-indexes.
+ * Result of a save attempt. Carries both the absolute filesystem path (for clipboard
+ * paste into terminal CLIs and for in-app navigation) and the MediaStore content URI
+ * (required by `ClipData.newUri` so receiving apps get a read grant — a filesystem path
+ * or unscoped FileProvider URI would be unreadable to most paste targets).
  */
-data class EditorSaveResult(val absolutePath: String)
+data class EditorSaveResult(val absolutePath: String, val contentUri: Uri?)
 
 object ImageEditorUtil {
 
@@ -64,7 +66,7 @@ object ImageEditorUtil {
             val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())
             val fileName = "${baseName}_edited_$timeStamp.$ext"
 
-            val savedAbsolutePath = saveBitmap(
+            val saved = saveBitmap(
                 context = context,
                 bitmap = rendered,
                 originalPath = originalPath,
@@ -73,7 +75,7 @@ object ImageEditorUtil {
                 format = format
             ) ?: return@withContext null
 
-            EditorSaveResult(savedAbsolutePath)
+            EditorSaveResult(saved.first, saved.second)
         } finally {
             rendered.recycle()
         }
@@ -253,7 +255,9 @@ object ImageEditorUtil {
     /**
      * Save [bitmap] beside the original when possible, falling back to Pictures/PicPath.
      * Uses MediaStore so the row is queryable immediately (no MediaScanner round-trip).
-     * Returns the absolute filesystem path of the saved file, or null on failure.
+     * Returns (absolute filesystem path, MediaStore content URI), or null on failure.
+     * The URI may be null on the pre-Q file fallback if the MediaStore insert failed but
+     * the file write succeeded — callers should treat null URI as "Copy Image not available".
      */
     private fun saveBitmap(
         context: Context,
@@ -262,7 +266,7 @@ object ImageEditorUtil {
         fileName: String,
         mime: String,
         format: Bitmap.CompressFormat
-    ): String? {
+    ): Pair<String, Uri?>? {
         val originalParent = File(originalPath).parentFile
         val externalRoot = Environment.getExternalStorageDirectory().absolutePath.trimEnd('/')
 
@@ -296,7 +300,7 @@ object ImageEditorUtil {
         mime: String,
         format: Bitmap.CompressFormat,
         relativePath: String
-    ): String? {
+    ): Pair<String, Uri?>? {
         val resolver = context.contentResolver
         val collection = MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
         val values = ContentValues().apply {
@@ -318,9 +322,10 @@ object ImageEditorUtil {
             resolver.update(uri, done, null, null)
 
             // Resolve absolute path back from MediaStore for clipboard + navigation.
-            resolver.query(uri, arrayOf(MediaStore.MediaColumns.DATA), null, null, null)?.use { c ->
+            val path = resolver.query(uri, arrayOf(MediaStore.MediaColumns.DATA), null, null, null)?.use { c ->
                 if (c.moveToFirst()) c.getString(0) else null
-            }
+            } ?: return null
+            path to uri
         } catch (t: Throwable) {
             try { resolver.delete(uri, null, null) } catch (_: Throwable) {}
             null
@@ -333,7 +338,7 @@ object ImageEditorUtil {
         fileName: String,
         format: Bitmap.CompressFormat,
         context: Context
-    ): String? {
+    ): Pair<String, Uri?>? {
         return try {
             if (!parentDir.exists()) parentDir.mkdirs()
             val file = File(parentDir, fileName)
@@ -349,8 +354,10 @@ object ImageEditorUtil {
                     if (format == Bitmap.CompressFormat.PNG) "image/png" else "image/jpeg"
                 )
             }
-            context.contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
-            file.absolutePath
+            val mediaUri = context.contentResolver.insert(
+                MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values
+            )
+            file.absolutePath to mediaUri
         } catch (t: Throwable) {
             null
         }

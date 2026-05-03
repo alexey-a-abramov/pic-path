@@ -32,6 +32,22 @@
             android:exported="false"
             android:theme="@style/Theme.ImageViewer" />
 
+        <!-- Standalone editor entry. Listed in "Edit with…" menus from any app
+             that exposes an image via ACTION_EDIT (gallery, file manager, etc.).
+             noHistory keeps it from polluting the caller's back stack. -->
+        <activity
+            android:name=".ui.ImageEditorActivity"
+            android:exported="true"
+            android:label="@string/edit_image"
+            android:noHistory="true"
+            android:theme="@style/Theme.ImageViewer">
+            <intent-filter>
+                <action android:name="android.intent.action.EDIT" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="image/*" />
+            </intent-filter>
+        </activity>
+
         <activity
             android:name=".MainActivity"
             android:exported="true"

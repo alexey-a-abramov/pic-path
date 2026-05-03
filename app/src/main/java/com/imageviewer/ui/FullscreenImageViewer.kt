@@ -18,6 +18,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -96,9 +97,9 @@ fun FullscreenImageViewer(
             ImageEditor(
                 imageUri = editingImage!!.uri,
                 imagePath = editingImage!!.path,
-                onSave = { newPath ->
+                onSave = { result ->
                     onRefresh()
-                    onEditSaved(newPath)
+                    onEditSaved(result.absolutePath)
                     editingImage = null
                 },
                 onCancel = { editingImage = null }
@@ -232,6 +233,27 @@ fun FullscreenImageViewer(
                                 modifier = Modifier.size(24.dp)
                             )
                         }
+                        // Copy image content (bitmap reference, for paste into chats / docs).
+                        IconButton(
+                            onClick = {
+                                runCatching { Uri.parse(current.uri) }.getOrNull()?.let { contentUri ->
+                                    ClipboardHelper.copyImageToClipboard(
+                                        context = context,
+                                        uri = contentUri,
+                                        mimeType = current.mimeType.ifBlank { "image/*" }
+                                    )
+                                }
+                            }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Image,
+                                contentDescription = "Copy image",
+                                tint = Color.White,
+                                modifier = Modifier.size(24.dp)
+                            )
+                        }
+                        // Copy path (the original action — keeps existing icon as the
+                        // user's primary muscle-memory affordance).
                         IconButton(
                             onClick = {
                                 ClipboardHelper.copyToClipboard(context, current.path)
