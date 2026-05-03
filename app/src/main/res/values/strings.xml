@@ -99,6 +99,7 @@
     <string name="edit">Edit</string>
     <string name="crop">Crop</string>
     <string name="arrow">Arrow</string>
+    <string name="freehand">Freehand</string>
     <string name="text">Text</string>
     <string name="undo">Undo</string>
     <string name="done">Done</string>

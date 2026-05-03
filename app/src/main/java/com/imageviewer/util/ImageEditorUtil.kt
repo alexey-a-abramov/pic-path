@@ -5,13 +5,14 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Canvas
-import android.graphics.Color
 import android.graphics.Paint
+import android.graphics.Path as AndroidPath
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.IntSize
 import com.imageviewer.ui.components.Annotation
 import kotlinx.coroutines.Dispatchers
@@ -148,24 +149,44 @@ object ImageEditorUtil {
         val offsetY = (viewH - bmpH * scale) / 2f
 
         val basePaint = Paint().apply {
-            color = Color.RED
             isAntiAlias = true
             strokeWidth = 10f / scale
             textSize = 60f / scale
             style = Paint.Style.STROKE
+            strokeCap = Paint.Cap.ROUND
+            strokeJoin = Paint.Join.ROUND
         }
         annotations.forEach { ann ->
             when (ann) {
-                is Annotation.Arrow -> drawArrowOnCanvas(
-                    canvas,
-                    (ann.start.x - offsetX) / scale,
-                    (ann.start.y - offsetY) / scale,
-                    (ann.end.x - offsetX) / scale,
-                    (ann.end.y - offsetY) / scale,
-                    basePaint
-                )
+                is Annotation.Arrow -> {
+                    val p = Paint(basePaint).apply { color = ann.color.toArgb() }
+                    drawArrowOnCanvas(
+                        canvas,
+                        (ann.start.x - offsetX) / scale,
+                        (ann.start.y - offsetY) / scale,
+                        (ann.end.x - offsetX) / scale,
+                        (ann.end.y - offsetY) / scale,
+                        p
+                    )
+                }
+                is Annotation.Stroke -> {
+                    if (ann.points.size < 2) return@forEach
+                    val path = AndroidPath()
+                    val first = ann.points[0]
+                    path.moveTo((first.x - offsetX) / scale, (first.y - offsetY) / scale)
+                    for (i in 1 until ann.points.size) {
+                        val p = ann.points[i]
+                        path.lineTo((p.x - offsetX) / scale, (p.y - offsetY) / scale)
+                    }
+                    val strokePaint = Paint(basePaint).apply {
+                        color = ann.color.toArgb()
+                        style = Paint.Style.STROKE
+                    }
+                    canvas.drawPath(path, strokePaint)
+                }
                 is Annotation.Text -> {
                     val textPaint = Paint(basePaint).apply {
+                        color = ann.color.toArgb()
                         style = Paint.Style.FILL
                         isFakeBoldText = true
                     }

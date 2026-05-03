@@ -3,14 +3,21 @@ package com.imageviewer.ui.components
 import android.net.Uri
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowOutward
+import androidx.compose.material.icons.filled.Brush
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Crop
@@ -35,12 +42,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathFillType
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.nativeCanvas
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -61,9 +72,22 @@ import kotlin.math.sin
 sealed class Annotation {
     data class Arrow(val start: Offset, val end: Offset, val color: Color = Color.Red) : Annotation()
     data class Text(val position: Offset, val text: String, val color: Color = Color.Red) : Annotation()
+    data class Stroke(val points: List<Offset>, val color: Color = Color.Red) : Annotation()
 }
 
-private enum class EditMode { None, Crop, Arrow, Text }
+private enum class EditMode { None, Crop, Arrow, Text, Freehand }
+
+/** Palette shown above the toolbar when an annotation tool is active. */
+private val ANNOTATION_PALETTE = listOf(
+    Color(0xFFE53935), // red
+    Color(0xFFFF9800), // orange
+    Color(0xFFFFEB3B), // yellow
+    Color(0xFF43A047), // green
+    Color(0xFF1E88E5), // blue
+    Color(0xFFD81B60), // pink
+    Color.Black,
+    Color.White
+)
 private enum class Handle {
     TopLeft, TopRight, BottomLeft, BottomRight,
     Top, Bottom, Left, Right,
@@ -82,12 +106,16 @@ fun ImageEditor(
     val annotations = remember { mutableStateListOf<Annotation>() }
     var currentArrowStart by remember { mutableStateOf<Offset?>(null) }
     var currentArrowEnd by remember { mutableStateOf<Offset?>(null) }
+    val currentStroke = remember { mutableStateListOf<Offset>() }
 
     var cropRect by remember { mutableStateOf<Rect?>(null) }
     var draggingHandle by remember { mutableStateOf<Handle?>(null) }
 
     var textEntryPosition by remember { mutableStateOf<Offset?>(null) }
     var textEntryValue by remember { mutableStateOf("") }
+
+    /** Active color for new arrows / text / strokes. */
+    var currentColor by remember { mutableStateOf(ANNOTATION_PALETTE[0]) }
 
     var saving by remember { mutableStateOf(false) }
 
@@ -119,9 +147,24 @@ fun ImageEditor(
                             onDragEnd = {
                                 val s = currentArrowStart
                                 val e = currentArrowEnd
-                                if (s != null && e != null) annotations.add(Annotation.Arrow(s, e))
+                                if (s != null && e != null) {
+                                    annotations.add(Annotation.Arrow(s, e, currentColor))
+                                }
                                 currentArrowStart = null
                                 currentArrowEnd = null
+                            }
+                        )
+                        EditMode.Freehand -> detectDragGestures(
+                            onDragStart = { offset ->
+                                currentStroke.clear()
+                                currentStroke.add(offset)
+                            },
+                            onDrag = { change, _ -> currentStroke.add(change.position) },
+                            onDragEnd = {
+                                if (currentStroke.size > 1) {
+                                    annotations.add(Annotation.Stroke(currentStroke.toList(), currentColor))
+                                }
+                                currentStroke.clear()
                             }
                         )
                         EditMode.Text -> detectTapGestures { offset ->
@@ -172,12 +215,13 @@ fun ImageEditor(
             annotations.forEach { ann ->
                 when (ann) {
                     is Annotation.Arrow -> drawArrow(ann.start, ann.end, ann.color)
+                    is Annotation.Stroke -> drawStroke(ann.points, ann.color)
                     is Annotation.Text -> drawContext.canvas.nativeCanvas.drawText(
                         ann.text,
                         ann.position.x,
                         ann.position.y,
                         android.graphics.Paint().apply {
-                            color = android.graphics.Color.RED
+                            color = ann.color.toArgb()
                             textSize = 60f
                             isFakeBoldText = true
                         }
@@ -185,7 +229,10 @@ fun ImageEditor(
                 }
             }
             if (currentArrowStart != null && currentArrowEnd != null) {
-                drawArrow(currentArrowStart!!, currentArrowEnd!!, Color.Red.copy(alpha = 0.5f))
+                drawArrow(currentArrowStart!!, currentArrowEnd!!, currentColor.copy(alpha = 0.5f))
+            }
+            if (currentStroke.size > 1) {
+                drawStroke(currentStroke.toList(), currentColor.copy(alpha = 0.7f))
             }
             cropRect?.let { rect ->
                 val normalized = normalize(rect)
@@ -284,58 +331,79 @@ fun ImageEditor(
             }
         }
 
-        Row(
-            modifier = Modifier.align(Alignment.BottomCenter).padding(16.dp).background(Color.Black.copy(alpha = 0.5f)),
-            verticalAlignment = Alignment.CenterVertically
+        Column(
+            modifier = Modifier.align(Alignment.BottomCenter).padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            ToolbarToggle(
-                icon = Icons.Default.Crop,
-                label = stringResource(R.string.crop),
-                selected = mode == EditMode.Crop,
-                enabled = !saving,
-                onClick = {
-                    mode = EditMode.Crop
-                    if (cropRect == null && viewSize != IntSize.Zero) {
-                        cropRect = defaultCropRect(viewSize)
-                    }
-                }
-            )
-            ToolbarToggle(
-                icon = Icons.Default.ArrowOutward,
-                label = stringResource(R.string.arrow),
-                selected = mode == EditMode.Arrow,
-                enabled = !saving,
-                onClick = { mode = EditMode.Arrow }
-            )
-            ToolbarToggle(
-                icon = Icons.Default.FormatSize,
-                label = stringResource(R.string.text),
-                selected = mode == EditMode.Text,
-                enabled = !saving,
-                onClick = { mode = EditMode.Text }
-            )
-            IconButton(
-                enabled = !saving,
-                onClick = {
-                    if (saving || viewSize == IntSize.Zero) return@IconButton
-                    saving = true
-                    val finalCrop = cropRect?.let { normalize(it) }
-                    val snapshotAnnotations = annotations.toList()
-                    scope.launch {
-                        val result = ImageEditorUtil.saveEditedCopy(
-                            context = context,
-                            originalUri = parsedUri,
-                            originalPath = imagePath,
-                            cropRect = finalCrop,
-                            annotations = snapshotAnnotations,
-                            viewSize = viewSize
-                        )
-                        saving = false
-                        if (result != null) onSave(result.absolutePath)
-                    }
-                }
+            // Color palette is only relevant for color-bearing tools.
+            if (mode == EditMode.Arrow || mode == EditMode.Text || mode == EditMode.Freehand) {
+                ColorPaletteRow(
+                    selected = currentColor,
+                    onSelect = { currentColor = it }
+                )
+            }
+            Row(
+                modifier = Modifier
+                    .background(Color.Black.copy(alpha = 0.5f)),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(Icons.Default.Check, contentDescription = stringResource(R.string.done), tint = Color.Green)
+                ToolbarToggle(
+                    icon = Icons.Default.Crop,
+                    label = stringResource(R.string.crop),
+                    selected = mode == EditMode.Crop,
+                    enabled = !saving,
+                    onClick = {
+                        mode = EditMode.Crop
+                        if (cropRect == null && viewSize != IntSize.Zero) {
+                            cropRect = defaultCropRect(viewSize)
+                        }
+                    }
+                )
+                ToolbarToggle(
+                    icon = Icons.Default.ArrowOutward,
+                    label = stringResource(R.string.arrow),
+                    selected = mode == EditMode.Arrow,
+                    enabled = !saving,
+                    onClick = { mode = EditMode.Arrow }
+                )
+                ToolbarToggle(
+                    icon = Icons.Default.Brush,
+                    label = stringResource(R.string.freehand),
+                    selected = mode == EditMode.Freehand,
+                    enabled = !saving,
+                    onClick = { mode = EditMode.Freehand }
+                )
+                ToolbarToggle(
+                    icon = Icons.Default.FormatSize,
+                    label = stringResource(R.string.text),
+                    selected = mode == EditMode.Text,
+                    enabled = !saving,
+                    onClick = { mode = EditMode.Text }
+                )
+                IconButton(
+                    enabled = !saving,
+                    onClick = {
+                        if (saving || viewSize == IntSize.Zero) return@IconButton
+                        saving = true
+                        val finalCrop = cropRect?.let { normalize(it) }
+                        val snapshotAnnotations = annotations.toList()
+                        scope.launch {
+                            val result = ImageEditorUtil.saveEditedCopy(
+                                context = context,
+                                originalUri = parsedUri,
+                                originalPath = imagePath,
+                                cropRect = finalCrop,
+                                annotations = snapshotAnnotations,
+                                viewSize = viewSize
+                            )
+                            saving = false
+                            if (result != null) onSave(result.absolutePath)
+                        }
+                    }
+                ) {
+                    Icon(Icons.Default.Check, contentDescription = stringResource(R.string.done), tint = Color.Green)
+                }
             }
         }
 
@@ -438,4 +506,47 @@ private fun androidx.compose.ui.graphics.drawscope.DrawScope.drawArrow(
     val p2 = Offset(end.x - arrowSize * cos(angle + 0.5f), end.y - arrowSize * sin(angle + 0.5f))
     drawLine(color = color, start = end, end = p1, strokeWidth = strokeWidth)
     drawLine(color = color, start = end, end = p2, strokeWidth = strokeWidth)
+}
+
+private fun androidx.compose.ui.graphics.drawscope.DrawScope.drawStroke(
+    points: List<Offset>,
+    color: Color
+) {
+    if (points.size < 2) return
+    val path = Path().apply {
+        moveTo(points[0].x, points[0].y)
+        for (i in 1 until points.size) lineTo(points[i].x, points[i].y)
+    }
+    drawPath(
+        path = path,
+        color = color,
+        style = Stroke(width = 8f, cap = StrokeCap.Round, join = StrokeJoin.Round)
+    )
+}
+
+@Composable
+private fun ColorPaletteRow(selected: Color, onSelect: (Color) -> Unit) {
+    Row(
+        modifier = Modifier
+            .background(Color.Black.copy(alpha = 0.5f))
+            .padding(horizontal = 8.dp, vertical = 6.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        ANNOTATION_PALETTE.forEach { c ->
+            val isSelected = c == selected
+            Box(
+                modifier = Modifier
+                    .size(if (isSelected) 32.dp else 24.dp)
+                    .clip(CircleShape)
+                    .background(c)
+                    .border(
+                        width = if (isSelected) 3.dp else 1.dp,
+                        color = if (isSelected) Color.White else Color.White.copy(alpha = 0.5f),
+                        shape = CircleShape
+                    )
+                    .clickable { onSelect(c) }
+            )
+        }
+    }
 }
