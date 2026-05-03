@@ -41,4 +41,73 @@
     <string name="language">Sprache</string>
     <string name="system_language">Systemsprache (Standard)</string>
     <string name="select_language">Sprache wählen</string>
+
+    <!-- Browse modes / search / permissions -->
+    <string name="mode_images">Bilder</string>
+    <string name="mode_all_files">Dateien</string>
+    <string name="mode_folders">Ordner</string>
+    <string name="select_browse_mode">Browse-Modus auswählen</string>
+    <string name="search_hint_files">Dateien suchen (* und ? möglich)…</string>
+    <string name="search_hint_folders">Ordner suchen…</string>
+    <string name="all_files_permission_required">Dateien-Modus benötigt Speicherzugriff</string>
+    <string name="grant">Erteilen</string>
+    <string name="no_files_found">Keine Dateien gefunden</string>
+    <string name="no_path_for_shared_file">Für dieses geteilte Element ist kein Dateipfad verfügbar</string>
+
+    <!-- Clipboard actions -->
+    <string name="image_copied">Bild in die Zwischenablage kopiert</string>
+    <string name="copy_path">Pfad kopieren</string>
+    <string name="copy_image">Bild kopieren</string>
+    <string name="edit_image_chooser_title">Bearbeitung gespeichert. Kopieren:</string>
+    <string name="done_action">Fertig</string>
+
+    <!-- Selection mode -->
+    <string name="selection_mode">%1$d ausgewählt</string>
+    <string name="clear">Leeren</string>
+    <string name="copy_selected">%1$d Pfade kopieren</string>
+    <string name="copy_selected_fmt">%1$d Pfade kopieren · %2$s</string>
+    <string name="fmt_tag_space">Leerzeichen</string>
+    <string name="fmt_tag_comma">Komma</string>
+    <string name="fmt_tag_semicolon">Semikolon</string>
+    <string name="fmt_tag_at">@-Präfix</string>
+    <string name="multiple_paths_copied">%1$d Pfade kopiert (durch Leerzeichen getrennt)</string>
+    <string name="select_mode">Mehrere auswählen</string>
+    <string name="select_all">Alle auswählen</string>
+    <string name="exit_selection">Auswahl beenden</string>
+
+    <!-- Settings -->
+    <string name="settings">Einstellungen</string>
+    <string name="multi_copy_format_title">Format für mehrere Bilder in der Zwischenablage</string>
+    <string name="multi_copy_format_subtitle">Wie mehrere ausgewählte Pfade beim Kopieren verbunden werden. Einzelkopien sind nicht betroffen.</string>
+    <string name="fmt_space_title">Durch Leerzeichen getrennt (Standard)</string>
+    <string name="fmt_space_subtitle">Universell: Claude / Gemini / Codex auf Termux erkennen es automatisch.</string>
+    <string name="fmt_comma_title">Durch Komma getrennt</string>
+    <string name="fmt_comma_subtitle">Besser lesbar; Claude Code hängt es möglicherweise nicht automatisch als Bilder an.</string>
+    <string name="fmt_semicolon_title">Durch Semikolon getrennt</string>
+    <string name="fmt_semicolon_subtitle">Wie Komma; nützlich, wenn Dateinamen bereits Kommas enthalten.</string>
+    <string name="fmt_at_title">@-Präfix (nur Claude Code)</string>
+    <string name="fmt_at_subtitle">Erzwingt die Anhang-Syntax von Claude Code. Funktioniert nicht mit Gemini CLI / Codex.</string>
+    <string name="folder_trailing_slash_title">Ordnerpfade enden mit /</string>
+    <string name="folder_trailing_slash_subtitle">Beim Kopieren von Ordnerpfaden einen Schrägstrich anhängen. Aus = nackter Pfad.</string>
+    <string name="share_opens_viewer_title">Teilen öffnet Detailansicht</string>
+    <string name="share_opens_viewer_subtitle">Aus (Standard): Beim Teilen eines Bildes wird nur der Pfad kopiert und geschlossen. Ein: Öffnet den Editor zum Zuschneiden / Annotieren / Weiterleiten.</string>
+
+    <!-- Crash Activity -->
+    <string name="app_crashed">App wurde beendet</string>
+    <string name="error_report">Fehlerbericht</string>
+    <string name="copy_stacktrace">Stacktrace kopieren</string>
+    <string name="restart_app">App neu starten</string>
+
+    <!-- Image Editor -->
+    <string name="edit">Bearbeiten</string>
+    <string name="crop">Zuschneiden</string>
+    <string name="arrow">Pfeil</string>
+    <string name="freehand">Freihand</string>
+    <string name="text">Text</string>
+    <string name="undo">Rückgängig</string>
+    <string name="done">Fertig</string>
+    <string name="cancel">Abbrechen</string>
+    <string name="enter_text_placeholder">Text eingeben</string>
+    <string name="add_text">Text hinzufügen</string>
+    <string name="edit_image">Bild bearbeiten</string>
 </resources>

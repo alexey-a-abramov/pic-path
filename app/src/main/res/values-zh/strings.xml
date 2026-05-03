@@ -41,4 +41,73 @@
     <string name="language">语言</string>
     <string name="system_language">系统语言 (默认)</string>
     <string name="select_language">选择语言</string>
+
+    <!-- 浏览模式 / 搜索 / 权限 -->
+    <string name="mode_images">图片</string>
+    <string name="mode_all_files">文件</string>
+    <string name="mode_folders">文件夹</string>
+    <string name="select_browse_mode">选择浏览模式</string>
+    <string name="search_hint_files">搜索文件 (可使用 * 和 ?)…</string>
+    <string name="search_hint_folders">搜索文件夹…</string>
+    <string name="all_files_permission_required">「文件」模式需要存储访问权限</string>
+    <string name="grant">授予</string>
+    <string name="no_files_found">未找到文件</string>
+    <string name="no_path_for_shared_file">此共享项没有可用的文件系统路径</string>
+
+    <!-- 剪贴板操作 -->
+    <string name="image_copied">图片已复制到剪贴板</string>
+    <string name="copy_path">复制路径</string>
+    <string name="copy_image">复制图片</string>
+    <string name="edit_image_chooser_title">已保存编辑。复制：</string>
+    <string name="done_action">完成</string>
+
+    <!-- 选择模式 -->
+    <string name="selection_mode">已选 %1$d 项</string>
+    <string name="clear">清除</string>
+    <string name="copy_selected">复制 %1$d 个路径</string>
+    <string name="copy_selected_fmt">复制 %1$d 个路径 · %2$s</string>
+    <string name="fmt_tag_space">空格分隔</string>
+    <string name="fmt_tag_comma">逗号分隔</string>
+    <string name="fmt_tag_semicolon">分号分隔</string>
+    <string name="fmt_tag_at">@ 前缀</string>
+    <string name="multiple_paths_copied">已复制 %1$d 个路径（用空格分隔）</string>
+    <string name="select_mode">多选</string>
+    <string name="select_all">全选</string>
+    <string name="exit_selection">退出选择</string>
+
+    <!-- 设置 -->
+    <string name="settings">设置</string>
+    <string name="multi_copy_format_title">多图剪贴板格式</string>
+    <string name="multi_copy_format_subtitle">复制多个所选路径时的拼接方式。单项复制不受影响。</string>
+    <string name="fmt_space_title">空格分隔（默认）</string>
+    <string name="fmt_space_subtitle">通用：在 Termux 上自动适配 Claude / Gemini / Codex。</string>
+    <string name="fmt_comma_title">逗号分隔</string>
+    <string name="fmt_comma_subtitle">更易读；Claude Code 可能不会自动作为图片附件识别。</string>
+    <string name="fmt_semicolon_title">分号分隔</string>
+    <string name="fmt_semicolon_subtitle">与逗号类似；当文件名本身包含逗号时很有用。</string>
+    <string name="fmt_at_title">@ 前缀（仅限 Claude Code）</string>
+    <string name="fmt_at_subtitle">强制使用 Claude Code 的附件语法。会破坏 Gemini CLI / Codex。</string>
+    <string name="folder_trailing_slash_title">文件夹路径以 / 结尾</string>
+    <string name="folder_trailing_slash_subtitle">复制文件夹路径时附加结尾斜杠。关闭则为不带斜杠的路径。</string>
+    <string name="share_opens_viewer_title">分享时打开详情视图</string>
+    <string name="share_opens_viewer_subtitle">关闭（默认）：分享图片时仅复制路径并关闭。开启：打开编辑器以裁剪 / 标注 / 再次分享。</string>
+
+    <!-- 崩溃页面 -->
+    <string name="app_crashed">应用已停止</string>
+    <string name="error_report">错误报告</string>
+    <string name="copy_stacktrace">复制堆栈跟踪</string>
+    <string name="restart_app">重启应用</string>
+
+    <!-- 图片编辑器 -->
+    <string name="edit">编辑</string>
+    <string name="crop">裁剪</string>
+    <string name="arrow">箭头</string>
+    <string name="freehand">自由绘制</string>
+    <string name="text">文本</string>
+    <string name="undo">撤销</string>
+    <string name="done">完成</string>
+    <string name="cancel">取消</string>
+    <string name="enter_text_placeholder">输入文本</string>
+    <string name="add_text">添加文本</string>
+    <string name="edit_image">编辑图片</string>
 </resources>

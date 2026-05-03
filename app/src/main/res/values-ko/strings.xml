@@ -41,4 +41,73 @@
     <string name="language">언어</string>
     <string name="system_language">시스템 언어 (기본값)</string>
     <string name="select_language">언어 선택</string>
+
+    <!-- 탐색 모드 / 검색 / 권한 -->
+    <string name="mode_images">이미지</string>
+    <string name="mode_all_files">파일</string>
+    <string name="mode_folders">폴더</string>
+    <string name="select_browse_mode">탐색 모드 선택</string>
+    <string name="search_hint_files">파일 검색 (* 와 ? 사용 가능)…</string>
+    <string name="search_hint_folders">폴더 검색…</string>
+    <string name="all_files_permission_required">파일 모드는 저장소 접근 권한이 필요합니다</string>
+    <string name="grant">허용</string>
+    <string name="no_files_found">파일을 찾을 수 없습니다</string>
+    <string name="no_path_for_shared_file">이 공유 항목에 대한 파일 시스템 경로를 사용할 수 없습니다</string>
+
+    <!-- 클립보드 동작 -->
+    <string name="image_copied">이미지를 클립보드에 복사했습니다</string>
+    <string name="copy_path">경로 복사</string>
+    <string name="copy_image">이미지 복사</string>
+    <string name="edit_image_chooser_title">편집을 저장했습니다. 복사:</string>
+    <string name="done_action">완료</string>
+
+    <!-- 선택 모드 -->
+    <string name="selection_mode">%1$d개 선택됨</string>
+    <string name="clear">지우기</string>
+    <string name="copy_selected">경로 %1$d개 복사</string>
+    <string name="copy_selected_fmt">경로 %1$d개 복사 · %2$s</string>
+    <string name="fmt_tag_space">공백 구분</string>
+    <string name="fmt_tag_comma">쉼표 구분</string>
+    <string name="fmt_tag_semicolon">세미콜론 구분</string>
+    <string name="fmt_tag_at">@ 접두사</string>
+    <string name="multiple_paths_copied">경로 %1$d개를 복사했습니다 (공백 구분)</string>
+    <string name="select_mode">여러 항목 선택</string>
+    <string name="select_all">모두 선택</string>
+    <string name="exit_selection">선택 종료</string>
+
+    <!-- 설정 -->
+    <string name="settings">설정</string>
+    <string name="multi_copy_format_title">다중 이미지 클립보드 형식</string>
+    <string name="multi_copy_format_subtitle">선택한 여러 경로를 복사할 때 결합하는 방식. 단일 항목 복사에는 영향이 없습니다.</string>
+    <string name="fmt_space_title">공백 구분 (기본값)</string>
+    <string name="fmt_space_subtitle">범용: Termux 의 Claude / Gemini / Codex 가 자동 감지합니다.</string>
+    <string name="fmt_comma_title">쉼표 구분</string>
+    <string name="fmt_comma_subtitle">가독성이 더 좋습니다. Claude Code 가 이미지로 자동 첨부하지 않을 수 있습니다.</string>
+    <string name="fmt_semicolon_title">세미콜론 구분</string>
+    <string name="fmt_semicolon_subtitle">쉼표와 동일한 개념. 파일 이름에 이미 쉼표가 포함된 경우에 유용합니다.</string>
+    <string name="fmt_at_title">@ 접두사 (Claude Code 전용)</string>
+    <string name="fmt_at_subtitle">Claude Code 첨부 구문을 강제로 사용합니다. Gemini CLI / Codex 에서는 동작하지 않습니다.</string>
+    <string name="folder_trailing_slash_title">폴더 경로를 / 로 끝내기</string>
+    <string name="folder_trailing_slash_subtitle">폴더 경로를 복사할 때 끝에 슬래시를 추가합니다. 끄면 슬래시 없는 경로가 사용됩니다.</string>
+    <string name="share_opens_viewer_title">공유 시 상세 보기 열기</string>
+    <string name="share_opens_viewer_subtitle">끔 (기본값): 이미지를 공유하면 경로만 복사하고 종료합니다. 켬: 편집기를 열어 자르기 / 주석 / 다시 공유 가능.</string>
+
+    <!-- 충돌 화면 -->
+    <string name="app_crashed">앱이 중지되었습니다</string>
+    <string name="error_report">오류 보고</string>
+    <string name="copy_stacktrace">스택 트레이스 복사</string>
+    <string name="restart_app">앱 다시 시작</string>
+
+    <!-- 이미지 편집기 -->
+    <string name="edit">편집</string>
+    <string name="crop">자르기</string>
+    <string name="arrow">화살표</string>
+    <string name="freehand">자유선</string>
+    <string name="text">텍스트</string>
+    <string name="undo">실행 취소</string>
+    <string name="done">완료</string>
+    <string name="cancel">취소</string>
+    <string name="enter_text_placeholder">텍스트 입력</string>
+    <string name="add_text">텍스트 추가</string>
+    <string name="edit_image">이미지 편집</string>
 </resources>

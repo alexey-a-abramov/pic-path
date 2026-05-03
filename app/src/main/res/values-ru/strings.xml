@@ -41,4 +41,73 @@
     <string name="language">Язык</string>
     <string name="system_language">Язык системы (по умолчанию)</string>
     <string name="select_language">Выберите язык</string>
+
+    <!-- Режимы просмотра / поиск / разрешения -->
+    <string name="mode_images">Изображения</string>
+    <string name="mode_all_files">Файлы</string>
+    <string name="mode_folders">Папки</string>
+    <string name="select_browse_mode">Выбрать режим просмотра</string>
+    <string name="search_hint_files">Поиск файлов (используйте * и ?)…</string>
+    <string name="search_hint_folders">Поиск папок…</string>
+    <string name="all_files_permission_required">Режиму «Файлы» требуется доступ к хранилищу</string>
+    <string name="grant">Предоставить</string>
+    <string name="no_files_found">Файлы не найдены</string>
+    <string name="no_path_for_shared_file">Нет пути в файловой системе для этого общего элемента</string>
+
+    <!-- Действия буфера обмена -->
+    <string name="image_copied">Изображение скопировано в буфер обмена</string>
+    <string name="copy_path">Копировать путь</string>
+    <string name="copy_image">Копировать изображение</string>
+    <string name="edit_image_chooser_title">Изменения сохранены. Копировать:</string>
+    <string name="done_action">Готово</string>
+
+    <!-- Режим выбора -->
+    <string name="selection_mode">Выбрано: %1$d</string>
+    <string name="clear">Очистить</string>
+    <string name="copy_selected">Копировать %1$d путей</string>
+    <string name="copy_selected_fmt">Копировать %1$d путей · %2$s</string>
+    <string name="fmt_tag_space">через пробел</string>
+    <string name="fmt_tag_comma">через запятую</string>
+    <string name="fmt_tag_semicolon">через ;</string>
+    <string name="fmt_tag_at">префикс @</string>
+    <string name="multiple_paths_copied">Скопировано путей: %1$d (через пробел)</string>
+    <string name="select_mode">Выбрать несколько</string>
+    <string name="select_all">Выбрать все</string>
+    <string name="exit_selection">Выйти из выбора</string>
+
+    <!-- Настройки -->
+    <string name="settings">Настройки</string>
+    <string name="multi_copy_format_title">Формат буфера для нескольких изображений</string>
+    <string name="multi_copy_format_subtitle">Как объединяются несколько выбранных путей при копировании. Копирование одного элемента не затрагивается.</string>
+    <string name="fmt_space_title">Через пробел (по умолчанию)</string>
+    <string name="fmt_space_subtitle">Универсально: автоопределение Claude / Gemini / Codex в Termux.</string>
+    <string name="fmt_comma_title">Через запятую</string>
+    <string name="fmt_comma_subtitle">Более читаемо; Claude Code может не присоединить как изображения автоматически.</string>
+    <string name="fmt_semicolon_title">Через точку с запятой</string>
+    <string name="fmt_semicolon_subtitle">То же, что и запятая; полезно, когда имена файлов уже содержат запятые.</string>
+    <string name="fmt_at_title">С префиксом @ (только Claude Code)</string>
+    <string name="fmt_at_subtitle">Принудительно использует синтаксис вложений Claude Code. Ломает Gemini CLI / Codex.</string>
+    <string name="folder_trailing_slash_title">Пути папок заканчиваются на /</string>
+    <string name="folder_trailing_slash_subtitle">При копировании путей папок добавлять косую черту в конце. Выкл = чистый путь.</string>
+    <string name="share_opens_viewer_title">«Поделиться» открывает подробный вид</string>
+    <string name="share_opens_viewer_subtitle">Выкл (по умолчанию): отправка изображения просто копирует путь и закрывает приложение. Вкл: открывает редактор для обрезки / аннотирования / повторной отправки.</string>
+
+    <!-- Окно сбоя -->
+    <string name="app_crashed">Приложение остановлено</string>
+    <string name="error_report">Отчёт об ошибке</string>
+    <string name="copy_stacktrace">Копировать стек вызовов</string>
+    <string name="restart_app">Перезапустить приложение</string>
+
+    <!-- Редактор изображений -->
+    <string name="edit">Изменить</string>
+    <string name="crop">Обрезать</string>
+    <string name="arrow">Стрелка</string>
+    <string name="freehand">От руки</string>
+    <string name="text">Текст</string>
+    <string name="undo">Отменить</string>
+    <string name="done">Готово</string>
+    <string name="cancel">Отмена</string>
+    <string name="enter_text_placeholder">Введите текст</string>
+    <string name="add_text">Добавить текст</string>
+    <string name="edit_image">Изменить изображение</string>
 </resources>

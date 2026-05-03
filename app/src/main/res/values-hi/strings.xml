@@ -41,4 +41,73 @@
     <string name="language">भाषा</string>
     <string name="system_language">सिस्टम भाषा (डिफ़ॉल्ट)</string>
     <string name="select_language">भाषा चुनें</string>
+
+    <!-- ब्राउज़ मोड / खोज / अनुमतियाँ -->
+    <string name="mode_images">छवियाँ</string>
+    <string name="mode_all_files">फ़ाइलें</string>
+    <string name="mode_folders">फ़ोल्डर</string>
+    <string name="select_browse_mode">ब्राउज़ मोड चुनें</string>
+    <string name="search_hint_files">फ़ाइलें खोजें (* और ? का उपयोग करें)…</string>
+    <string name="search_hint_folders">फ़ोल्डर खोजें…</string>
+    <string name="all_files_permission_required">फ़ाइलें मोड के लिए स्टोरेज एक्सेस चाहिए</string>
+    <string name="grant">अनुमति दें</string>
+    <string name="no_files_found">कोई फ़ाइल नहीं मिली</string>
+    <string name="no_path_for_shared_file">इस साझा आइटम के लिए कोई फ़ाइल पथ उपलब्ध नहीं है</string>
+
+    <!-- क्लिपबोर्ड क्रियाएँ -->
+    <string name="image_copied">छवि क्लिपबोर्ड पर कॉपी हुई</string>
+    <string name="copy_path">पथ कॉपी करें</string>
+    <string name="copy_image">छवि कॉपी करें</string>
+    <string name="edit_image_chooser_title">संपादन सहेजा गया। कॉपी करें:</string>
+    <string name="done_action">पूर्ण</string>
+
+    <!-- चयन मोड -->
+    <string name="selection_mode">%1$d चयनित</string>
+    <string name="clear">साफ़ करें</string>
+    <string name="copy_selected">%1$d पथ कॉपी करें</string>
+    <string name="copy_selected_fmt">%1$d पथ कॉपी करें · %2$s</string>
+    <string name="fmt_tag_space">स्पेस-सेप</string>
+    <string name="fmt_tag_comma">कॉमा-सेप</string>
+    <string name="fmt_tag_semicolon">सेमीकोलन-सेप</string>
+    <string name="fmt_tag_at">@-उपसर्ग</string>
+    <string name="multiple_paths_copied">%1$d पथ कॉपी हुए (स्पेस से अलग)</string>
+    <string name="select_mode">एकाधिक चुनें</string>
+    <string name="select_all">सभी चुनें</string>
+    <string name="exit_selection">चयन से बाहर निकलें</string>
+
+    <!-- सेटिंग्स -->
+    <string name="settings">सेटिंग्स</string>
+    <string name="multi_copy_format_title">एकाधिक छवि क्लिपबोर्ड फ़ॉर्मेट</string>
+    <string name="multi_copy_format_subtitle">कई चयनित पथों को कॉपी करते समय कैसे जोड़ा जाता है। एकल आइटम कॉपी पर असर नहीं होता।</string>
+    <string name="fmt_space_title">स्पेस से अलग (डिफ़ॉल्ट)</string>
+    <string name="fmt_space_subtitle">सार्वभौमिक: Termux पर Claude / Gemini / Codex स्वतः पहचान।</string>
+    <string name="fmt_comma_title">कॉमा से अलग</string>
+    <string name="fmt_comma_subtitle">अधिक पठनीय; Claude Code छवियों के रूप में स्वतः नहीं जोड़ सकता।</string>
+    <string name="fmt_semicolon_title">सेमीकोलन से अलग</string>
+    <string name="fmt_semicolon_subtitle">कॉमा जैसा ही; जब फ़ाइल नामों में पहले से कॉमा हों तब उपयोगी।</string>
+    <string name="fmt_at_title">@-उपसर्ग (केवल Claude Code)</string>
+    <string name="fmt_at_subtitle">Claude Code के अटैच सिंटैक्स को बाध्य करता है। Gemini CLI / Codex को तोड़ता है।</string>
+    <string name="folder_trailing_slash_title">फ़ोल्डर पथ / से समाप्त होते हैं</string>
+    <string name="folder_trailing_slash_subtitle">फ़ोल्डर पथ कॉपी करते समय अंत में स्लैश जोड़ें। बंद = बिना स्लैश का पथ।</string>
+    <string name="share_opens_viewer_title">शेयर पर विस्तृत दृश्य खुले</string>
+    <string name="share_opens_viewer_subtitle">बंद (डिफ़ॉल्ट): छवि शेयर करने पर केवल पथ कॉपी होकर बंद हो जाता है। चालू: संपादक खुलता है — क्रॉप / एनोटेट / आगे शेयर करने के लिए।</string>
+
+    <!-- क्रैश गतिविधि -->
+    <string name="app_crashed">ऐप बंद हो गया है</string>
+    <string name="error_report">त्रुटि रिपोर्ट</string>
+    <string name="copy_stacktrace">स्टैकट्रेस कॉपी करें</string>
+    <string name="restart_app">ऐप पुनः आरंभ करें</string>
+
+    <!-- छवि संपादक -->
+    <string name="edit">संपादित</string>
+    <string name="crop">क्रॉप</string>
+    <string name="arrow">तीर</string>
+    <string name="freehand">फ़्रीहैंड</string>
+    <string name="text">टेक्स्ट</string>
+    <string name="undo">पूर्ववत करें</string>
+    <string name="done">पूर्ण</string>
+    <string name="cancel">रद्द करें</string>
+    <string name="enter_text_placeholder">टेक्स्ट दर्ज करें</string>
+    <string name="add_text">टेक्स्ट जोड़ें</string>
+    <string name="edit_image">छवि संपादित करें</string>
 </resources>

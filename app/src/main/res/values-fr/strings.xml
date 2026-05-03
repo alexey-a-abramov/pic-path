@@ -41,4 +41,73 @@
     <string name="language">Langue</string>
     <string name="system_language">Langue du système (Par défaut)</string>
     <string name="select_language">Choisir la langue</string>
+
+    <!-- Modes de navigation / recherche / autorisations -->
+    <string name="mode_images">Images</string>
+    <string name="mode_all_files">Fichiers</string>
+    <string name="mode_folders">Dossiers</string>
+    <string name="select_browse_mode">Sélectionner le mode de navigation</string>
+    <string name="search_hint_files">Rechercher des fichiers (utilisez * et ?)…</string>
+    <string name="search_hint_folders">Rechercher des dossiers…</string>
+    <string name="all_files_permission_required">Le mode Fichiers nécessite l\'accès au stockage</string>
+    <string name="grant">Accorder</string>
+    <string name="no_files_found">Aucun fichier trouvé</string>
+    <string name="no_path_for_shared_file">Aucun chemin de fichier disponible pour cet élément partagé</string>
+
+    <!-- Actions du presse-papiers -->
+    <string name="image_copied">Image copiée dans le presse-papiers</string>
+    <string name="copy_path">Copier le chemin</string>
+    <string name="copy_image">Copier l\'image</string>
+    <string name="edit_image_chooser_title">Modification enregistrée. Copier :</string>
+    <string name="done_action">Terminé</string>
+
+    <!-- Mode de sélection -->
+    <string name="selection_mode">%1$d sélectionné(s)</string>
+    <string name="clear">Effacer</string>
+    <string name="copy_selected">Copier %1$d chemins</string>
+    <string name="copy_selected_fmt">Copier %1$d chemins · %2$s</string>
+    <string name="fmt_tag_space">espaces</string>
+    <string name="fmt_tag_comma">virgules</string>
+    <string name="fmt_tag_semicolon">points-virgules</string>
+    <string name="fmt_tag_at">préfixe @</string>
+    <string name="multiple_paths_copied">%1$d chemins copiés (séparés par des espaces)</string>
+    <string name="select_mode">Sélectionner plusieurs</string>
+    <string name="select_all">Tout sélectionner</string>
+    <string name="exit_selection">Quitter la sélection</string>
+
+    <!-- Paramètres -->
+    <string name="settings">Paramètres</string>
+    <string name="multi_copy_format_title">Format du presse-papiers pour plusieurs images</string>
+    <string name="multi_copy_format_subtitle">Comment plusieurs chemins sélectionnés sont assemblés lors de la copie. Les copies d\'un seul élément ne sont pas affectées.</string>
+    <string name="fmt_space_title">Séparé par des espaces (par défaut)</string>
+    <string name="fmt_space_subtitle">Universel : détection automatique par Claude / Gemini / Codex sur Termux.</string>
+    <string name="fmt_comma_title">Séparé par des virgules</string>
+    <string name="fmt_comma_subtitle">Plus lisible ; Claude Code peut ne pas l\'attacher automatiquement comme images.</string>
+    <string name="fmt_semicolon_title">Séparé par des points-virgules</string>
+    <string name="fmt_semicolon_subtitle">Même idée que la virgule ; utile lorsque les noms de fichier contiennent déjà des virgules.</string>
+    <string name="fmt_at_title">Préfixé par @ (Claude Code uniquement)</string>
+    <string name="fmt_at_subtitle">Force la syntaxe d\'attachement de Claude Code. Casse Gemini CLI / Codex.</string>
+    <string name="folder_trailing_slash_title">Les chemins de dossier se terminent par /</string>
+    <string name="folder_trailing_slash_subtitle">Lors de la copie de chemins de dossier, ajouter une barre oblique finale. Désactivé = chemin nu.</string>
+    <string name="share_opens_viewer_title">Partager ouvre la vue détaillée</string>
+    <string name="share_opens_viewer_subtitle">Désactivé (par défaut) : partager une image copie simplement le chemin et ferme. Activé : ouvre l\'éditeur pour recadrer / annoter / repartager.</string>
+
+    <!-- Activité de plantage -->
+    <string name="app_crashed">L\'application s\'est arrêtée</string>
+    <string name="error_report">Rapport d\'erreur</string>
+    <string name="copy_stacktrace">Copier la trace de pile</string>
+    <string name="restart_app">Redémarrer l\'application</string>
+
+    <!-- Éditeur d\'image -->
+    <string name="edit">Modifier</string>
+    <string name="crop">Recadrer</string>
+    <string name="arrow">Flèche</string>
+    <string name="freehand">Main levée</string>
+    <string name="text">Texte</string>
+    <string name="undo">Annuler</string>
+    <string name="done">Terminé</string>
+    <string name="cancel">Annuler</string>
+    <string name="enter_text_placeholder">Saisir du texte</string>
+    <string name="add_text">Ajouter du texte</string>
+    <string name="edit_image">Modifier l\'image</string>
 </resources>

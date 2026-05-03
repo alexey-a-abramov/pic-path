@@ -41,4 +41,73 @@
     <string name="language">Dil</string>
     <string name="system_language">Sistem Dili (Varsayılan)</string>
     <string name="select_language">Dil Seçin</string>
+
+    <!-- Tarama modları / arama / izinler -->
+    <string name="mode_images">Görseller</string>
+    <string name="mode_all_files">Dosyalar</string>
+    <string name="mode_folders">Klasörler</string>
+    <string name="select_browse_mode">Tarama modunu seçin</string>
+    <string name="search_hint_files">Dosyalarda ara (* ve ? kullanın)…</string>
+    <string name="search_hint_folders">Klasörlerde ara…</string>
+    <string name="all_files_permission_required">Dosyalar modu depolama erişimi gerektirir</string>
+    <string name="grant">İzin ver</string>
+    <string name="no_files_found">Dosya bulunamadı</string>
+    <string name="no_path_for_shared_file">Paylaşılan bu öğe için kullanılabilir bir dosya yolu yok</string>
+
+    <!-- Pano işlemleri -->
+    <string name="image_copied">Görsel panoya kopyalandı</string>
+    <string name="copy_path">Yolu kopyala</string>
+    <string name="copy_image">Görseli kopyala</string>
+    <string name="edit_image_chooser_title">Düzenleme kaydedildi. Kopyala:</string>
+    <string name="done_action">Tamam</string>
+
+    <!-- Seçim modu -->
+    <string name="selection_mode">%1$d seçildi</string>
+    <string name="clear">Temizle</string>
+    <string name="copy_selected">%1$d yolu kopyala</string>
+    <string name="copy_selected_fmt">%1$d yolu kopyala · %2$s</string>
+    <string name="fmt_tag_space">boşlukla</string>
+    <string name="fmt_tag_comma">virgülle</string>
+    <string name="fmt_tag_semicolon">noktalı virgülle</string>
+    <string name="fmt_tag_at">@ öneki</string>
+    <string name="multiple_paths_copied">%1$d yol kopyalandı (boşlukla ayrılmış)</string>
+    <string name="select_mode">Birden çok seç</string>
+    <string name="select_all">Tümünü seç</string>
+    <string name="exit_selection">Seçimden çık</string>
+
+    <!-- Ayarlar -->
+    <string name="settings">Ayarlar</string>
+    <string name="multi_copy_format_title">Çoklu görsel pano biçimi</string>
+    <string name="multi_copy_format_subtitle">Seçili birden çok yolun kopyalanırken nasıl birleştirileceği. Tek öğe kopyaları etkilenmez.</string>
+    <string name="fmt_space_title">Boşlukla ayrılmış (varsayılan)</string>
+    <string name="fmt_space_subtitle">Evrensel: Termux üzerinde Claude / Gemini / Codex otomatik algılar.</string>
+    <string name="fmt_comma_title">Virgülle ayrılmış</string>
+    <string name="fmt_comma_subtitle">Daha okunaklı; Claude Code görüntü olarak otomatik eklemeyebilir.</string>
+    <string name="fmt_semicolon_title">Noktalı virgülle ayrılmış</string>
+    <string name="fmt_semicolon_subtitle">Virgül ile aynı mantık; dosya adlarında zaten virgül varsa kullanışlıdır.</string>
+    <string name="fmt_at_title">@ önekli (yalnızca Claude Code)</string>
+    <string name="fmt_at_subtitle">Claude Code ekleme sözdizimini zorlar. Gemini CLI / Codex ile çalışmaz.</string>
+    <string name="folder_trailing_slash_title">Klasör yolları / ile bitsin</string>
+    <string name="folder_trailing_slash_subtitle">Klasör yolları kopyalanırken sona eğik çizgi eklenir. Kapalı = sade yol.</string>
+    <string name="share_opens_viewer_title">Paylaş ayrıntılı görünümü açsın</string>
+    <string name="share_opens_viewer_subtitle">Kapalı (varsayılan): bir görsel paylaşıldığında yalnızca yol kopyalanır ve uygulama kapanır. Açık: kırpma / işaretleme / yeniden paylaşım için düzenleyici açılır.</string>
+
+    <!-- Çökme ekranı -->
+    <string name="app_crashed">Uygulama durdu</string>
+    <string name="error_report">Hata Raporu</string>
+    <string name="copy_stacktrace">Stack trace\'i kopyala</string>
+    <string name="restart_app">Uygulamayı yeniden başlat</string>
+
+    <!-- Görsel düzenleyici -->
+    <string name="edit">Düzenle</string>
+    <string name="crop">Kırp</string>
+    <string name="arrow">Ok</string>
+    <string name="freehand">Serbest çizim</string>
+    <string name="text">Metin</string>
+    <string name="undo">Geri al</string>
+    <string name="done">Tamam</string>
+    <string name="cancel">İptal</string>
+    <string name="enter_text_placeholder">Metin girin</string>
+    <string name="add_text">Metin ekle</string>
+    <string name="edit_image">Görseli düzenle</string>
 </resources>

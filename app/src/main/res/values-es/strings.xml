@@ -41,4 +41,73 @@
     <string name="language">Idioma</string>
     <string name="system_language">Idioma del sistema (Predeterminado)</string>
     <string name="select_language">Seleccionar Idioma</string>
+
+    <!-- Modos de exploración / búsqueda / permisos -->
+    <string name="mode_images">Imágenes</string>
+    <string name="mode_all_files">Archivos</string>
+    <string name="mode_folders">Carpetas</string>
+    <string name="select_browse_mode">Seleccionar modo de exploración</string>
+    <string name="search_hint_files">Buscar archivos (usa * y ?)…</string>
+    <string name="search_hint_folders">Buscar carpetas…</string>
+    <string name="all_files_permission_required">El modo Archivos requiere acceso al almacenamiento</string>
+    <string name="grant">Conceder</string>
+    <string name="no_files_found">No se encontraron archivos</string>
+    <string name="no_path_for_shared_file">No hay ruta de archivo disponible para este elemento compartido</string>
+
+    <!-- Acciones de portapapeles -->
+    <string name="image_copied">Imagen copiada al portapapeles</string>
+    <string name="copy_path">Copiar ruta</string>
+    <string name="copy_image">Copiar imagen</string>
+    <string name="edit_image_chooser_title">Edición guardada. Copiar:</string>
+    <string name="done_action">Listo</string>
+
+    <!-- Modo de selección -->
+    <string name="selection_mode">%1$d seleccionados</string>
+    <string name="clear">Borrar</string>
+    <string name="copy_selected">Copiar %1$d rutas</string>
+    <string name="copy_selected_fmt">Copiar %1$d rutas · %2$s</string>
+    <string name="fmt_tag_space">espacios</string>
+    <string name="fmt_tag_comma">comas</string>
+    <string name="fmt_tag_semicolon">punto y coma</string>
+    <string name="fmt_tag_at">prefijo @</string>
+    <string name="multiple_paths_copied">%1$d rutas copiadas (separadas por espacios)</string>
+    <string name="select_mode">Seleccionar varios</string>
+    <string name="select_all">Seleccionar todo</string>
+    <string name="exit_selection">Salir de la selección</string>
+
+    <!-- Ajustes -->
+    <string name="settings">Ajustes</string>
+    <string name="multi_copy_format_title">Formato del portapapeles para varias imágenes</string>
+    <string name="multi_copy_format_subtitle">Cómo se unen varias rutas seleccionadas al copiarlas. Las copias de un solo elemento no se ven afectadas.</string>
+    <string name="fmt_space_title">Separadas por espacios (predeterminado)</string>
+    <string name="fmt_space_subtitle">Universal: detección automática de Claude / Gemini / Codex en Termux.</string>
+    <string name="fmt_comma_title">Separadas por comas</string>
+    <string name="fmt_comma_subtitle">Más legible; puede que Claude Code no las adjunte automáticamente como imágenes.</string>
+    <string name="fmt_semicolon_title">Separadas por punto y coma</string>
+    <string name="fmt_semicolon_subtitle">Igual que la coma; útil cuando los nombres de archivo ya contienen comas.</string>
+    <string name="fmt_at_title">Prefijo @ (solo Claude Code)</string>
+    <string name="fmt_at_subtitle">Fuerza la sintaxis de adjuntos de Claude Code. Rompe Gemini CLI / Codex.</string>
+    <string name="folder_trailing_slash_title">Las rutas de carpeta terminan en /</string>
+    <string name="folder_trailing_slash_subtitle">Al copiar rutas de carpeta, añade una barra final. Desactivado = ruta sin barra.</string>
+    <string name="share_opens_viewer_title">Compartir abre la vista detallada</string>
+    <string name="share_opens_viewer_subtitle">Desactivado (predeterminado): compartir una imagen solo copia la ruta y cierra. Activado: abre el editor para recortar / anotar / volver a compartir.</string>
+
+    <!-- Pantalla de fallo -->
+    <string name="app_crashed">La aplicación se ha detenido</string>
+    <string name="error_report">Informe de errores</string>
+    <string name="copy_stacktrace">Copiar stacktrace</string>
+    <string name="restart_app">Reiniciar aplicación</string>
+
+    <!-- Editor de imagen -->
+    <string name="edit">Editar</string>
+    <string name="crop">Recortar</string>
+    <string name="arrow">Flecha</string>
+    <string name="freehand">Mano alzada</string>
+    <string name="text">Texto</string>
+    <string name="undo">Deshacer</string>
+    <string name="done">Listo</string>
+    <string name="cancel">Cancelar</string>
+    <string name="enter_text_placeholder">Introducir texto</string>
+    <string name="add_text">Añadir texto</string>
+    <string name="edit_image">Editar imagen</string>
 </resources>
